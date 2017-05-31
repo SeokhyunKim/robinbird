@@ -1,0 +1,24 @@
+# OS files
+*.DS_Store
+Thumbs.db
+
+# Build files
+bin
+target
+build/
+.gradle
+
+# Eclipse project files
+.classpath
+.project
+.settings
+.springBeans
+
+# Intellij IDEA files
+*.iml
+*.ipr
+*.iws
+*.idea
+
+# Autogen parser files
+src/main/java/org/robinbird/parser
