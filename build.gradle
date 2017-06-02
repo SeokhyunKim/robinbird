@@ -14,7 +14,7 @@ dependencies {
 	compile "com.google.guava:guava:22.0"
 	compile "org.apache.commons:commons-lang3:3.0"
 	//compile "com.h2database:h2"
-	compile "org.springframework.boot:spring-boot-starter-data-jpa"
+	//compile "org.springframework.boot:spring-boot-starter-data-jpa"
 	compile "org.slf4j:slf4j-simple:1.7.25" // TODO: change to other logger implementation. see http://saltnlight5.blogspot.ca/2013/08/how-to-configure-slf4j-with-different.html
 	compileOnly "org.projectlombok:lombok:1.16.16"
 	testCompile "junit:junit:4.12"

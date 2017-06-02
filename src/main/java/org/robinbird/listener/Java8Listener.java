@@ -13,6 +13,11 @@ public class Java8Listener extends org.robinbird.parser.Java8BaseListener {
 	}
 
 	@Override
+	public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
+		int tt = 0;
+	}
+
+	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
 		System.out.println(ctx.Identifier().getText());
 	}
