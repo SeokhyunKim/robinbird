@@ -4,25 +4,30 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.robinbird.presentation.PresentationType;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.robinbird.utils.Msgs.Key.PRESENTATION_OPTION_IS_NOT_VALID;
 import static org.robinbird.utils.Msgs.Key.ROOT_SOURCE_PATH_NOT_PROVIDED;
 
 /**
  * Created by seokhyun on 5/26/17.
  */
+@Slf4j
 @Getter
 @Builder
 @ToString
 public class AppArguments {
 
 	private enum ArgType {
-		ROOT1("-r"), ROOT2("--root");
+		ROOT1("-r"), ROOT2("--root"),
+		PRESENTATION1("-p"), PRESENTATION2("--presentation");
 
 		private final String name;
 		private static Map<String, ArgType> argTypeMap;
@@ -45,8 +50,14 @@ public class AppArguments {
 	@NonNull
 	private String sourceRootPath;
 
+	@NonNull
+	private PresentationType presentationType = PresentationType.PLANTUML;
+
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();
+		//default values
+		argsBuilder.presentationType(PresentationType.PLANTUML);
+		// parse parameters
 		for (int i=0; i<args.length;) {
 			ArgType at = ArgType.getArgType(args[i]);
 			if (at == null) {
@@ -58,6 +69,17 @@ public class AppArguments {
 				case ROOT2:
 					checkState(i+1<args.length, Msgs.get(ROOT_SOURCE_PATH_NOT_PROVIDED));
 					argsBuilder.sourceRootPath(args[i+1]);
+					i += 2;
+					break;
+				case PRESENTATION1:
+				case PRESENTATION2:
+					try {
+						if (i+1 >= args.length) { throw new IllegalArgumentException(); }
+						PresentationType ptype = PresentationType.valueOf(args[i + 1]);
+						argsBuilder.presentationType(ptype);
+					} catch (IllegalArgumentException e) {
+						log.info(Msgs.get(PRESENTATION_OPTION_IS_NOT_VALID, (i+1<args.length ? args[i+1] : "Not given") + " Using default value."));
+					}
 					i += 2;
 					break;
 				default:

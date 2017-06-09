@@ -6,7 +6,7 @@ repositories {
 }
 
 generateGrammarSource {
-	outputDirectory = file("src/main/java/org/robinbird/parser")
+	outputDirectory = file("src/main/java/org/robinbird/parser/java8")
 }
 
 dependencies {

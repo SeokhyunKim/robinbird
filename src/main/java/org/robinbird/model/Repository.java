@@ -33,6 +33,8 @@ public class Repository<T extends Repositable> {
 		return repositableList.get(idx);
 	}
 
+	public int size() { return repositableList.size(); }
+
 	public boolean isExisting(String name) {
 		return (repositableMap.get(name) != null);
 	}

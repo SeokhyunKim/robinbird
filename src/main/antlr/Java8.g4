@@ -53,7 +53,7 @@ Total lexer+parser time 30844ms.
  */
 grammar Java8;
 @header {
-	package org.robinbird.parser;
+	package org.robinbird.parser.java8;
 }
 
 /*

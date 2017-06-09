@@ -5,6 +5,7 @@ import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by seokhyun on 6/2/17.
@@ -13,19 +14,24 @@ import java.util.Map;
 @ToString(callSuper = true)
 public class Class extends Repositable {
 
-	private ClassType classType;
-	private Map<String, Member> memberVariables;
-	private Map<String, MemberFunction> memberFunctions;
+	private ClassType classType = ClassType.CLASS;
+	private Map<String, Member> memberVariables = new HashMap<>();
+	private TreeMap<String, MemberFunction> memberFunctions = new TreeMap<>();
 
 	public Class(String name) {
 		super(name);
-		classType = ClassType.CLASS;
-		this.memberVariables = new HashMap<String, Member>();
-		this.memberFunctions = new HashMap<String, MemberFunction>();
 	}
 
-	public Class(ClassType classType, String name) {
+	public Class(String name, ClassType classType) {
 		this(name);
 		this.classType = classType;
+	}
+
+	public void addMember(Member m) {
+		memberVariables.put(m.getName(), m);
+	}
+
+	public void addMemberFunction(MemberFunction f) {
+		memberFunctions.put(f.getName(), f);
 	}
 }

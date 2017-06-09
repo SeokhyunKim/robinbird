@@ -30,5 +30,7 @@ public class RepositoryTest {
 
 		Class cl = new Class("test");
 		assertTrue(cl.getClassType() == ClassType.CLASS);
+		assertTrue(cl.getMemberFunctions() != null);
+		assertTrue(cl.getMemberVariables() != null);
 	}
 }

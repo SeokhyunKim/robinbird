@@ -2,6 +2,13 @@ package org.robinbird.utils;
 
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.utils.Msgs.Key.ROOT_SOURCE_PATH_NOT_PROVIDED;
 
@@ -10,7 +17,7 @@ import static org.robinbird.utils.Msgs.Key.ROOT_SOURCE_PATH_NOT_PROVIDED;
  */
 public class AppArgumentsTest {
 	@Test(expected = NullPointerException.class)
-	public void throws_null_pointer_exception_when_no_root_path_is_given() {
+	public void throws_null_pointer_exception_when_no_root_path_is_given() throws IOException {
 		String[] args = new String[]{};
 		AppArguments.parseArguments(args);
 	}
