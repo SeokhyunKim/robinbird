@@ -51,7 +51,7 @@ public class AppArguments {
 	private String sourceRootPath;
 
 	@NonNull
-	private PresentationType presentationType = PresentationType.PLANTUML;
+	private PresentationType presentationType;
 
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();

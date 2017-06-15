@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.robinbird.listener.Java8Listener;
+import org.robinbird.analyser.Java8Analyser;
 import org.robinbird.parser.java8.Java8Lexer;
 import org.robinbird.parser.java8.Java8Parser;
 import org.robinbird.utils.Msgs;
@@ -105,9 +103,9 @@ public class AnalysisUnit {
 		switch(language) {
 			case JAVA8:
 			default:
-				Java8Listener java8Listener = new Java8Listener();
-				java8Listener.setAnalysisContext(analysisContext);;
-				listener = java8Listener;
+				Java8Analyser java8Analyser = new Java8Analyser();
+				java8Analyser.setAnalysisContext(analysisContext);;
+				listener = java8Analyser;
 				break;
 		}
 		return listener;

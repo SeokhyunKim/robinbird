@@ -1,4 +1,4 @@
-package org.robinbird.listener;
+package org.robinbird.analyser;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.robinbird.model.AccessModifier;
@@ -7,9 +7,9 @@ import org.robinbird.model.AnalysisContextApplier;
 import org.robinbird.model.Class;
 import org.robinbird.model.ClassType;
 import org.robinbird.model.Collection;
-import org.robinbird.model.Map;
 import org.robinbird.model.Member;
 import org.robinbird.model.Type;
+import org.robinbird.parser.java8.Java8BaseListener;
 import org.robinbird.parser.java8.Java8Parser;
 import org.robinbird.utils.Msgs;
 
@@ -22,7 +22,7 @@ import static org.robinbird.utils.Msgs.Key.*;
 /**
  * Created by seokhyun on 5/26/17.
  */
-public class Java8Listener extends org.robinbird.parser.java8.Java8BaseListener implements AnalysisContextApplier {
+public class Java8Analyser extends Java8BaseListener implements AnalysisContextApplier {
 
 	private AnalysisContext analysisContext;
 
@@ -31,16 +31,19 @@ public class Java8Listener extends org.robinbird.parser.java8.Java8BaseListener 
 
 	@Override
 	public void enterNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
-		Class c = analysisContext.getClass(ctx.Identifier().getText(), ClassType.CLASS);
-	}
-
-	@Override
-	public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
+		String className = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
+		Class c = analysisContext.getClass( className, ClassType.CLASS);
+		if (ctx.superclass() != null) {
+			Java8Parser.ClassTypeContext classTypeContext = ctx.superclass().classType();
+			Class parent = analysisContext.getClass(classTypeContext.getText(), ClassType.CLASS);
+			c.setParent(parent);
+		}
+		analysisContext.setCurrentClass(c);
 	}
 
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-		Class c = analysisContext.getClass(ctx.Identifier().getText(), ClassType.INTERFACE);
+		analysisContext.getClass(ctx.Identifier().getText(), ClassType.INTERFACE); // registering interface. getClass registers new one.
 	}
 
 	@Override
@@ -56,11 +59,28 @@ public class Java8Listener extends org.robinbird.parser.java8.Java8BaseListener 
 		}
 	}
 
+	private String getTemplateClassParameters(Java8Parser.TypeParametersContext ctx) {
+		if (ctx == null) { return ""; }
+		StringBuffer sb = new StringBuffer();
+		sb.append("<");
+		int i = 0;
+		Java8Parser.TypeParameterContext tpCtx = ctx.typeParameterList().typeParameter(i);
+		while (tpCtx != null) {
+			sb.append(tpCtx.Identifier().getText());
+			tpCtx = ctx.typeParameterList().typeParameter(++i);
+			if (tpCtx != null) {
+				sb.append(", ");
+			}
+		}
+		sb.append(">");
+		return sb.toString();
+	}
+
 	private AccessModifier getAccessModifier(List<Java8Parser.FieldModifierContext> fieldModifierContexts) {
 		AccessModifier accessModifier = AccessModifier.PRIVATE;
 		for (Java8Parser.FieldModifierContext modifierContext : fieldModifierContexts) {
 			try {
-				accessModifier = AccessModifier.valueOf(modifierContext.getText());
+				accessModifier = AccessModifier.fromDescription(modifierContext.getText());
 			} catch (IllegalArgumentException e) {
 				continue;
 			}
@@ -83,19 +103,14 @@ public class Java8Listener extends org.robinbird.parser.java8.Java8BaseListener 
 				String typeText = referenceTypeContext.getText();
 				if (isPrimitive(typeText))
 				{
-					type = new Type(unannTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
+					type = new Type(typeText, Type.Kind.PRIMITIVE);
 				}
 				else if (isCollection(typeText))
 				{
-					List<Java8Parser.ReferenceTypeContext> refTypes = new ArrayList<>();
-					findReferenceTypes(referenceTypeContext, refTypes);
-					type = new Collection(typeText, analysisContext.getType(refTypes.get(0).getText()));
-				}
-				else if (isMap(typeText))
-				{
-					List<Java8Parser.ReferenceTypeContext> refTypes = new ArrayList<>();
-					findReferenceTypes(referenceTypeContext, refTypes);
-					type = new Map(typeText, analysisContext.getType(refTypes.get(0).getText()), analysisContext.getType(refTypes.get(1).getText()));
+					List<Java8Parser.ReferenceTypeContext> java8RefTypes = new ArrayList<>();
+					findJava8ParserReferenceTypes(referenceTypeContext, java8RefTypes);
+					List<Type> refTypes = getReferenceTypes(java8RefTypes);
+					type = new Collection(typeText, refTypes);
 				}
 				else
 				{
@@ -129,29 +144,34 @@ public class Java8Listener extends org.robinbird.parser.java8.Java8BaseListener 
 	}
 
 	private boolean isCollection(String text) {
-		String[] collections = { "List", "LinkedList", "ArrayList", "Set", "TreeSet", "HashSet", "LinkedHashSet"};
+		String[] collections = { "List", "LinkedList", "ArrayList", "Set", "TreeSet", "HashSet", "LinkedHashSet", "Map", "HashMap", "TreeMap"};
 		for (String collection : collections) {
 			if (text.startsWith(collection)) { return true; }
 		}
 		return false;
 	}
 
-	private boolean isMap(String text) {
-		String[] maps = { "Map", "HashMap", "TreeMap"};
-		for (String map : maps) {
-			if (text.startsWith(map)) { return true; }
-		}
-		return false;
-	}
-
-	private void findReferenceTypes(ParseTree node, List<Java8Parser.ReferenceTypeContext> refTypes) {
+	private void findJava8ParserReferenceTypes(ParseTree node, List<Java8Parser.ReferenceTypeContext> refTypes) {
 		if (node instanceof Java8Parser.ReferenceTypeContext) {
 			refTypes.add((Java8Parser.ReferenceTypeContext)node);
 		}
 		int i=0;
 		while (node.getChild(i) != null) {
-			findReferenceTypes(node.getChild(i++), refTypes);
+			findJava8ParserReferenceTypes(node.getChild(i++), refTypes);
 		}
+	}
+
+	// convert the list of Java8Parser.ReferenceTypeContext like "List<A>, A, Map<B, C>, B, C" to "A, B, C" by removing collections and maps.
+	// and register reference types
+	private List<Type> getReferenceTypes(List<Java8Parser.ReferenceTypeContext> referenceTypeContexts) {
+		List<Type> refTypes = new ArrayList<>();
+		for (Java8Parser.ReferenceTypeContext context : referenceTypeContexts) {
+			if (isCollection(context.getText()) || isPrimitive(context.getText())) {
+				continue;
+			}
+			refTypes.add(analysisContext.getType(context.getText()));
+		}
+		return refTypes;
 	}
 
 	private List<String> getVariableList(Java8Parser.VariableDeclaratorListContext variableDeclaratorListContext) {

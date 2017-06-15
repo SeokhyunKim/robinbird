@@ -13,4 +13,8 @@ public enum AccessModifier {
 	}
 
 	public String getDescription() { return description; }
+
+	public static AccessModifier fromDescription(String desc) throws IllegalArgumentException {
+		return AccessModifier.valueOf(desc.toUpperCase());
+	}
 }
