@@ -15,9 +15,9 @@ import java.util.TreeMap;
  */
 @Getter
 @ToString(callSuper = true)
-public class Class extends Repositable {
+public class Class extends Type {
 
-	private ClassType classType = ClassType.CLASS;
+	@Setter private ClassType classType = ClassType.CLASS;
 	@Setter private Class parent;
 	private List<Class> interfaces = new ArrayList<>();
 	private Map<String, Member> memberVariables = new HashMap<>();

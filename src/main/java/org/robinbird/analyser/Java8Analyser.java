@@ -3,7 +3,7 @@ package org.robinbird.analyser;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
-import org.robinbird.model.AnalysisContextApplier;
+import org.robinbird.model.Analyser;
 import org.robinbird.model.Class;
 import org.robinbird.model.ClassType;
 import org.robinbird.model.Collection;
@@ -22,7 +22,7 @@ import static org.robinbird.utils.Msgs.Key.*;
 /**
  * Created by seokhyun on 5/26/17.
  */
-public class Java8Analyser extends Java8BaseListener implements AnalysisContextApplier {
+public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	private AnalysisContext analysisContext;
 
@@ -43,7 +43,15 @@ public class Java8Analyser extends Java8BaseListener implements AnalysisContextA
 
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-		analysisContext.getClass(ctx.Identifier().getText(), ClassType.INTERFACE); // registering interface. getClass registers new one.
+		String typeText = ctx.Identifier().getText();
+		Type t = analysisContext.getType(typeText);
+		if (t != null) {
+			checkState(t instanceof Class, Msgs.get(ALREADY_EXISTING_TYPE_NAME, typeText));
+			Class c = (Class)t;
+			c.setClassType(ClassType.INTERFACE);
+		} else {
+			analysisContext.getClass(ctx.Identifier().getText(), ClassType.INTERFACE); // registering interface. getClass registers new one.
+		}
 	}
 
 	@Override
@@ -114,21 +122,27 @@ public class Java8Analyser extends Java8BaseListener implements AnalysisContextA
 				}
 				else
 				{
-					type = analysisContext.getType(typeText);
+					type = analysisContext.getClass(typeText, ClassType.CLASS); // For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
 				}
 			}
 			// array type field
 			else if (referenceTypeContext.unannArrayType() != null) {
 				Java8Parser.UnannArrayTypeContext arrayTypeContext = referenceTypeContext.unannArrayType();
+				Type aryBaseType = null;
 				if (arrayTypeContext.unannClassOrInterfaceType() != null) {
-					if (isPrimitive(arrayTypeContext.unannClassOrInterfaceType().getText())) {
-						type = new Type(unannTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
+					String classOrInterfaceTypeText = arrayTypeContext.unannClassOrInterfaceType().getText();
+					if (isPrimitive(classOrInterfaceTypeText)) {
+						aryBaseType = new Type(classOrInterfaceTypeText, Type.Kind.PRIMITIVE);
 					} else {
-						type = analysisContext.getType(arrayTypeContext.unannClassOrInterfaceType().getText());
+						aryBaseType = analysisContext.getClass(classOrInterfaceTypeText, ClassType.CLASS);
 					}
 				} else if (arrayTypeContext.unannPrimitiveType() != null) {
-					type = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
+					aryBaseType = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
 				}
+				checkState(aryBaseType != null, Msgs.get(FAILED_TO_FIND_MEMBER_TYPE, arrayTypeContext.getText()));
+				List<Type> types = new ArrayList<>();
+				types.add(aryBaseType);
+				type = new Collection(arrayTypeContext.getText(), types);
 			}
 		}
 		checkState(type != null, Msgs.get(FAILED_TO_FIND_MEMBER_TYPE, analysisContext.getCurrentClass().getName()));
@@ -161,7 +175,7 @@ public class Java8Analyser extends Java8BaseListener implements AnalysisContextA
 		}
 	}
 
-	// convert the list of Java8Parser.ReferenceTypeContext like "List<A>, A, Map<B, C>, B, C" to "A, B, C" by removing collections and maps.
+	// convert the list of Java8Parser.ReferenceTypeContext like "List<A>, A, Map<B, C>, B, C" to "A, B, C" by removing specific collection implementations.
 	// and register reference types
 	private List<Type> getReferenceTypes(List<Java8Parser.ReferenceTypeContext> referenceTypeContexts) {
 		List<Type> refTypes = new ArrayList<>();

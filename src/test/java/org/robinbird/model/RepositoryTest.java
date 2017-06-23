@@ -2,6 +2,9 @@ package org.robinbird.model;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -19,14 +22,10 @@ public class RepositoryTest {
 		assertTrue(t.getName().equals("test"));
 		assertTrue(t.getId() == 0);
 
-		Collection c = new Collection("test", t);
+		List<Type> types = new ArrayList<>();
+		Collection c = new Collection("test", types);
 		assertTrue(t.getName().equals("test"));
-		assertTrue(c.getType() == t);
-
-		Map m = new Map("test", t, c);
-		assertTrue(m.getName().equals("test"));
-		assertTrue(m.getKey() == t);
-		assertTrue(m.getValue() == c);
+		assertTrue(c.getTypes() == types);
 
 		Class cl = new Class("test");
 		assertTrue(cl.getClassType() == ClassType.CLASS);

@@ -36,7 +36,6 @@ public class AnalysisUnit {
 
 	private List<Path> paths = new ArrayList<>();
 	private Repository<Type> types = new Repository<>();
-	private Repository<Class> classes = new Repository<>();
 
 	public AnalysisUnit(Language language) {
 		this.language = language;
@@ -47,7 +46,7 @@ public class AnalysisUnit {
 	}
 
 	public AnalysisContext analysis() {
-		AnalysisContext analysisContext = new AnalysisContext(types, classes);
+		AnalysisContext analysisContext = new AnalysisContext(types);
 		for (Path path : paths) {
 			log.info("Start analysis for " + path);
 			if (Files.isRegularFile(path)) {
@@ -68,6 +67,7 @@ public class AnalysisUnit {
 				log.debug("Skip current java file because of exception: " + Msgs.get(IOEXCEPTION_WHILE_READING_SOURCE_CODES, e));
 			}
 		}
+		analysisContext.update();
 		return analysisContext;
 	}
 

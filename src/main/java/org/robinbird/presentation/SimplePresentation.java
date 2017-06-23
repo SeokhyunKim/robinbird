@@ -3,6 +3,7 @@ package org.robinbird.presentation;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
+import org.robinbird.model.Relation;
 import org.robinbird.model.Repository;
 import org.robinbird.model.Type;
 
@@ -16,10 +17,7 @@ public class SimplePresentation implements AnalysisContextPersentation {
 	public void present(AnalysisContext analysisContext) {
 		System.out.println("//----------------------------------------------------");
 		System.out.println("// Classes");
-		Repository<Class> classes = analysisContext.getClasses();
-		int i=0;
-		while (classes.getRepositable(i) != null) {
-			Class classObj = classes.getRepositable(i++);
+		for (Class classObj : analysisContext.getClasses()) {
 			System.out.println(classObj.getName());
 			for (Map.Entry<String, Member> entry : classObj.getMemberVariables().entrySet()) {
 				System.out.println(String.format("\t%s : %s", entry.getKey(), entry.getValue().getType().getName()));
@@ -27,11 +25,14 @@ public class SimplePresentation implements AnalysisContextPersentation {
 		}
 		System.out.println("//----------------------------------------------------");
 		System.out.println("// Types");
-		Repository<Type> types = analysisContext.getTypes();
-		i=0;
-		while (types.getRepositable(i) != null) {
-			Type type = types.getRepositable(i++);
+		for (Type type : analysisContext.getTypes()) {
 			System.out.println(type.getName());
+		}
+		System.out.println("//----------------------------------------------------");
+		System.out.println("// Relations");
+		for (Relation r : analysisContext.getRelations()) {
+			System.out.println(String.format("%s (%s) --- (%s) %s", r.getFirst().getName(), (r.getFirstCardinality() != null ? r.getFirstCardinality() : "null"),
+				(r.getSecondCardinality() != null ? r.getSecondCardinality() : "null"), r.getSecond().getName()));
 		}
 	}
 }

@@ -1,4 +1,4 @@
 class Parent {
 	public Integer a;
-	SomeClass b;
+	Class3 b;
 }

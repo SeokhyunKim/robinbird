@@ -33,6 +33,10 @@ public class Repository<T extends Repositable> {
 		return repositableList.get(idx);
 	}
 
+	public List<T> getRepositableList() {
+		return repositableList;
+	}
+
 	public int size() { return repositableList.size(); }
 
 	public boolean isExisting(String name) {

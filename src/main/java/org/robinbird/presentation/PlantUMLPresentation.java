@@ -4,9 +4,11 @@ import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
+import org.robinbird.model.Relation;
 import org.robinbird.model.Repository;
 import org.robinbird.model.Type;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,17 +18,26 @@ public class PlantUMLPresentation implements AnalysisContextPersentation {
 
 	public void present(AnalysisContext analysisContext) {
 		System.out.println("@startuml");
-		Repository<Class> classes = analysisContext.getClasses();
-		int i=0;
-		while (classes.getRepositable(i) != null) {
-			Class classObj = classes.getRepositable(i++);
+		for (Class classObj : analysisContext.getClasses()) {
 			// class name, member variables, and member functions
 			System.out.println(String.format("class %s {", classObj.getName()));
 			printMemberVariables(classObj.getMemberVariables());
 			System.out.println("}");
 			// inheritance
 			if (classObj.getParent() != null) {
-				System.out.println(classObj.getParent().getName() + " <|-- " + classObj.getName());
+				System.out.println(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
+			}
+		}
+		for (Relation r : analysisContext.getRelations()) {
+			String firstName = removeGenerics(r.getFirst().getName());
+			String secondName = removeGenerics(r.getSecond().getName());
+			if (r.getFirstCardinality() == null) {
+				System.out.println(firstName + " --> " + attachQuotes(r.getSecondCardinality()) + " " + secondName);
+			} else if (r.getSecondCardinality() == null) {
+				System.out.println(firstName + " " + attachQuotes(r.getFirstCardinality()) + " <-- " + secondName);
+			} else {
+				System.out.println(firstName + " " + attachQuotes(r.getFirstCardinality()) + " -- "
+									+ attachQuotes(r.getSecondCardinality()) + " " + secondName);
 			}
 		}
 		System.out.println("@enduml");
@@ -49,5 +60,18 @@ public class PlantUMLPresentation implements AnalysisContextPersentation {
 			case PROTECTED: return "#";
 		}
 		return "-";
+	}
+
+	private String attachQuotes(String text) {
+		return "\""+text+"\"";
+	}
+
+	private String removeGenerics(String name) {
+		if (!isGeneric(name)) { return name; }
+		return name.substring(0, name.indexOf("<"));
+	}
+
+	private boolean isGeneric(String name) {
+		return name.contains("<");
 	}
 }

@@ -16,7 +16,8 @@ public class Msgs {
 		ALREADY_EXISTING_TYPE_NAME,
 		CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE,
 		FAILED_TO_FIND_MEMBER_TYPE,
-		PRESENTATION_OPTION_IS_NOT_VALID
+		PRESENTATION_OPTION_IS_NOT_VALID,
+		NULL_POINTER_ENCOUNTERED,
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -28,6 +29,7 @@ public class Msgs {
 			.put(Key.CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE, "Current class is null while parsing class.")
 			.put(Key.FAILED_TO_FIND_MEMBER_TYPE, "Failed to find member type for %s.")
 			.put(Key.PRESENTATION_OPTION_IS_NOT_VALID, "Invalid presentation option: %s.")
+			.put(Key.NULL_POINTER_ENCOUNTERED, "Null pointer encountered in %s.")
 			.build();
 	}
 

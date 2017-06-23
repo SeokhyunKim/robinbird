@@ -1,6 +1,7 @@
 
-class Class1<T extends B, S> extends Parent<Class2> {
+class Class1<T extends B, S> extends Parent<S> {
 	int a, b;
 	float c;
-	List<Map<List<T1>, T2>> ttt;
+	List<Map<List<T>, S>> ttt;
+	Integer[] d;
 }
