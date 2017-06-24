@@ -1,13 +1,10 @@
 package org.robinbird.model;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
@@ -18,52 +15,53 @@ import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
  */
 public class AnalysisUnitTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+	private String rootTestPath;
 
-	private static final String CONTENT1 = "public class Test1 {}";
-	private static final String CONTENT2 = "public interface Test2 {}";
+	@Before
+	public void setup() {
+		Path currentRelativePath = Paths.get("");
+		String s = currentRelativePath.toAbsolutePath().toString();
+		rootTestPath = s + "/src/test/resources/test_directory/AnalysisUnitTest";
+	}
 
 	@Test
 	public void can_analysis_files() throws IOException {
-		String path1 = writeStringToFile(CONTENT1, tempFolder.getRoot().getAbsolutePath(), "Test1.java");
-		String path2 = writeStringToFile(CONTENT2, tempFolder.getRoot().getAbsolutePath(), "Test2.java");
+		String path1 = getTestPath("/can_analysis_files/Test1.java");
+		String path2 = getTestPath("/can_analysis_files/Test2.java");
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path1));
 		au.addPath(Paths.get(path2));
 		au.analysis();
 
-		assertTrue(au.getClasses().size() == 2);
-		assertTrue(au.getClasses().getRepositable(0).getName().equals("Test1"));
-		assertTrue(au.getClasses().getRepositable(0).getClassType() == ClassType.CLASS);
-		assertTrue(au.getClasses().getRepositable(1).getName().equals("Test2"));
-		assertTrue(au.getClasses().getRepositable(1).getClassType() == ClassType.INTERFACE);
+		assertTrue(au.getTypes().size() == 2);
+		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
+		Class c1 = (Class)au.getTypes().getRepositable(0);
+		assertTrue(c1.getClassType() == ClassType.CLASS);
+		assertTrue(au.getTypes().getRepositable(1).getName().equals("Test2"));
+		Class c2 = (Class)au.getTypes().getRepositable(1);
+		assertTrue(c2.getClassType() == ClassType.INTERFACE);
 	}
 
 	@Test
 	public void can_analysis_folder() throws IOException {
-		File testFolder = tempFolder.newFolder("test");
-		String path1 = writeStringToFile(CONTENT1, testFolder.getAbsolutePath(), "Test1.java");
-		String path2 = writeStringToFile(CONTENT2, testFolder.getAbsolutePath(), "Test2.java");
+		String path = getTestPath("/can_analysis_folder/test");
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
-		au.addPath(Paths.get(testFolder.getAbsolutePath()));
+		au.addPath(Paths.get(path));
 		au.analysis();
 
-		assertTrue(au.getClasses().size() == 2);
-		assertTrue(au.getClasses().getRepositable(0).getName().equals("Test1"));
-		assertTrue(au.getClasses().getRepositable(0).getClassType() == ClassType.CLASS);
-		assertTrue(au.getClasses().getRepositable(1).getName().equals("Test2"));
-		assertTrue(au.getClasses().getRepositable(1).getClassType() == ClassType.INTERFACE);
+		assertTrue(au.getTypes().size() == 2);
+		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
+		Class c1 = (Class)au.getTypes().getRepositable(0);
+		assertTrue(c1.getClassType() == ClassType.CLASS);
+		assertTrue(au.getTypes().getRepositable(1).getName().equals("Test2"));
+		Class c2 = (Class)au.getTypes().getRepositable(1);
+		assertTrue(c2.getClassType() == ClassType.INTERFACE);
 	}
 
-	private String writeStringToFile(String content, String root, String fileName) throws IOException {
-		String path = root + "/" + fileName;
-		FileWriter fw = new FileWriter(path);
-		fw.write(content);
-		fw.flush();
-		return path;
+	private String getTestPath(String testPath) {
+		return rootTestPath + testPath;
 	}
 
 

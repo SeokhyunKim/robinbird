@@ -4,7 +4,6 @@ import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
 import org.robinbird.model.Relation;
-import org.robinbird.model.Repository;
 import org.robinbird.model.Type;
 
 import java.util.Map;
@@ -12,27 +11,29 @@ import java.util.Map;
 /**
  * Created by seokhyun on 6/7/17.
  */
-public class SimplePresentation implements AnalysisContextPersentation {
+public class SimplePresentation implements AnalysisContextPresentation {
 
-	public void present(AnalysisContext analysisContext) {
-		System.out.println("//----------------------------------------------------");
-		System.out.println("// Classes");
+	public String present(AnalysisContext analysisContext) {
+		StringAppender sa = new StringAppender();
+		sa.appendLine("//----------------------------------------------------");
+		sa.appendLine("// Classes");
 		for (Class classObj : analysisContext.getClasses()) {
-			System.out.println(classObj.getName());
+			sa.appendLine(classObj.getName());
 			for (Map.Entry<String, Member> entry : classObj.getMemberVariables().entrySet()) {
-				System.out.println(String.format("\t%s : %s", entry.getKey(), entry.getValue().getType().getName()));
+				sa.appendLine(String.format("\t%s : %s", entry.getKey(), entry.getValue().getType().getName()));
 			}
 		}
-		System.out.println("//----------------------------------------------------");
-		System.out.println("// Types");
+		sa.appendLine("//----------------------------------------------------");
+		sa.appendLine("// Types");
 		for (Type type : analysisContext.getTypes()) {
-			System.out.println(type.getName());
+			sa.appendLine(type.getName());
 		}
-		System.out.println("//----------------------------------------------------");
-		System.out.println("// Relations");
+		sa.appendLine("//----------------------------------------------------");
+		sa.appendLine("// Relations");
 		for (Relation r : analysisContext.getRelations()) {
-			System.out.println(String.format("%s (%s) --- (%s) %s", r.getFirst().getName(), (r.getFirstCardinality() != null ? r.getFirstCardinality() : "null"),
+			sa.appendLine(String.format("%s (%s) --- (%s) %s", r.getFirst().getName(), (r.getFirstCardinality() != null ? r.getFirstCardinality() : "null"),
 				(r.getSecondCardinality() != null ? r.getSecondCardinality() : "null"), r.getSecond().getName()));
 		}
+		return sa.toString();
 	}
 }

@@ -50,6 +50,9 @@ public class AnalysisContext {
 		if (t instanceof Class) {
 			Class c = (Class)t;
 			setCurrentClass(c);
+			if (c.getClassType() != ctype) {
+				c.setClassType(ctype);
+			}
 			return c;
 		}
 		return null;

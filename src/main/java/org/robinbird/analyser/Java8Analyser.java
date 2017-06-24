@@ -43,15 +43,8 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-		String typeText = ctx.Identifier().getText();
-		Type t = analysisContext.getType(typeText);
-		if (t != null) {
-			checkState(t instanceof Class, Msgs.get(ALREADY_EXISTING_TYPE_NAME, typeText));
-			Class c = (Class)t;
-			c.setClassType(ClassType.INTERFACE);
-		} else {
-			analysisContext.getClass(ctx.Identifier().getText(), ClassType.INTERFACE); // registering interface. getClass registers new one.
-		}
+		String typeText = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
+		analysisContext.getClass( typeText, ClassType.INTERFACE); // registering interface. getClass registers new one.
 	}
 
 	@Override

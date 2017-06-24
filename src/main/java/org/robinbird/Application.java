@@ -3,7 +3,7 @@ package org.robinbird;
 import lombok.extern.slf4j.Slf4j;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisUnit;
-import org.robinbird.presentation.AnalysisContextPersentation;
+import org.robinbird.presentation.AnalysisContextPresentation;
 import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.PresentationType;
 import org.robinbird.presentation.SimplePresentation;
@@ -24,12 +24,12 @@ public class Application {
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(appArgs.getSourceRootPath()));
 		AnalysisContext ac = au.analysis();
-		AnalysisContextPersentation acPresent = createPresentation(appArgs.getPresentationType());
-		acPresent.present(ac);
+		AnalysisContextPresentation acPresent = createPresentation(appArgs.getPresentationType());
+		System.out.print(acPresent.present(ac));
 	}
 
-	AnalysisContextPersentation createPresentation(PresentationType ptype) {
-		AnalysisContextPersentation presentation;
+	AnalysisContextPresentation createPresentation(PresentationType ptype) {
+		AnalysisContextPresentation presentation;
 		switch (ptype) {
 			case SIMPLE:
 				presentation = new SimplePresentation();
