@@ -23,7 +23,7 @@ import static org.robinbird.utils.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 public class AnalysisContext {
 
 	private Repository<Type> types;
-	@Getter @Setter private Class currentClass;
+	private Class currentClass;
 
 	private Map<Relation.Key, Relation> relationMap;
 
@@ -31,31 +31,42 @@ public class AnalysisContext {
 		this.types = types;
 	}
 
+	public Class getCurrentClass() { return currentClass; }
+	public void setCurrentClass(Class c) { currentClass = c; }
+
 	public Type getType(String name) {
-		Type t = types.getRepositable(name);
-		if (t != null ) { return t; }
+		return types.getRepositable(name);
+	}
+
+	public Class getClass(String name) {
+		Type t = getType(name);
+		if (t == null || !(t instanceof Class)) {
+			return null;
+		}
+		return (Class)t;
+	}
+
+	public Class getClass(String name, ClassType ctype) {
+		Class c = getClass(name);
+		if (c == null) { return null; }
+		if (c.getClassType() != ctype) { return null; }
+		return c;
+	}
+
+	public Type registerType(String name) {
+		Type t = getType(name);
+		if (t != null) { return t; }
 		t = new Type(name);
 		types.register(t);
 		return t;
 	}
 
-	public Class getClass(String name, ClassType ctype) {
-		Type t = types.getRepositable(name);
-		if (t == null) {
-			Class c = new Class(name, ctype);
-			types.register(c);
-			setCurrentClass(c);
-			return c;
-		}
-		if (t instanceof Class) {
-			Class c = (Class)t;
-			setCurrentClass(c);
-			if (c.getClassType() != ctype) {
-				c.setClassType(ctype);
-			}
-			return c;
-		}
-		return null;
+	public Class registerClass(String name, ClassType ctype) {
+		Class c = getClass(name, ctype);
+		if (c != null) { return c; }
+		c = new Class(name, ctype);
+		types.register(c);
+		return c;
 	}
 
 	public List<Type> getTypes() {
@@ -74,7 +85,7 @@ public class AnalysisContext {
 
 	public Set<Relation> getRelations() {
 		checkState(relationMap != null, Msgs.get(NULL_POINTER_ENCOUNTERED, "AnalysisContext"));
-		return new HashSet<Relation>(relationMap.values());
+		return new HashSet<>(relationMap.values());
 	}
 
 	public void update() {

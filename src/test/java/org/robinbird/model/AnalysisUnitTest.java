@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
 
@@ -58,6 +59,48 @@ public class AnalysisUnitTest {
 		assertTrue(au.getTypes().getRepositable(1).getName().equals("Test2"));
 		Class c2 = (Class)au.getTypes().getRepositable(1);
 		assertTrue(c2.getClassType() == ClassType.INTERFACE);
+	}
+
+	@Test
+	public void can_read_independent_classes_and_interfaces() {
+		String path = getTestPath("/can_read_independent_classes_and_interfaces");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis();
+
+		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
+		assertNotNull(ac.getClass("Class2", ClassType.CLASS));
+		assertNotNull(ac.getClass("Interface1", ClassType.INTERFACE));
+		assertNotNull(ac.getClass("Interface2", ClassType.INTERFACE));
+		assertNotNull(ac.getClass("Interface3", ClassType.INTERFACE));
+	}
+
+	@Test
+	public void can_read_member_variables() {
+		// will add later
+	}
+
+	@Test
+	public void can_read_member_functions_for_class() {
+		// will add later
+	}
+
+	@Test
+	public void can_read_member_functions_for_interface() {
+		// will add later
+	}
+
+	@Test
+	public void relation_test__can_recognize_associated_interface() {
+		String path = getTestPath("/relation_test__can_recognize_associated_interface");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis();
+
+		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
+		assertNotNull(ac.getClass("Interface1", ClassType.CLASS));
 	}
 
 	private String getTestPath(String testPath) {

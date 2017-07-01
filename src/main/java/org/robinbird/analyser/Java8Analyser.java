@@ -32,10 +32,15 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	@Override
 	public void enterNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
 		String className = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
-		Class c = analysisContext.getClass( className, ClassType.CLASS);
+		Class c = analysisContext.getClass(className);
+		if (c != null) {
+			c.setClassType(ClassType.CLASS);
+		} else {
+			c = analysisContext.registerClass(className, ClassType.CLASS);
+		}
 		if (ctx.superclass() != null) {
 			Java8Parser.ClassTypeContext classTypeContext = ctx.superclass().classType();
-			Class parent = analysisContext.getClass(classTypeContext.getText(), ClassType.CLASS);
+			Class parent = analysisContext.registerClass(classTypeContext.getText(), ClassType.CLASS);
 			c.setParent(parent);
 		}
 		analysisContext.setCurrentClass(c);
@@ -44,7 +49,14 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
 		String typeText = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
-		analysisContext.getClass( typeText, ClassType.INTERFACE); // registering interface. getClass registers new one.
+		String interfaceName = ctx.Identifier().getText();
+		Class c = analysisContext.getClass(interfaceName);
+		if (c != null) {
+			c.setClassType(ClassType.INTERFACE);
+		} else {
+			c = analysisContext.registerClass(interfaceName, ClassType.INTERFACE);
+		}
+		analysisContext.setCurrentClass(c);
 	}
 
 	@Override
@@ -115,7 +127,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 				}
 				else
 				{
-					type = analysisContext.getClass(typeText, ClassType.CLASS); // For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
+					type = analysisContext.registerClass(typeText, ClassType.CLASS); // For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
 				}
 			}
 			// array type field
@@ -127,7 +139,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 					if (isPrimitive(classOrInterfaceTypeText)) {
 						aryBaseType = new Type(classOrInterfaceTypeText, Type.Kind.PRIMITIVE);
 					} else {
-						aryBaseType = analysisContext.getClass(classOrInterfaceTypeText, ClassType.CLASS);
+						aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
 					}
 				} else if (arrayTypeContext.unannPrimitiveType() != null) {
 					aryBaseType = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
@@ -176,7 +188,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			if (isCollection(context.getText()) || isPrimitive(context.getText())) {
 				continue;
 			}
-			refTypes.add(analysisContext.getType(context.getText()));
+			refTypes.add(new Type(context.getText()));
 		}
 		return refTypes;
 	}

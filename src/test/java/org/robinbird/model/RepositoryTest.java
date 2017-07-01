@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by seokhyun on 6/2/17.
@@ -31,5 +31,55 @@ public class RepositoryTest {
 		assertTrue(cl.getClassType() == ClassType.CLASS);
 		assertTrue(cl.getMemberFunctions() != null);
 		assertTrue(cl.getMemberVariables() != null);
+	}
+
+	@Test
+	public void can_find_repositable_with_name() {
+		Repository<Repositable> repo = new Repository<>();
+		repo.register(new Repositable("test3"));
+		repo.register(new Repositable("test2"));
+		repo.register(new Repositable("test1"));
+		assertNotNull(repo.getRepositable("test1"));
+		assertNotNull(repo.getRepositable("test2"));
+		assertNotNull(repo.getRepositable("test3"));
+	}
+
+	@Test
+	public void return_null_for_not_existing_repositable() {
+		Repository<Repositable> repo = new Repository<>();
+		assertNull(repo.getRepositable("test"));
+		repo.register(new Repositable("test"));
+		assertNull(repo.getRepositable("wrong_name"));
+	}
+
+	@Test
+	public void saved_in_the_order_of_insertions() {
+		Repository<Repositable> repo = new Repository<>();
+		repo.register(new Repositable("test3"));
+		repo.register(new Repositable("test2"));
+		repo.register(new Repositable("test1"));
+		assertTrue(repo.getRepositable(0).getName().equals("test3"));
+		assertTrue(repo.getRepositable(1).getName().equals("test2"));
+		assertTrue(repo.getRepositable(2).getName().equals("test1"));
+	}
+
+	@Test
+	public void cleaned_well() {
+		Repository<Repositable> repo = new Repository<>();
+		repo.register(new Repositable("test3"));
+		repo.register(new Repositable("test2"));
+		repo.register(new Repositable("test1"));
+		repo.clean();
+		assertTrue(repo.getRepositableList().size() == 0);
+	}
+
+	@Test
+	public void isExisting_working_well() {
+		Repository<Repositable> repo = new Repository<>();
+		repo.register(new Repositable("test3"));
+		repo.register(new Repositable("test2"));
+		assertFalse(repo.isExisting("test1"));
+		assertTrue(repo.isExisting("test2"));
+		assertTrue(repo.isExisting("test3"));
 	}
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * Created by seokhyun on 6/2/17.
  */
@@ -20,7 +22,7 @@ public class Class extends Type {
 	@Setter private ClassType classType = ClassType.CLASS;
 	@Setter private Class parent;
 	private List<Class> interfaces = new ArrayList<>();
-	private Map<String, Member> memberVariables = new HashMap<>();
+	private TreeMap<String, Member> memberVariables = new TreeMap<>();
 	private TreeMap<String, MemberFunction> memberFunctions = new TreeMap<>();
 
 	public Class(String name) {
@@ -32,13 +34,17 @@ public class Class extends Type {
 		this.classType = classType;
 	}
 
-	public void addInterface(Class interfaceClass) { interfaces.add(interfaceClass); }
+	public void addInterface(Class interfaceClass) {
+		checkState(interfaceClass.getClassType() == ClassType.INTERFACE);
+		interfaces.add(interfaceClass); }
 
 	public void addMember(Member m) {
+		checkState(m.getName() != null);
 		memberVariables.put(m.getName(), m);
 	}
 
 	public void addMemberFunction(MemberFunction f) {
+		checkState(f.getName() != null);
 		memberFunctions.put(f.getName(), f);
 	}
 }

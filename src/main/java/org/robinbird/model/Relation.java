@@ -44,8 +44,13 @@ public class Relation {
 	}
 
 	public static Key createKey(Type first, Type second) {
-		Relation r = new Relation(first, second);
-		return new Key(r.getFirst().getName(), r.getSecond().getName());
+		checkState(first != null);
+		checkState(second != null);
+		if (first.compareTo(second) <= 0) {
+			return new Key(first.getName(), second.getName());
+		} else {
+			return new Key(second.getName(), first.getName());
+		}
 	}
 
 	public static Key createKey(String first, String second) {

@@ -11,15 +11,8 @@ import java.nio.file.Paths;
  */
 public class Java8AnalyserTest {
 
-	@Before
-	public void setup() {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		System.out.println("Current relative path is: " + s);
-	}
-
 	@Test
-	public void dummy() {
+	public void not_yet_implemented_any_test() {
 
 	}
 }
