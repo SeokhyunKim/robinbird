@@ -1,5 +1,6 @@
 package org.robinbird.analyser;
 
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
@@ -22,6 +23,7 @@ import static org.robinbird.utils.Msgs.Key.*;
 /**
  * Created by seokhyun on 5/26/17.
  */
+@Slf4j
 public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	private AnalysisContext analysisContext;
@@ -40,7 +42,10 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 		}
 		if (ctx.superclass() != null) {
 			Java8Parser.ClassTypeContext classTypeContext = ctx.superclass().classType();
-			Class parent = analysisContext.registerClass(classTypeContext.getText(), ClassType.CLASS);
+			Class parent = analysisContext.getClass(classTypeContext.getText());
+			if (parent == null) {
+				parent = analysisContext.registerClass(classTypeContext.getText(), ClassType.CLASS);
+			}
 			c.setParent(parent);
 		}
 		analysisContext.setCurrentClass(c);
@@ -48,8 +53,8 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-		String typeText = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
 		String interfaceName = ctx.Identifier().getText();
+		log.debug("new interface: " + interfaceName);
 		Class c = analysisContext.getClass(interfaceName);
 		if (c != null) {
 			c.setClassType(ClassType.INTERFACE);
@@ -127,7 +132,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 				}
 				else
 				{
-					type = analysisContext.registerClass(typeText, ClassType.CLASS); // For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
+					type = analysisContext.getType(typeText);
+					if (type == null) {
+						// For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
+						type = analysisContext.registerClass(typeText, ClassType.CLASS);
+					}
 				}
 			}
 			// array type field
@@ -139,7 +148,10 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 					if (isPrimitive(classOrInterfaceTypeText)) {
 						aryBaseType = new Type(classOrInterfaceTypeText, Type.Kind.PRIMITIVE);
 					} else {
-						aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
+						aryBaseType = analysisContext.getClass(classOrInterfaceTypeText);
+						if (aryBaseType == null) {
+							aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
+						}
 					}
 				} else if (arrayTypeContext.unannPrimitiveType() != null) {
 					aryBaseType = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
@@ -185,10 +197,18 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	private List<Type> getReferenceTypes(List<Java8Parser.ReferenceTypeContext> referenceTypeContexts) {
 		List<Type> refTypes = new ArrayList<>();
 		for (Java8Parser.ReferenceTypeContext context : referenceTypeContexts) {
-			if (isCollection(context.getText()) || isPrimitive(context.getText())) {
+			if (isCollection(context.getText())) {
 				continue;
 			}
-			refTypes.add(new Type(context.getText()));
+			if (isPrimitive(context.getText())) {
+				refTypes.add(new Type(context.getText()));
+			} else {
+				Type t = analysisContext.getType(context.getText());
+				if (t == null) {
+					t = analysisContext.registerClass(context.getText(), ClassType.CLASS);
+				}
+				refTypes.add(t);
+			}
 		}
 		return refTypes;
 	}

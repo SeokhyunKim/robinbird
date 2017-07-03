@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.robinbird.exception.ExistingTypeNameException;
 import org.robinbird.utils.Msgs;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import static org.robinbird.utils.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 /**
  * Created by seokhyun on 6/4/17.
  */
+@Slf4j
 public class AnalysisContext {
 
 	private Repository<Type> types;
@@ -64,6 +67,11 @@ public class AnalysisContext {
 	public Class registerClass(String name, ClassType ctype) {
 		Class c = getClass(name, ctype);
 		if (c != null) { return c; }
+		if (types.isExisting(name)) {
+			throw new ExistingTypeNameException(
+				String.format("Type name %s is already registered with different Type. Failed to register %s as Class.", name, name));
+		}
+
 		c = new Class(name, ctype);
 		types.register(c);
 		return c;
@@ -89,9 +97,12 @@ public class AnalysisContext {
 	}
 
 	public void update() {
+		log.info("Starting to analyse relations among classes...");
 		relationMap = new HashMap<>();
 		for (Class classObj : getClasses()) {
+			log.debug("updating relations for " + classObj.getName());
 			for (Member m : classObj.getMemberVariables().values()) {
+				log.debug("member " + m.getName() + "...");
 				Type memberType = m.getType();
 				Type associated = memberType;
 				String cardinality = "1";

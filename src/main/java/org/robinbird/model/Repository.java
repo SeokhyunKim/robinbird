@@ -1,5 +1,7 @@
 package org.robinbird.model;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 /**
  * Created by seokhyun on 5/31/17.
  */
+@Slf4j
 public class Repository<T extends Repositable> {
 	private List<T> repositableList;
 	private Map<String, Integer> repositableMap;
@@ -47,6 +50,7 @@ public class Repository<T extends Repositable> {
 		T r = getRepositable(newRepositable.getName());
 		if (r != null) { return r; }
 		newRepositable.setId(repositableList.size());
+		log.debug("Registering to repository: " + newRepositable.getName() + " as " + newRepositable.getClass().getName());
 		repositableList.add(newRepositable);
 		repositableMap.put(newRepositable.getName(), newRepositable.getId());
 		return newRepositable;
