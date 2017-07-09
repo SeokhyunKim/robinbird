@@ -100,7 +100,7 @@ public class AnalysisUnitTest {
 		AnalysisContext ac = au.analysis();
 
 		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
-		assertNotNull(ac.getClass("Interface1", ClassType.CLASS));
+		assertNotNull(ac.getClass("Interface1", ClassType.INTERFACE));
 	}
 
 	private String getTestPath(String testPath) {

@@ -42,7 +42,8 @@ public class Java8AnalyserTest {
 		java8Analyser.setAnalysisContext(analysisContext);
 
 		when(classDeclarationContext.Identifier()).thenReturn(identifier);
-		when(interfaceDeclarationContext.Identifier()).thenReturn(identifier);
+		// TO DO: write UTs using this
+		//when(interfaceDeclarationContext.Identifier()).thenReturn(identifier);
 		when(identifier.getText()).thenReturn("test");
 	}
 
