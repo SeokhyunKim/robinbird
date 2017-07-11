@@ -33,7 +33,7 @@ public class AnalysisUnitTest {
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path1));
 		au.addPath(Paths.get(path2));
-		au.analysis();
+		au.analysis(null, null);
 
 		assertTrue(au.getTypes().size() == 2);
 		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
@@ -50,7 +50,7 @@ public class AnalysisUnitTest {
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
-		au.analysis();
+		au.analysis(null, null);
 
 		assertTrue(au.getTypes().size() == 2);
 		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
@@ -67,7 +67,7 @@ public class AnalysisUnitTest {
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
-		AnalysisContext ac = au.analysis();
+		AnalysisContext ac = au.analysis(null, null);
 
 		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
 		assertNotNull(ac.getClass("Class2", ClassType.CLASS));
@@ -97,7 +97,7 @@ public class AnalysisUnitTest {
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
-		AnalysisContext ac = au.analysis();
+		AnalysisContext ac = au.analysis(null, null);
 
 		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
 		assertNotNull(ac.getClass("Interface1", ClassType.INTERFACE));

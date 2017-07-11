@@ -18,6 +18,10 @@ public class Msgs {
 		FAILED_TO_FIND_MEMBER_TYPE,
 		PRESENTATION_OPTION_IS_NOT_VALID,
 		NULL_POINTER_ENCOUNTERED,
+		WRONG_REGEXP_FOR_TERMINAL,
+		WRONG_REGEXP_FOR_EXCLUSION,
+		REGEXP_FOR_TERMINAL_IS_NOT_GIVEN,
+		REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -30,6 +34,10 @@ public class Msgs {
 			.put(Key.FAILED_TO_FIND_MEMBER_TYPE, "Failed to find member type for %s.")
 			.put(Key.PRESENTATION_OPTION_IS_NOT_VALID, "Invalid presentation option: %s.")
 			.put(Key.NULL_POINTER_ENCOUNTERED, "Null pointer encountered in %s.")
+			.put(Key.WRONG_REGEXP_FOR_TERMINAL, "Wrong regular expression pattern is given for terminal: %s.")
+			.put(Key.WRONG_REGEXP_FOR_EXCLUSION, "Wrong regular expression pattern is given for exclusion: %s.")
+			.put(Key.REGEXP_FOR_TERMINAL_IS_NOT_GIVEN, "Regular expression pattern for a terminal is not given.")
+			.put(Key.REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN, "Regular expression pattern for exclusion is not given.")
 			.build();
 	}
 

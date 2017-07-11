@@ -26,7 +26,7 @@ public class MemberFunctionTest {
 		MemberFunction f = new MemberFunction(	AccessModifier.PUBLIC,
 												new Type("String", Type.Kind.DEFINED),
 												"test1",
-												Arrays.asList(new Type("Integer"), new Class("Class1")));
+												Arrays.asList(new Type("Integer", Type.Kind.PRIMITIVE), new Class("Class1")));
 		assertTrue( f.getArguments().get(0).getName() == "Integer");
 		assertTrue( f.getArguments().get(1).getName() == "Class1");
 	}

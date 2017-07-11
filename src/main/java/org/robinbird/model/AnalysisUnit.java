@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
@@ -45,8 +46,14 @@ public class AnalysisUnit {
 		paths.add(p);
 	}
 
-	public AnalysisContext analysis() {
+	public AnalysisContext analysis(List<Pattern> terminalPatterns, List<Pattern> excludePatterns) {
 		AnalysisContext analysisContext = new AnalysisContext(types);
+		if (terminalPatterns != null && terminalPatterns.size()>0) {
+			analysisContext.setTerminalPatterns(terminalPatterns);
+		}
+		if (excludePatterns != null && excludePatterns.size()>0) {
+			analysisContext.setExcludePatterns(excludePatterns);
+		}
 		for (Path path : paths) {
 			log.info("Start analysis for " + path);
 			if (Files.isRegularFile(path)) {

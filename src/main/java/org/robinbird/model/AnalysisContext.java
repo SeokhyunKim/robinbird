@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.robinbird.utils.Msgs.Key.ALREADY_EXISTING_TYPE_NAME;
@@ -26,16 +27,15 @@ import static org.robinbird.utils.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 public class AnalysisContext {
 
 	private Repository<Type> types;
-	private Class currentClass;
+	@Getter @Setter private Class currentClass;
+	@Getter @Setter private List<Pattern> terminalPatterns = new ArrayList<>();
+	@Getter @Setter private List<Pattern> excludePatterns = new ArrayList<>();
 
 	private Map<Relation.Key, Relation> relationMap;
 
 	public AnalysisContext(Repository<Type> types) {
 		this.types = types;
 	}
-
-	public Class getCurrentClass() { return currentClass; }
-	public void setCurrentClass(Class c) { currentClass = c; }
 
 	public Type getType(String name) {
 		return types.getRepositable(name);
@@ -49,6 +49,34 @@ public class AnalysisContext {
 		return (Class)t;
 	}
 
+	public boolean isTerminal(String identifier) {
+		for (Pattern pattern : terminalPatterns) {
+			if (pattern.matcher(identifier).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isCurrentClassTerminal() {
+		if (currentClass == null) { return false; }
+		return isTerminal(currentClass.getName());
+	}
+
+	public boolean isExcluded(String identifier) {
+		for (Pattern pattern : excludePatterns) {
+			if (pattern.matcher(identifier).matches()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isCurrentClassExcluded() {
+		if (currentClass == null) { return false; }
+		return isExcluded(currentClass.getName());
+	}
+
 	public Class getClass(String name, ClassType ctype) {
 		Class c = getClass(name);
 		if (c == null) { return null; }
@@ -59,12 +87,13 @@ public class AnalysisContext {
 	public Type registerType(String name) {
 		Type t = getType(name);
 		if (t != null) { return t; }
-		t = new Type(name);
+		t = new Type(name, Type.Kind.DEFINED);
 		types.register(t);
 		return t;
 	}
 
 	public Class registerClass(String name, ClassType ctype) {
+		log.debug("register class: {}, {}", name, ctype.toString());
 		Class c = getClass(name, ctype);
 		if (c != null) { return c; }
 		if (types.isExisting(name)) {
@@ -101,6 +130,10 @@ public class AnalysisContext {
 		relationMap = new HashMap<>();
 		for (Class classObj : getClasses()) {
 			log.debug("updating relations for " + classObj.getName());
+			if (isTerminal(classObj.getName())) {
+				log.debug("not update relations for terminal {}...", classObj.getName());
+				continue;
+			}
 			for (Member m : classObj.getMemberVariables().values()) {
 				log.debug("member " + m.getName() + "...");
 				Type memberType = m.getType();
@@ -110,9 +143,17 @@ public class AnalysisContext {
 					Collection c = (Collection)associated;
 					checkState(c.getTypes().size() > 0);
 					associated = c.getTypes().get(c.getTypes().size()-1);
+					log.debug("associated is changed for collection: {}", associated.toString());
 					cardinality = "*";
 				}
-				if (associated.isPrimitiveType()) { continue; }
+				if (associated.isPrimitiveType()) {
+					log.debug("associated type {} is primitive and skip to create relation.", associated.getName());
+					continue;
+				}
+				if (isExcluded(associated.getName())) {
+					log.debug("associated type {} is excluded type and skip to create relation.", associated.getName());
+					continue;
+				}
 				Relation.Key k = Relation.createKey(classObj, associated);
 				Relation r = relationMap.get(k);
 				if (r == null) {

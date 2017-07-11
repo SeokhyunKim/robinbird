@@ -26,7 +26,7 @@ public class Class extends Type {
 	private TreeMap<String, MemberFunction> memberFunctions = new TreeMap<>();
 
 	public Class(String name) {
-		super(name);
+		super(name, Kind.DEFINED);
 	}
 
 	public Class(String name, ClassType classType) {

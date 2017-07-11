@@ -29,8 +29,8 @@ public class ClassTest {
 	@Test
 	public void test_addMember_and_addMemberFunction() {
 		Class c = new Class("test");
-		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType"), "testMember");
-		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType"), "testFn");
+		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "testMember");
+		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "testFn");
 		c.addMember(m);
 		c.addMemberFunction(f);
 		assertTrue(c.getMemberVariables().size() == 1);

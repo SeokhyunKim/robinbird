@@ -59,7 +59,7 @@ public class Java8AnalyserTest {
 	@Test(expected = ExistingTypeNameException.class)
 	public void failed_to_register_existing_normal_class() {
 		repository.clean();
-		repository.register(new Type("test"));
+		repository.register(new Type("test", Type.Kind.DEFINED));
 		java8Analyser.enterNormalClassDeclaration(classDeclarationContext);
 	}
 
@@ -142,4 +142,12 @@ public class Java8AnalyserTest {
 
 		return superclassContext;
 	}
+
+	@Test
+	// will write later
+	public void can_recognize_fields_of_class_well() {
+
+	}
+
+
 }

@@ -31,9 +31,17 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	public void setAnalysisContext(AnalysisContext analysisContext) { this.analysisContext = analysisContext; }
 	public AnalysisContext getAnalysisContext() { return analysisContext; }
 
+	private enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE};
+	State state = State.NONE;
+
 	@Override
 	public void enterNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
 		String className = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
+		if (analysisContext.isExcluded(className)) {
+			state = State.EXCLUDED_TYPE;
+			return;
+		}
+		state = State.PARSING_CLASS;
 		Class c = analysisContext.getClass(className);
 		if (c != null) {
 			c.setClassType(ClassType.CLASS);
@@ -54,7 +62,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
 		String interfaceName = ctx.Identifier().getText();
-		log.debug("new interface: " + interfaceName);
+		if (analysisContext.isExcluded(interfaceName)) {
+			state = State.EXCLUDED_TYPE;
+			return;
+		}
+		state = State.PARSING_INTERFACE;
 		Class c = analysisContext.getClass(interfaceName);
 		if (c != null) {
 			c.setClassType(ClassType.INTERFACE);
@@ -66,7 +78,9 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	@Override
 	public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
+		if (state == State.EXCLUDED_TYPE) { return; }
 		checkState(analysisContext.getCurrentClass() != null, Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
+		if (analysisContext.isCurrentClassTerminal()) { return; }
 
 		AccessModifier accessModifier = getAccessModifier(ctx.fieldModifier());
 		Type type = getType(ctx.unannType());
@@ -134,8 +148,16 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 				{
 					type = analysisContext.getType(typeText);
 					if (type == null) {
-						// For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
-						type = analysisContext.registerClass(typeText, ClassType.CLASS);
+						if (isPrimitive(typeText)) {
+							type = new Type(typeText, Type.Kind.PRIMITIVE);
+						} else {
+							if (analysisContext.isExcluded(typeText)) {
+								type = new Class(typeText, ClassType.CLASS);
+							} else {
+								// For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
+								type = analysisContext.registerClass(typeText, ClassType.CLASS);
+							}
+						}
 					}
 				}
 			}
@@ -150,7 +172,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 					} else {
 						aryBaseType = analysisContext.getClass(classOrInterfaceTypeText);
 						if (aryBaseType == null) {
-							aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
+							if (analysisContext.isExcluded(classOrInterfaceTypeText)) {
+								aryBaseType = new Class(classOrInterfaceTypeText, ClassType.CLASS);
+							} else {
+								aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
+							}
 						}
 					}
 				} else if (arrayTypeContext.unannPrimitiveType() != null) {
@@ -167,7 +193,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	}
 
 	private boolean isPrimitive(String text) {
-		String[] types = { "Byte", "Short", "Integer", "Long", "Character", "Float", "Double", "Boolean"};
+		String[] types = { "Byte", "Short", "Integer", "Long", "Character", "Float", "Double", "Boolean", "String"};
 		for (String type : types) {
 			if (text.startsWith(type)) { return true; }
 		}
@@ -201,11 +227,19 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 				continue;
 			}
 			if (isPrimitive(context.getText())) {
-				refTypes.add(new Type(context.getText()));
+				refTypes.add(new Type(context.getText(), Type.Kind.PRIMITIVE));
 			} else {
 				Type t = analysisContext.getType(context.getText());
 				if (t == null) {
-					t = analysisContext.registerClass(context.getText(), ClassType.CLASS);
+					if (isPrimitive(context.getText())) {
+						t = new Type(context.getText(), Type.Kind.PRIMITIVE);
+					} else {
+						if (analysisContext.isExcluded(context.getText())) {
+							t = new Class(context.getText(), ClassType.CLASS);
+						} else {
+							t = analysisContext.registerClass(context.getText(), ClassType.CLASS);
+						}
+					}
 				}
 				refTypes.add(t);
 			}

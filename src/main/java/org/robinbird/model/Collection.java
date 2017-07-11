@@ -14,7 +14,7 @@ public class Collection extends Type {
 	private List<Type> types;
 
 	public Collection(String name, List<Type> types) {
-		super(name);
+		super(name, Kind.DEFINED);
 		this.types = types;
 	}
 }

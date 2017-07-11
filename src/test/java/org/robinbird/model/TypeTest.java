@@ -11,13 +11,7 @@ public class TypeTest {
 
 	@Test(expected = NullPointerException.class)
 	public void cannot_create_Type_with_null_name() {
-		new Type(null);
-	}
-
-	@Test
-	public void default_Kind_of_Type_is_DEFINED() {
-		Type t = new Type("type");
-		assertTrue(t.getKind() == Type.Kind.DEFINED);
+		new Type(null, Type.Kind.DEFINED);
 	}
 
 	@Test

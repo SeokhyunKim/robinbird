@@ -18,7 +18,7 @@ public class RepositoryTest {
 		assertTrue(r.getName().equals("test"));
 		assertTrue(r.getId() == 0);
 
-		Type t =  new Type("test");
+		Type t =  new Type("test", Type.Kind.DEFINED);
 		assertTrue(t.getName().equals("test"));
 		assertTrue(t.getId() == 0);
 

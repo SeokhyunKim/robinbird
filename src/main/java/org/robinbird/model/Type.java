@@ -16,11 +16,6 @@ public class Type extends Repositable {
 
 	@Getter private Kind kind;
 
-	public Type(String name) {
-		super(name);
-		kind = DEFINED;
-	}
-
 	public Type(String name, Kind kind) {
 		super(name);
 		this.kind = kind;

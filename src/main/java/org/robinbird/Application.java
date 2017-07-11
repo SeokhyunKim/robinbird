@@ -8,6 +8,7 @@ import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.PresentationType;
 import org.robinbird.presentation.SimplePresentation;
 import org.robinbird.utils.AppArguments;
+import org.slf4j.impl.SimpleLogger;
 
 import java.nio.file.Paths;
 
@@ -23,7 +24,7 @@ public class Application {
 		log.info("Start app with args: " + appArgs.toString());
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(appArgs.getSourceRootPath()));
-		AnalysisContext ac = au.analysis();
+		AnalysisContext ac = au.analysis(appArgs.getTerminalPatterns(), appArgs.getExcludePatterns());
 		AnalysisContextPresentation acPresent = createPresentation(appArgs.getPresentationType());
 		System.out.print(acPresent.present(ac));
 	}

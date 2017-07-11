@@ -57,4 +57,20 @@ public class AppArgumentsTest {
 		AppArguments appArgs = AppArguments.parseArguments(args);
 		assertTrue(appArgs.getSourceRootPath().equals("/test"));
 	}
+
+	@Test
+	public void success_to_read_terminal_pattern_with_TERMINAL() {
+		String[] args = new String[]{"-r", "/test", "-t", "tt+", "-t", "abc", "--terminal", "de*"};
+		AppArguments appArgs = AppArguments.parseArguments(args);
+		assertTrue(appArgs.getTerminalPatterns().get(0).toString().equals("tt+"));
+		assertTrue(appArgs.getTerminalPatterns().get(1).toString().equals("abc"));
+		assertTrue(appArgs.getTerminalPatterns().get(2).toString().equals("de*"));
+	}
+
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void failed_to_read_terminal_pattern_because_regexp_is_not_given() {
+		String[] args = new String[]{"-r", "/test", "--terminal"};
+		AppArguments appArgs = AppArguments.parseArguments(args);
+		assertTrue(appArgs.getTerminalPatterns().get(0).toString().equals("tt+"));
+	}
 }
