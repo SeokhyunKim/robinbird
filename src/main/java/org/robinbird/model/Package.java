@@ -30,7 +30,7 @@ public class Package extends Repositable {
 		classList.add(c);
 	}
 
-	List<Class> getClassList() { return classList; }
+	public List<Class> getClassList() { return classList; }
 
 	public String toString() {
 		return "Package: " + this.getName();

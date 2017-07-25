@@ -4,6 +4,7 @@ import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
+import org.robinbird.model.Package;
 import org.robinbird.model.Relation;
 
 import java.util.Map;
@@ -16,15 +17,20 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 	public String present(AnalysisContext analysisContext) {
 		StringAppender sa = new StringAppender();
 		sa.appendLine("@startuml");
-		for (Class classObj : analysisContext.getClasses()) {
-			// class name, member variables, and member functions
-			sa.appendLine(String.format("class %s {", classObj.getName()));
-			sa.append(printMemberVariables(classObj.getMemberVariables()));
-			sa.appendLine("}");
-			// inheritance
-			if (classObj.getParent() != null) {
-				sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
+		for (Package classPackage : analysisContext.getPackages()) {
+			sa.appendLine("package " + classPackage.getName() + " {");
+			//for (Class classObj : analysisContext.getClasses()) {
+			for (Class classObj : classPackage.getClassList()) {
+				// class name, member variables, and member functions
+				sa.appendLine(String.format("class %s {", classObj.getName()));
+				sa.append(printMemberVariables(classObj.getMemberVariables()));
+				sa.appendLine("}");
+				// inheritance
+				if (classObj.getParent() != null) {
+					sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
+				}
 			}
+			sa.appendLine("}");
 		}
 		for (Relation r : analysisContext.getRelations()) {
 			String firstName = removeGenerics(r.getFirst().getName());
