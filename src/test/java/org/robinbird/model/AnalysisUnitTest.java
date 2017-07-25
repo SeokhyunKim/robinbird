@@ -33,14 +33,14 @@ public class AnalysisUnitTest {
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path1));
 		au.addPath(Paths.get(path2));
-		au.analysis(null, null);
+		AnalysisContext ac = au.analysis(null, null);
 
-		assertTrue(au.getTypes().size() == 2);
-		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
-		Class c1 = (Class)au.getTypes().getRepositable(0);
+		assertTrue(ac.getTypes().size() == 2);
+		assertTrue(ac.getTypes().get(0).getName().equals("Test1"));
+		Class c1 = (Class)ac.getTypes().get(0);
 		assertTrue(c1.getClassType() == ClassType.CLASS);
-		assertTrue(au.getTypes().getRepositable(1).getName().equals("Test2"));
-		Class c2 = (Class)au.getTypes().getRepositable(1);
+		assertTrue(ac.getTypes().get(1).getName().equals("Test2"));
+		Class c2 = (Class)ac.getTypes().get(1);
 		assertTrue(c2.getClassType() == ClassType.INTERFACE);
 	}
 
@@ -50,14 +50,14 @@ public class AnalysisUnitTest {
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
-		au.analysis(null, null);
+		AnalysisContext ac = au.analysis(null, null);
 
-		assertTrue(au.getTypes().size() == 2);
-		assertTrue(au.getTypes().getRepositable(0).getName().equals("Test1"));
-		Class c1 = (Class)au.getTypes().getRepositable(0);
+		assertTrue(ac.getTypes().size() == 2);
+		assertTrue(ac.getTypes().get(0).getName().equals("Test1"));
+		Class c1 = (Class)ac.getTypes().get(0);
 		assertTrue(c1.getClassType() == ClassType.CLASS);
-		assertTrue(au.getTypes().getRepositable(1).getName().equals("Test2"));
-		Class c2 = (Class)au.getTypes().getRepositable(1);
+		assertTrue(ac.getTypes().get(1).getName().equals("Test2"));
+		Class c2 = (Class)ac.getTypes().get(1);
 		assertTrue(c2.getClassType() == ClassType.INTERFACE);
 	}
 
@@ -93,7 +93,7 @@ public class AnalysisUnitTest {
 
 	@Test
 	public void relation_test__can_recognize_associated_interface() {
-		String path = getTestPath("/relation_test__can_recognize_associated_interface");
+		String path = getTestPath("/relation_test/can_recognize_associated_interface");
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
@@ -101,6 +101,26 @@ public class AnalysisUnitTest {
 
 		assertNotNull(ac.getClass("Class1", ClassType.CLASS));
 		assertNotNull(ac.getClass("Interface1", ClassType.INTERFACE));
+	}
+
+	@Test
+	public void can_read_package() {
+		String path = getTestPath("/can_read_package");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, null);
+
+		assertNotNull(ac.getPackage("com.test.module"));
+	}
+
+	@Test
+	public void enum_test() {
+		String path = getTestPath("/can_process_enum_type");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, null);
 	}
 
 	private String getTestPath(String testPath) {

@@ -1,7 +1,5 @@
 package org.robinbird.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +15,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.utils.Msgs.Key.ALREADY_EXISTING_TYPE_NAME;
 import static org.robinbird.utils.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 
 /**
@@ -27,14 +24,41 @@ import static org.robinbird.utils.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 public class AnalysisContext {
 
 	private Repository<Type> types;
-	@Getter @Setter private Class currentClass;
-	@Getter @Setter private List<Pattern> terminalPatterns = new ArrayList<>();
-	@Getter @Setter private List<Pattern> excludePatterns = new ArrayList<>();
+	private Repository<Package> packages;
+
+	@Getter
+	private Class currentClass;
+
+	@Getter @Setter
+	private Package currentPackage;
+
+	@Getter @Setter
+	private List<Pattern> terminalPatterns = new ArrayList<>();
+
+	@Getter @Setter
+	private List<Pattern> excludePatterns = new ArrayList<>();
 
 	private Map<Relation.Key, Relation> relationMap;
 
-	public AnalysisContext(Repository<Type> types) {
+	@Getter @Setter
+	private boolean isParsingEnum;
+
+	public AnalysisContext() {
+		this.types = new Repository<>();
+		this.packages = new Repository<>();
+	}
+
+	public AnalysisContext(Repository<Type> types, Repository<Package> packages) {
 		this.types = types;
+		this.packages = packages;
+	}
+
+	public void setCurrentClass(Class c) {
+		if (c != null && currentPackage != null) {
+			currentPackage.addClass(c);
+			c.setClassPackage(currentPackage);
+		}
+		currentClass = c;
 	}
 
 	public Type getType(String name) {
@@ -168,6 +192,23 @@ public class AnalysisContext {
 			}
 		}
 
+	}
+
+	public Package getPackage(String name) {
+		return (Package)packages.getRepositable(name);
+	}
+
+	public List<Package> getPackages() {
+		return packages.getRepositableList();
+	}
+
+	public Package registerPackage(List<String> packageNameList) {
+		String packageName = Package.createPackageName(packageNameList);
+		if (packages.getRepositable(packageName) != null) {
+			return getPackage(packageName);
+		}
+		Package newPackage = new Package(packageName);
+		return packages.register(newPackage);
 	}
 
 }

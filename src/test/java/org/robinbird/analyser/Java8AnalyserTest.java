@@ -1,6 +1,7 @@
 package org.robinbird.analyser;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,9 +11,13 @@ import org.robinbird.exception.ExistingTypeNameException;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.ClassType;
+import org.robinbird.model.Package;
 import org.robinbird.model.Repository;
 import org.robinbird.model.Type;
 import org.robinbird.parser.java8.Java8Parser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +42,7 @@ public class Java8AnalyserTest {
 	@Before
 	public void setup() {
 		repository = new Repository<>();
-		analysisContext = new AnalysisContext(repository);
+		analysisContext = new AnalysisContext(repository, new Repository<Package>());
 		java8Analyser = new Java8Analyser();
 		java8Analyser.setAnalysisContext(analysisContext);
 
@@ -145,8 +150,51 @@ public class Java8AnalyserTest {
 
 	@Test
 	// will write later
-	public void can_recognize_fields_of_class_well() {
+	public void can_recognize_a_field_of_class() {
+		repository.clean();
+		java8Analyser.enterNormalClassDeclaration(classDeclarationContext);
 
+		Java8Parser.FieldDeclarationContext fieldDeclarationContext = mock(Java8Parser.FieldDeclarationContext.class);
+		List<Java8Parser.FieldModifierContext> fieldModifierContexts = new ArrayList<>();
+		when(fieldDeclarationContext.fieldModifier()).thenReturn(fieldModifierContexts);
+
+		Java8Parser.UnannTypeContext unannTypeContext = mockUnannTypeContextForPrimitive();
+		Java8Parser.VariableDeclaratorListContext variableDeclaratorListContext = mockVariableDeclaratorListContext(3);
+		when(fieldDeclarationContext.unannType()).thenReturn(unannTypeContext);
+		when(fieldDeclarationContext.variableDeclaratorList()).thenReturn(variableDeclaratorListContext);
+
+		java8Analyser.enterFieldDeclaration(fieldDeclarationContext);
+		assertTrue(analysisContext.getCurrentClass().getMemberVariables().size() == 3);
+	}
+
+	private Java8Parser.UnannTypeContext mockUnannTypeContextForPrimitive() {
+		Java8Parser.UnannTypeContext unannTypeContext = mock(Java8Parser.UnannTypeContext.class);
+		Java8Parser.UnannPrimitiveTypeContext unannPrimitiveTypeContext = mock(Java8Parser.UnannPrimitiveTypeContext.class);
+		when(unannTypeContext.unannPrimitiveType()).thenReturn(unannPrimitiveTypeContext);
+		when(unannPrimitiveTypeContext.getText()).thenReturn("int");
+		return unannTypeContext;
+	}
+
+	private Java8Parser.VariableDeclaratorListContext mockVariableDeclaratorListContext(int numVariableContext) {
+		Java8Parser.VariableDeclaratorListContext variableDeclaratorListContext
+			= mock(Java8Parser.VariableDeclaratorListContext.class);
+		List<Java8Parser.VariableDeclaratorContext> variableDeclaratorContexts
+			= new ArrayList<>();
+		when(variableDeclaratorListContext.variableDeclarator()).thenReturn(variableDeclaratorContexts);
+
+		String[] vars = ArrayUtils.toArray("a", "b", "c", "d", "e");
+		for (int i=0; i<numVariableContext; ++i) {
+			Java8Parser.VariableDeclaratorContext variableDeclaratorContext = mock(Java8Parser.VariableDeclaratorContext.class);
+			Java8Parser.VariableDeclaratorIdContext variableDeclaratorIdContext = mock(Java8Parser.VariableDeclaratorIdContext.class);
+			TerminalNode varName = mock(TerminalNode.class);
+			when(variableDeclaratorContext.variableDeclaratorId()).thenReturn(variableDeclaratorIdContext);
+			when(variableDeclaratorIdContext.Identifier()).thenReturn(varName);
+			when(varName.getText()).thenReturn(vars[i%5]);
+
+			variableDeclaratorContexts.add(variableDeclaratorContext);
+		}
+
+		return variableDeclaratorListContext;
 	}
 
 

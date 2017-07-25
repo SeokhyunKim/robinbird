@@ -21,7 +21,8 @@ public class Msgs {
 		WRONG_REGEXP_FOR_TERMINAL,
 		WRONG_REGEXP_FOR_EXCLUSION,
 		REGEXP_FOR_TERMINAL_IS_NOT_GIVEN,
-		REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN
+		REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN,
+		LIST_FOR_PACKAGE_NAME_IS_EMPTY
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -38,6 +39,7 @@ public class Msgs {
 			.put(Key.WRONG_REGEXP_FOR_EXCLUSION, "Wrong regular expression pattern is given for exclusion: %s.")
 			.put(Key.REGEXP_FOR_TERMINAL_IS_NOT_GIVEN, "Regular expression pattern for a terminal is not given.")
 			.put(Key.REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN, "Regular expression pattern for exclusion is not given.")
+			.put(Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY, "List for defining package name is empty.")
 			.build();
 	}
 

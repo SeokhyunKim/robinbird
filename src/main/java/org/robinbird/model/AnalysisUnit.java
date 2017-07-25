@@ -36,7 +36,6 @@ public class AnalysisUnit {
 	private Language language = JAVA8;
 
 	private List<Path> paths = new ArrayList<>();
-	private Repository<Type> types = new Repository<>();
 
 	public AnalysisUnit(Language language) {
 		this.language = language;
@@ -47,7 +46,7 @@ public class AnalysisUnit {
 	}
 
 	public AnalysisContext analysis(List<Pattern> terminalPatterns, List<Pattern> excludePatterns) {
-		AnalysisContext analysisContext = new AnalysisContext(types);
+		AnalysisContext analysisContext = new AnalysisContext();
 		if (terminalPatterns != null && terminalPatterns.size()>0) {
 			analysisContext.setTerminalPatterns(terminalPatterns);
 		}

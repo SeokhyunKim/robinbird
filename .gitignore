@@ -8,6 +8,7 @@ target
 build/
 .gradle
 test_results/
+classes/
 
 # Eclipse project files
 .classpath

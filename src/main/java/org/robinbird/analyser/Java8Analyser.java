@@ -2,6 +2,7 @@ package org.robinbird.analyser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Analyser;
@@ -10,6 +11,7 @@ import org.robinbird.model.ClassType;
 import org.robinbird.model.Collection;
 import org.robinbird.model.Member;
 import org.robinbird.model.Type;
+import org.robinbird.model.Package;
 import org.robinbird.parser.java8.Java8BaseListener;
 import org.robinbird.parser.java8.Java8Parser;
 import org.robinbird.utils.Msgs;
@@ -33,6 +35,24 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 	private enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE};
 	State state = State.NONE;
+
+	@Override
+	public void enterPackageDeclaration(Java8Parser.PackageDeclarationContext ctx) {
+		List<String> packageNameList = new ArrayList<>();
+		for (TerminalNode identifier : ctx.Identifier()) {
+			packageNameList.add(identifier.getText());
+		}
+		Package p = analysisContext.registerPackage(packageNameList);
+		analysisContext.setCurrentPackage(p);
+	}
+
+	@Override public void enterEnumDeclaration(Java8Parser.EnumDeclarationContext ctx) {
+		analysisContext.setParsingEnum(true);
+	}
+
+	@Override public void exitEnumDeclaration(Java8Parser.EnumDeclarationContext ctx) {
+		analysisContext.setParsingEnum(false);
+	}
 
 	@Override
 	public void enterNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
@@ -60,6 +80,12 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	}
 
 	@Override
+	public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
+		analysisContext.setCurrentClass(null);
+		analysisContext.setCurrentPackage(null);
+	}
+
+	@Override
 	public void enterNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
 		String interfaceName = ctx.Identifier().getText();
 		if (analysisContext.isExcluded(interfaceName)) {
@@ -77,7 +103,14 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	}
 
 	@Override
+	public void exitNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
+		analysisContext.setCurrentClass(null);
+		analysisContext.setCurrentPackage(null);
+	}
+
+	@Override
 	public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
+		if (analysisContext.isParsingEnum()) { return; }
 		if (state == State.EXCLUDED_TYPE) { return; }
 		checkState(analysisContext.getCurrentClass() != null, Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
 		if (analysisContext.isCurrentClassTerminal()) { return; }

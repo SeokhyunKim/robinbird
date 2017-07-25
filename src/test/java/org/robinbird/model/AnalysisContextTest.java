@@ -16,7 +16,7 @@ public class AnalysisContextTest {
 
 	@Before
 	public void setup() {
-		analysisContext = new AnalysisContext(new Repository<Type>());
+		analysisContext = new AnalysisContext();
 		analysisContext.registerType("test1");
 		analysisContext.registerType("test2");
 		analysisContext.registerClass("Class1", ClassType.CLASS);

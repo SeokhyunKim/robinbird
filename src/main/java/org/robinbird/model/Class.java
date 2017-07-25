@@ -16,11 +16,11 @@ import static com.google.common.base.Preconditions.checkState;
  * Created by seokhyun on 6/2/17.
  */
 @Getter
-@ToString(callSuper = true)
 public class Class extends Type {
 
 	@Setter private ClassType classType = ClassType.CLASS;
 	@Setter private Class parent;
+	@Setter private Package classPackage;
 	private List<Class> interfaces = new ArrayList<>();
 	private TreeMap<String, Member> memberVariables = new TreeMap<>();
 	private TreeMap<String, MemberFunction> memberFunctions = new TreeMap<>();
@@ -32,6 +32,10 @@ public class Class extends Type {
 	public Class(String name, ClassType classType) {
 		this(name);
 		this.classType = classType;
+	}
+
+	public String toString() {
+		return classType.toString() + ": " + this.getName();
 	}
 
 	public void addInterface(Class interfaceClass) {

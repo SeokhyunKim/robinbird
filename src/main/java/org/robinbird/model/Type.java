@@ -1,7 +1,6 @@
 package org.robinbird.model;
 
 import lombok.Getter;
-import lombok.ToString;
 
 import static org.robinbird.model.Type.Kind.PRIMITIVE;
 import static org.robinbird.model.Type.Kind.DEFINED;
@@ -9,7 +8,6 @@ import static org.robinbird.model.Type.Kind.DEFINED;
 /**
  * Created by seokhyun on 5/31/17.
  */
-@ToString(callSuper = true)
 public class Type extends Repositable {
 
 	public enum Kind { PRIMITIVE, DEFINED};
@@ -19,6 +17,10 @@ public class Type extends Repositable {
 	public Type(String name, Kind kind) {
 		super(name);
 		this.kind = kind;
+	}
+
+	public String toString() {
+		return "Type: " + this.getName();
 	}
 
 	public boolean isPrimitiveType() {
