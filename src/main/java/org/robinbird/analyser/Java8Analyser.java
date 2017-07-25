@@ -76,6 +76,20 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			}
 			c.setParent(parent);
 		}
+		// TO DO : write UTs
+		if (ctx.superinterfaces() != null) {
+			Java8Parser.SuperinterfacesContext superinterfacesContext = ctx.superinterfaces();
+			if (superinterfacesContext.interfaceTypeList() != null) {
+				for (Java8Parser.InterfaceTypeContext interfaceTypeContext : superinterfacesContext.interfaceTypeList().interfaceType()) {
+					Class newInterface = analysisContext.getClass(interfaceTypeContext.getText());
+					if (newInterface == null) {
+						newInterface = analysisContext.registerClass(interfaceTypeContext.getText(), ClassType.INTERFACE);
+					}
+					c.addInterface(newInterface);
+				}
+
+			}
+		}
 		analysisContext.setCurrentClass(c);
 	}
 

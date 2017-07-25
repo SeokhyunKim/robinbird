@@ -29,6 +29,11 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 				if (classObj.getParent() != null) {
 					sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
 				}
+				if (classObj.getInterfaces().size() > 0) {
+					for (Class interfaceOfClassObj : classObj.getInterfaces()) {
+						sa.appendLine(removeGenerics(interfaceOfClassObj.getName()) + " <|.. " + removeGenerics(classObj.getName()));
+					}
+				}
 			}
 			sa.appendLine("}");
 		}
