@@ -25,18 +25,38 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 				sa.appendLine(String.format("class %s {", classObj.getName()));
 				sa.append(printMemberVariables(classObj.getMemberVariables()));
 				sa.appendLine("}");
-				// inheritance
+				/*/ inheritance
 				if (classObj.getParent() != null) {
 					sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
 				}
+				// interfaces
+				if (classObj.getInterfaces().size() > 0) {
+					for (Class interfaceOfClassObj : classObj.getInterfaces()) {
+						sa.appendLine(removeGenerics(interfaceOfClassObj.getName()) + " <|.. " + removeGenerics(classObj.getName()));
+					}
+				}*/
+			}
+			sa.appendLine("}");
+		}
+		// inheritance
+		for (Package classPackage : analysisContext.getPackages()) {
+			for (Class classObj : classPackage.getClassList()) {
+				if (classObj.getParent() != null) {
+					sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
+				}
+			}
+		}
+		// interfaces
+		for (Package classPackage : analysisContext.getPackages()) {
+			for (Class classObj : classPackage.getClassList()) {
 				if (classObj.getInterfaces().size() > 0) {
 					for (Class interfaceOfClassObj : classObj.getInterfaces()) {
 						sa.appendLine(removeGenerics(interfaceOfClassObj.getName()) + " <|.. " + removeGenerics(classObj.getName()));
 					}
 				}
 			}
-			sa.appendLine("}");
 		}
+		// relations
 		for (Relation r : analysisContext.getRelations()) {
 			String firstName = removeGenerics(r.getFirst().getName());
 			String secondName = removeGenerics(r.getSecond().getName());

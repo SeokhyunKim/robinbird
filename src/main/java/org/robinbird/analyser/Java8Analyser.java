@@ -248,7 +248,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	}
 
 	private boolean isCollection(String text) {
-		String[] collections = { "List", "LinkedList", "ArrayList", "Set", "TreeSet", "HashSet", "LinkedHashSet", "Map", "HashMap", "TreeMap"};
+		String[] collections = { "List", "LinkedList", "ArrayList", "Set", "TreeSet", "HashSet", "LinkedHashSet", "Map", "HashMap", "TreeMap", "ConcurrentMap"};
 		for (String collection : collections) {
 			if (text.startsWith(collection)) { return true; }
 		}

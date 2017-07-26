@@ -39,7 +39,8 @@ public class Class extends Type {
 	}
 
 	public void addInterface(Class interfaceClass) {
-		checkState(interfaceClass.getClassType() == ClassType.INTERFACE);
+		// TO DO: check just doing this is safe
+		//checkState(interfaceClass.getClassType() == ClassType.INTERFACE);
 		interfaces.add(interfaceClass); }
 
 	public void addMember(Member m) {
