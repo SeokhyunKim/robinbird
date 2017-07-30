@@ -4,6 +4,15 @@ apply plugin: 'application'
 
 // set main class for application plugin
 mainClassName = "org.robinbird.Application"
+// default JVM args for application plugin
+applicationDefaultJvmArgs = ["-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"]
+
+run {
+	// split space-delimited value in robinbird.args (or rb.args) and pass as args
+	String robinbirdArgs = System.getProperty("robinbird.args")
+	robinbirdArgs = (robinbirdArgs == null) ? System.getProperty("rb.args") : robinbirdArgs
+	args ((robinbirdArgs == null) ? null : robinbirdArgs.split())
+}
 
 // grammar source directory for antlr plugin
 generateGrammarSource {
