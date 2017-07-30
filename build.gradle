@@ -1,27 +1,18 @@
 apply plugin: 'java'
 apply plugin: 'antlr'
+apply plugin: 'application'
 
-repositories {
-	mavenCentral()
-}
+// set main class for application plugin
+mainClassName = "org.robinbird.Application"
 
-// reference: https://www.mkyong.com/gradle/gradle-create-a-jar-file-with-dependencies/
-task fatJar(type: Jar) {
-	manifest {
-		attributes (
-			'Main-Class': 'org.robinbird.Application'
-		)
-	}
-	baseName = project.name + '-all'
-	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	with jar
-}
-
+// grammar source directory for antlr plugin
 generateGrammarSource {
 	outputDirectory = file("src/main/java/org/robinbird/parser/java8")
 }
 
-
+repositories {
+	mavenCentral()
+}
 
 dependencies {
 	antlr "org.antlr:antlr4:4.5"
