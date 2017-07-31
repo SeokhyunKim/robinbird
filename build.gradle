@@ -11,7 +11,9 @@ run {
 	// split space-delimited value in robinbird.args (or rb.args) and pass as args
 	String robinbirdArgs = System.getProperty("robinbird.args")
 	robinbirdArgs = (robinbirdArgs == null) ? System.getProperty("rb.args") : robinbirdArgs
-	args ((robinbirdArgs == null) ? null : robinbirdArgs.split())
+	if (robinbirdArgs != null) {
+		args robinbirdArgs.split()
+	}
 }
 
 // grammar source directory for antlr plugin
