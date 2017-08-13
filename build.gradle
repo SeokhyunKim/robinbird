@@ -1,6 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'antlr'
 apply plugin: 'application'
+apply plugin: 'jacoco'
+
+//-----------------------------------------------------------------------------
+// application config
 
 // set main class for application plugin
 mainClassName = "org.robinbird.Application"
@@ -16,14 +20,69 @@ run {
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+// antlr config
+
 // grammar source directory for antlr plugin
 generateGrammarSource {
 	outputDirectory = file("src/main/java/org/robinbird/parser/java8")
 }
 
+
+
+//-----------------------------------------------------------------------------
+// jacoco config
+
+test {
+
+	jacoco {
+		append = false
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		//classDumpFile = file("$buildDir/jacoco/classpathdumps") gradle error happened. don't know why..
+	}
+	check.dependsOn jacocoTestReport
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled true
+		xml.enabled true
+		csv.enabled false
+		html.destination file("${buildDir}/jacocoHtml")
+	}
+
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+			fileTree(dir: it,
+					exclude: ['org/robinbird/parser/**'])
+		})
+	}
+
+	doLast {
+		def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
+		logger.lifecycle("JaCoCo Report: ${report}")
+		logger.quiet("Coverage ratio for each type:")
+
+		def reportParser = new XmlParser()
+		reportParser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		reportParser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+		def results = reportParser.parse(report)
+
+		results.counter.each {
+			def type = it.'@type'
+			def covered = it.'@covered' as Float
+			def missed = it.'@missed' as Float
+			logger.quiet("{}: {}", type, (covered/(covered+missed)).round(3))
+		}
+	}
+}
+
+
 repositories {
 	mavenCentral()
 }
+
 
 dependencies {
 	antlr "org.antlr:antlr4:4.5"
