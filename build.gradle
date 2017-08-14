@@ -34,8 +34,9 @@ generateGrammarSource {
 //-----------------------------------------------------------------------------
 // jacoco config
 
-test {
+jacoco.toolVersion = "0.7.9"
 
+test {
 	jacoco {
 		append = false
 		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
@@ -60,8 +61,8 @@ jacocoTestReport {
 	}
 
 	doLast {
+		logger.lifecycle("JaCoCo Report: ${buildDir}/jacocoHtml/index.html")
 		def report = file("${jacoco.reportsDir}/test/jacocoTestReport.xml")
-		logger.lifecycle("JaCoCo Report: ${report}")
 		logger.quiet("Coverage ratio for each type:")
 
 		def reportParser = new XmlParser()
