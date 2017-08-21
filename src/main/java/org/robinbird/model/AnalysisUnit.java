@@ -48,10 +48,10 @@ public class AnalysisUnit {
 	public AnalysisContext analysis(List<Pattern> terminalPatterns, List<Pattern> excludePatterns) {
 		AnalysisContext analysisContext = new AnalysisContext();
 		if (terminalPatterns != null && terminalPatterns.size()>0) {
-			analysisContext.setTerminalPatterns(terminalPatterns);
+			analysisContext.setTerminalClassPatterns(terminalPatterns);
 		}
 		if (excludePatterns != null && excludePatterns.size()>0) {
-			analysisContext.setExcludePatterns(excludePatterns);
+			analysisContext.setExcludedClassPatterns(excludePatterns);
 		}
 		for (Path path : paths) {
 			log.info("Start analysis for " + path);

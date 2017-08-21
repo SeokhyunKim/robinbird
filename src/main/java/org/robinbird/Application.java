@@ -24,7 +24,7 @@ public class Application {
 		log.info("Start app with args: " + appArgs.toString());
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(appArgs.getSourceRootPath()));
-		AnalysisContext ac = au.analysis(appArgs.getTerminalPatterns(), appArgs.getExcludePatterns());
+		AnalysisContext ac = au.analysis(appArgs.getTerminalClassPatterns(), appArgs.getExcludedClassPatterns());
 		AnalysisContextPresentation acPresent = createPresentation(appArgs.getPresentationType());
 		System.out.print(acPresent.present(ac));
 	}

@@ -33,10 +33,10 @@ public class AnalysisContext {
 	private Package currentPackage;
 
 	@Getter @Setter
-	private List<Pattern> terminalPatterns = new ArrayList<>();
+	private List<Pattern> terminalClassPatterns = new ArrayList<>();
 
 	@Getter @Setter
-	private List<Pattern> excludePatterns = new ArrayList<>();
+	private List<Pattern> excludedClassPatterns = new ArrayList<>();
 
 	private Map<Relation.Key, Relation> relationMap;
 
@@ -74,7 +74,7 @@ public class AnalysisContext {
 	}
 
 	public boolean isTerminal(String identifier) {
-		for (Pattern pattern : terminalPatterns) {
+		for (Pattern pattern : terminalClassPatterns) {
 			if (pattern.matcher(identifier).matches()) {
 				return true;
 			}
@@ -88,7 +88,7 @@ public class AnalysisContext {
 	}
 
 	public boolean isExcluded(String identifier) {
-		for (Pattern pattern : excludePatterns) {
+		for (Pattern pattern : excludedClassPatterns) {
 			if (pattern.matcher(identifier).matches()) {
 				return true;
 			}

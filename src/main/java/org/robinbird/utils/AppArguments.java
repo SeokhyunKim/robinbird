@@ -31,8 +31,8 @@ public class AppArguments {
 	private enum ArgType {
 		ROOT1("-r"), ROOT2("--root"),
 		PRESENTATION1("-p"), PRESENTATION2("--presentation"),
-		TERMINAL1("-t"), TERMINAL2("--terminal"),
-		EXCLUSION1("-e"), EXCLUSION2("--exclusion");
+		TERMINAL_CLASS1("-tc"), TERMINAL_CLASS2("--terminal-class"),
+		EXCLUDED_CLASS1("-ec"), EXCLUDED_CLASS2("--excluded-class");
 
 		private final String name;
 		private static Map<String, ArgType> argTypeMap;
@@ -54,8 +54,8 @@ public class AppArguments {
 
 	@NonNull private String sourceRootPath;
 	@NonNull private PresentationType presentationType;
-	@NonNull private List<Pattern> terminalPatterns;
-	@NonNull private List<Pattern> excludePatterns;
+	@NonNull private List<Pattern> terminalClassPatterns;
+	@NonNull private List<Pattern> excludedClassPatterns;
 
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();
@@ -63,8 +63,8 @@ public class AppArguments {
 		argsBuilder.presentationType(PresentationType.PLANTUML);
 		List<Pattern> terminalPatterns = new ArrayList<>();
 		List<Pattern> excludePatterns = new ArrayList<>();
-		argsBuilder.terminalPatterns(terminalPatterns);
-		argsBuilder.excludePatterns(excludePatterns);
+		argsBuilder.terminalClassPatterns(terminalPatterns);
+		argsBuilder.excludedClassPatterns(excludePatterns);
 		// parse parameters
 		for (int i=0; i<args.length;) {
 			ArgType at = ArgType.getArgType(args[i]);
@@ -90,13 +90,13 @@ public class AppArguments {
 					}
 					i += 2;
 					break;
-				case TERMINAL1:
-				case TERMINAL2:
-				case EXCLUSION1:
-				case EXCLUSION2:
+				case TERMINAL_CLASS1:
+				case TERMINAL_CLASS2:
+				case EXCLUDED_CLASS1:
+				case EXCLUDED_CLASS2:
 					List<Pattern> patterns;
 					Msgs.Key keyForIllegarArg, keyForPatternSyntax;
-					if(at==ArgType.TERMINAL1 || at==ArgType.TERMINAL2) {
+					if(at==ArgType.TERMINAL_CLASS1 || at==ArgType.TERMINAL_CLASS2) {
 						patterns = terminalPatterns;
 						keyForIllegarArg = REGEXP_FOR_TERMINAL_IS_NOT_GIVEN;
 						keyForPatternSyntax = WRONG_REGEXP_FOR_TERMINAL;
