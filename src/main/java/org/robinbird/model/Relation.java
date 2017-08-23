@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Getter
 @ToString
-@EqualsAndHashCode
 public class Relation {
 
 	@Value

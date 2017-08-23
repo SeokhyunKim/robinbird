@@ -1,7 +1,10 @@
 package org.robinbird.model;
 
+import be.joengenduvel.java.verifiers.ToStringVerifier;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -29,7 +32,56 @@ public class RelationTest {
 	@Test
 	public void create_and_createKey_make_same_Keys() {
 		Relation r = Relation.create(new Type("BType", Type.Kind.DEFINED), new Type("AType", Type.Kind.DEFINED));
-		Relation.Key k = Relation.createKey("AType", "BType");
-		assertTrue(r.getKey().equals(k));
+		Relation.Key k1 = Relation.createKey("AType", "BType");
+		Relation.Key k2 = Relation.createKey("BType", "AType");
+		assertTrue(r.getKey().equals(k1));
+		assertTrue(r.getKey().equals(k2));
+	}
+
+	@Test
+	public void check_equals_and_hashcode() {
+		EqualsVerifier.forClass(Relation.Key.class).verify();
+	}
+
+	@Test
+	public void check_toString() {
+		Relation r = Relation.create(new Type("abc", Type.Kind.PRIMITIVE), new Type("def", Type.Kind.DEFINED));
+		r.setFirstCardinality("1");
+		r.setSecondCardinality("2");
+		// TO DO: fix problem with jacoco
+		//ToStringVerifier.forClass(Relation.class).ignore("jacocodata").containsAllPrivateFields(r);
+		String str = r.toString();
+		assertTrue(str.contains("Relation") && str.contains("first") &&
+					str.contains("second") && str.contains("firstCardinality") && str.contains("secondCardinality"));
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_relation_with_1st_null_param() {
+		Relation.create(null, new Type("test", Type.Kind.DEFINED));
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_relation_with_2nd_null_param() {
+		Relation.create(new Type("test", Type.Kind.DEFINED), null);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_key_with_1st_null_param() {
+		Relation.createKey(null, new Type("test", Type.Kind.DEFINED));
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_key_with_2nd_null_param() {
+		Relation.createKey(new Type("test", Type.Kind.DEFINED), null);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_key_with_1st_null_string() {
+		Relation.createKey(null, "test");
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void create_key_with_2nd_null_string() {
+		Relation.createKey("test", null);
 	}
 }

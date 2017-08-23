@@ -93,6 +93,8 @@ dependencies {
 	compileOnly "org.projectlombok:lombok:1.16.16"
 	testCompile "junit:junit:4.12"
 	testCompile "org.mockito:mockito-core:2.8.47"
+	testCompile "nl.jqno.equalsverifier:equalsverifier:2.3.2" // http://jqno.nl/equalsverifier/
+	testCompile "be.joengenduvel.java.verifiers:to-string:1.0.2" // https://github.com/Joengenduvel/toStringVerifier
 }
 
 
