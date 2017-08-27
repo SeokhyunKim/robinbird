@@ -46,13 +46,9 @@ public class RelationTest {
 	@Test
 	public void check_toString() {
 		Relation r = Relation.create(new Type("abc", Type.Kind.PRIMITIVE), new Type("def", Type.Kind.DEFINED));
-		r.setFirstCardinality("1");
-		r.setSecondCardinality("2");
-		// TO DO: fix problem with jacoco
-		//ToStringVerifier.forClass(Relation.class).ignore("jacocodata").containsAllPrivateFields(r);
-		String str = r.toString();
-		assertTrue(str.contains("Relation") && str.contains("first") &&
-					str.contains("second") && str.contains("firstCardinality") && str.contains("secondCardinality"));
+		ToStringVerifier.forClass(Relation.class).ignore("$jacocoData").containsAllPrivateFields(r);
+		Relation.Key k = Relation.createKey("first", "second");
+		ToStringVerifier.forClass(Relation.Key.class).ignore("$jacocoData").containsAllPrivateFields(k);
 	}
 
 	@Test(expected = IllegalStateException.class)

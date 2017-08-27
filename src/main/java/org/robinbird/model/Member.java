@@ -1,17 +1,23 @@
 package org.robinbird.model;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 /**
  * Created by seokhyun on 5/31/17.
  */
-@Data
+@Getter
+@AllArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class Member {
 
-	@NonNull protected AccessModifier accessModifier;
+	@NonNull protected final AccessModifier accessModifier;
 
-	@NonNull protected Type type;
+	@NonNull protected final Type type;
 
-	@NonNull protected String name;
+	@NonNull protected final String name;
 }
