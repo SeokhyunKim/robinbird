@@ -45,11 +45,27 @@ public class RepositoryTest {
 	}
 
 	@Test
+	public void can_return_already_existing_repositable() {
+		Repository<Repositable> repo = new Repository<>();
+		Repositable r1 = repo.register(new Repositable("test1"));
+		Repositable r2 = repo.register(new Repositable("test1"));
+		assertTrue(r1 == r2);
+	}
+
+	@Test
 	public void return_null_for_not_existing_repositable() {
 		Repository<Repositable> repo = new Repository<>();
 		assertNull(repo.getRepositable("test"));
 		repo.register(new Repositable("test"));
 		assertNull(repo.getRepositable("wrong_name"));
+	}
+
+	@Test
+	public void return_null_with_wrong_indicies() {
+		Repository<Repositable> repo = new Repository<>();
+		repo.register(new Repositable("test"));
+		assertNull(repo.getRepositable(-1));
+		assertNull(repo.getRepositable(1));
 	}
 
 	@Test

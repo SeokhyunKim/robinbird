@@ -39,6 +39,15 @@ public class RelationTest {
 	}
 
 	@Test
+	public void can_set_cardinalities() {
+		Relation r = Relation.create(new Type("BType", Type.Kind.DEFINED), new Type("AType", Type.Kind.DEFINED));
+		r.setFirstCardinality("1");
+		r.setSecondCardinality("1");
+		assertTrue("1".equals(r.getFirstCardinality()));
+		assertTrue("1".equals(r.getSecondCardinality()));
+	}
+
+	@Test
 	public void check_equals_and_hashcode() {
 		EqualsVerifier.forClass(Relation.Key.class).verify();
 	}

@@ -2,6 +2,7 @@ package org.robinbird.model;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -18,8 +19,10 @@ public class TypeTest {
 	public void test_Kind_checking_functions() {
 		Type t1 = new Type("type", Type.Kind.PRIMITIVE);
 		assertTrue(t1.isPrimitiveType());
+		assertFalse(t1.isDefinedType());
 		Type t2 = new Type("type", Type.Kind.DEFINED);
 		assertTrue(t2.isDefinedType());
+		assertFalse(t2.isPrimitiveType());
 	}
 
 }
