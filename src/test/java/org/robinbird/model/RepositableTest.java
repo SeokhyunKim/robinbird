@@ -13,15 +13,8 @@ import static org.junit.Assert.assertTrue;
 public class RepositableTest {
 
 	@Test
-	public void can_set_a_name() {
-		Repositable r = new Repositable("test");
-		r.setName("newName");
-		assertTrue(r.getName().equals("newName"));
-	}
-
-	@Test
 	public void test_equals_and_hashcode() {
-		//EqualsVerifier.forClass(Repositable.class).verify();
+		EqualsVerifier.forClass(Repositable.class).withIgnoredFields("id").verify();
 
 	}
 
