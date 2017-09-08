@@ -6,8 +6,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
 
@@ -74,6 +77,31 @@ public class AnalysisUnitTest {
 		assertNotNull(ac.getClass("Interface1", ClassType.INTERFACE));
 		assertNotNull(ac.getClass("Interface2", ClassType.INTERFACE));
 		assertNotNull(ac.getClass("Interface3", ClassType.INTERFACE));
+	}
+
+	@Test
+	public void can_recognize_excluded_pattern_file() {
+		String path = getTestPath("/can_recognize_excluded_pattern_file");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, Arrays.asList(Pattern.compile("Excluded")));
+
+		assertNotNull(ac.getClass("Class1"));
+		assertNull(ac.getClass("Excluded"));
+	}
+
+	@Test
+	public void terminal_class_does_not_have_any_member() {
+		String path = getTestPath("/terminal_class_does_not_have_any_member");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(Arrays.asList(Pattern.compile("Terminal")), null);
+
+		Class t = ac.getClass("Terminal");
+		assertTrue(t.getMemberVariables().size() == 0);
+		assertTrue(t.getMemberFunctions().size() == 0);
 	}
 
 	@Test

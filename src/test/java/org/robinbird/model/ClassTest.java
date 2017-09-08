@@ -38,4 +38,18 @@ public class ClassTest {
 		assertTrue(c.getMemberVariables().size() == 1);
 		assertTrue(c.getMemberFunctions().size() == 1);
 	}
+
+	@Test(expected = IllegalStateException.class)
+	public void when_member_name_is_empty_IllegalStateException_is_thrown() {
+		Class c = new Class("test");
+		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "");
+		c.addMember(m);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void when_memger_function_name_is_empty_IllegalStateException_is_thrown() {
+		Class c = new Class("test");
+		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "");
+		c.addMemberFunction(f);
+	}
 }

@@ -44,12 +44,12 @@ public class Class extends Type {
 		interfaces.add(interfaceClass); }
 
 	public void addMember(Member m) {
-		checkState(m.getName() != null);
+		checkState(!m.getName().isEmpty());
 		memberVariables.put(m.getName(), m);
 	}
 
 	public void addMemberFunction(MemberFunction f) {
-		checkState(f.getName() != null);
+		checkState(!f.getName().isEmpty());
 		memberFunctions.put(f.getName(), f);
 	}
 }
