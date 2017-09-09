@@ -105,18 +105,14 @@ public class AnalysisUnitTest {
 	}
 
 	@Test
-	public void can_read_member_variables() {
-		// will add later
-	}
+	public void files_with_extensions_other_than_java_are_skipped() {
+		String path = getTestPath("/files_with_extensions_other_than_java_are_skipped");
 
-	@Test
-	public void can_read_member_functions_for_class() {
-		// will add later
-	}
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, null);
 
-	@Test
-	public void can_read_member_functions_for_interface() {
-		// will add later
+		assertTrue(ac.getClasses().size() == 1);
 	}
 
 	@Test

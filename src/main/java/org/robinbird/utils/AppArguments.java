@@ -115,9 +115,6 @@ public class AppArguments {
 					}
 					i += 2;
 					break;
-				default:
-					++i;
-					break;
 			}
 		}
 		AppArguments appArgs = argsBuilder.build();
