@@ -31,8 +31,8 @@ public class ClassTest {
 	@Test
 	public void test_addMember_and_addMemberFunction() {
 		Class c = new Class("test");
-		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "testMember");
-		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "testFn");
+		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.REFERENCE), "testMember");
+		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.REFERENCE), "testFn");
 		c.addMember(m);
 		c.addMemberFunction(f);
 		assertTrue(c.getMemberVariables().size() == 1);
@@ -42,14 +42,14 @@ public class ClassTest {
 	@Test(expected = IllegalStateException.class)
 	public void when_member_name_is_empty_IllegalStateException_is_thrown() {
 		Class c = new Class("test");
-		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "");
+		Member m = new Member(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.REFERENCE), "");
 		c.addMember(m);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void when_memger_function_name_is_empty_IllegalStateException_is_thrown() {
 		Class c = new Class("test");
-		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.DEFINED), "");
+		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("TestType", Type.Kind.REFERENCE), "");
 		c.addMemberFunction(f);
 	}
 }

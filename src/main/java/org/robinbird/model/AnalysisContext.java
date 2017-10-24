@@ -113,7 +113,7 @@ public class AnalysisContext {
 	public Type registerType(String name) {
 		Type t = getType(name);
 		if (t != null) { return t; }
-		t = new Type(name, Type.Kind.DEFINED);
+		t = new Type(name, Type.Kind.REFERENCE);
 		types.register(t);
 		return t;
 	}

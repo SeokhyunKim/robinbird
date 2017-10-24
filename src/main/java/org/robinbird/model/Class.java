@@ -2,12 +2,9 @@ package org.robinbird.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -26,7 +23,7 @@ public class Class extends Type {
 	private TreeMap<String, MemberFunction> memberFunctions = new TreeMap<>();
 
 	public Class(String name) {
-		super(name, Kind.DEFINED);
+		super(name, Kind.REFERENCE);
 	}
 
 	public Class(String name, ClassType classType) {

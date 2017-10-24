@@ -1,7 +1,6 @@
 package org.robinbird.model;
 
 import lombok.Getter;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class Collection extends Type {
 	private List<Type> types;
 
 	public Collection(String name, List<Type> types) {
-		super(name, Kind.DEFINED);
+		super(name, Kind.REFERENCE);
 		this.types = types;
 	}
 

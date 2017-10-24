@@ -85,10 +85,11 @@ public class AnalysisUnitTest {
 
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
-		AnalysisContext ac = au.analysis(null, Arrays.asList(Pattern.compile("Excluded")));
+		AnalysisContext ac = au.analysis(null, Arrays.asList(Pattern.compile("Excluded.*")));
 
 		assertNotNull(ac.getClass("Class1"));
 		assertNull(ac.getClass("Excluded"));
+		assertNull(ac.getClass("ExcludedInterface"));
 	}
 
 	@Test

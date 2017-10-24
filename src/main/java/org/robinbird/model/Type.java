@@ -3,14 +3,14 @@ package org.robinbird.model;
 import lombok.Getter;
 
 import static org.robinbird.model.Type.Kind.PRIMITIVE;
-import static org.robinbird.model.Type.Kind.DEFINED;
+import static org.robinbird.model.Type.Kind.REFERENCE;
 
 /**
  * Created by seokhyun on 5/31/17.
  */
 public class Type extends Repositable {
 
-	public enum Kind { PRIMITIVE, DEFINED};
+	public enum Kind { PRIMITIVE, REFERENCE};
 
 	@Getter private Kind kind;
 
@@ -27,8 +27,8 @@ public class Type extends Repositable {
 		return kind == PRIMITIVE;
 	}
 
-	public boolean isDefinedType() {
-		return kind == DEFINED;
+	public boolean isReferenceType() {
+		return kind == REFERENCE;
 	}
 
 	public int compareTo(Type another) {

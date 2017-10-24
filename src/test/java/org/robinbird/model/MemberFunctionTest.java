@@ -1,9 +1,7 @@
 package org.robinbird.model;
 
 import be.joengenduvel.java.verifiers.ToStringVerifier;
-import lombok.NonNull;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,11 +16,11 @@ public class MemberFunctionTest {
 
 	@Test
 	public void test_create_member_function_without_arguments() {
-		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("String", Type.Kind.DEFINED), "test1");
+		MemberFunction f = new MemberFunction(AccessModifier.PUBLIC, new Type("String", Type.Kind.REFERENCE), "test1");
 		assertTrue(f.getAccessModifier() == AccessModifier.PUBLIC);
 		assertTrue(f.getName().equals("test1"));
 		assertTrue(f.getType().getName() == "String");
-		assertTrue(f.getType().getKind() == Type.Kind.DEFINED);
+		assertTrue(f.getType().getKind() == Type.Kind.REFERENCE);
 		assertTrue(f.getName() == "test1");
 	}
 
@@ -57,7 +55,7 @@ public class MemberFunctionTest {
 
 	private MemberFunction createTestMemberFunction() {
 		return new MemberFunction(	AccessModifier.PUBLIC,
-			new Type("String", Type.Kind.DEFINED),
+			new Type("String", Type.Kind.REFERENCE),
 			"test1",
 			Arrays.asList(new Type("Integer", Type.Kind.PRIMITIVE), new Class("Class1")));
 	}

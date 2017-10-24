@@ -14,8 +14,8 @@ public class RelationTest {
 
 	@Test
 	public void create_relation_with_lexicographical_order_of_type_names() {
-		Relation r1 = Relation.create(new Type("A_should_be_1st", Type.Kind.DEFINED), new Type("B_should_be_2nd", Type.Kind.DEFINED));
-		Relation r2 = Relation.create(new Type("B_should_be_2nd", Type.Kind.DEFINED), new Type("A_should_be_1st", Type.Kind.DEFINED));
+		Relation r1 = Relation.create(new Type("A_should_be_1st", Type.Kind.REFERENCE), new Type("B_should_be_2nd", Type.Kind.REFERENCE));
+		Relation r2 = Relation.create(new Type("B_should_be_2nd", Type.Kind.REFERENCE), new Type("A_should_be_1st", Type.Kind.REFERENCE));
 		assertTrue(r1.getFirst().getName() == "A_should_be_1st");
 		assertTrue(r1.getSecond().getName() == "B_should_be_2nd");
 		assertTrue(r2.getFirst().getName() == "A_should_be_1st");
@@ -24,14 +24,14 @@ public class RelationTest {
 
 	@Test
 	public void create_Key_fns_make_Keys_based_on_alphabetical_order_of_names() {
-		Relation.Key k1 = Relation.createKey(new Type("BType", Type.Kind.DEFINED), new Type("AType", Type.Kind.DEFINED));
+		Relation.Key k1 = Relation.createKey(new Type("BType", Type.Kind.REFERENCE), new Type("AType", Type.Kind.REFERENCE));
 		Relation.Key k2= Relation.createKey("AType", "BType");
 		assertTrue(k1.equals(k2));
 	}
 
 	@Test
 	public void create_and_createKey_make_same_Keys() {
-		Relation r = Relation.create(new Type("BType", Type.Kind.DEFINED), new Type("AType", Type.Kind.DEFINED));
+		Relation r = Relation.create(new Type("BType", Type.Kind.REFERENCE), new Type("AType", Type.Kind.REFERENCE));
 		Relation.Key k1 = Relation.createKey("AType", "BType");
 		Relation.Key k2 = Relation.createKey("BType", "AType");
 		assertTrue(r.getKey().equals(k1));
@@ -40,7 +40,7 @@ public class RelationTest {
 
 	@Test
 	public void can_set_cardinalities() {
-		Relation r = Relation.create(new Type("BType", Type.Kind.DEFINED), new Type("AType", Type.Kind.DEFINED));
+		Relation r = Relation.create(new Type("BType", Type.Kind.REFERENCE), new Type("AType", Type.Kind.REFERENCE));
 		r.setFirstCardinality("1");
 		r.setSecondCardinality("1");
 		assertTrue("1".equals(r.getFirstCardinality()));
@@ -54,7 +54,7 @@ public class RelationTest {
 
 	@Test
 	public void check_toString() {
-		Relation r = Relation.create(new Type("abc", Type.Kind.PRIMITIVE), new Type("def", Type.Kind.DEFINED));
+		Relation r = Relation.create(new Type("abc", Type.Kind.PRIMITIVE), new Type("def", Type.Kind.REFERENCE));
 		ToStringVerifier.forClass(Relation.class).ignore("$jacocoData").containsAllPrivateFields(r);
 		Relation.Key k = Relation.createKey("first", "second");
 		ToStringVerifier.forClass(Relation.Key.class).ignore("$jacocoData").containsAllPrivateFields(k);
@@ -62,22 +62,22 @@ public class RelationTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void create_relation_with_1st_null_param() {
-		Relation.create(null, new Type("test", Type.Kind.DEFINED));
+		Relation.create(null, new Type("test", Type.Kind.REFERENCE));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void create_relation_with_2nd_null_param() {
-		Relation.create(new Type("test", Type.Kind.DEFINED), null);
+		Relation.create(new Type("test", Type.Kind.REFERENCE), null);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void create_key_with_1st_null_param() {
-		Relation.createKey(null, new Type("test", Type.Kind.DEFINED));
+		Relation.createKey(null, new Type("test", Type.Kind.REFERENCE));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void create_key_with_2nd_null_param() {
-		Relation.createKey(new Type("test", Type.Kind.DEFINED), null);
+		Relation.createKey(new Type("test", Type.Kind.REFERENCE), null);
 	}
 
 	@Test(expected = IllegalStateException.class)

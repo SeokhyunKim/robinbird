@@ -172,74 +172,83 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 		// primitive type field
 		if (unannTypeContext.unannPrimitiveType() != null) {
-			type = new Type(unannTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
+			type = getPrimitiveType(unannTypeContext.unannPrimitiveType());
 		}
 		// reference type field
 		else if (unannTypeContext.unannReferenceType() != null) {
 			Java8Parser.UnannReferenceTypeContext referenceTypeContext = unannTypeContext.unannReferenceType();
-
 			if (referenceTypeContext.unannClassOrInterfaceType() != null) {
-				String typeText = referenceTypeContext.getText();
-				if (isPrimitive(typeText))
-				{
-					type = new Type(typeText, Type.Kind.PRIMITIVE);
-				}
-				else if (isCollection(typeText))
-				{
-					List<Java8Parser.ReferenceTypeContext> java8RefTypes = new ArrayList<>();
-					findJava8ParserReferenceTypes(referenceTypeContext, java8RefTypes);
-					List<Type> refTypes = getReferenceTypes(java8RefTypes);
-					type = new Collection(typeText, refTypes);
-				}
-				else
-				{
-					type = analysisContext.getType(typeText);
-					if (type == null) {
-						if (isPrimitive(typeText)) {
-							type = new Type(typeText, Type.Kind.PRIMITIVE);
-						} else {
-							if (analysisContext.isExcluded(typeText)) {
-								type = new Class(typeText, ClassType.CLASS);
-							} else {
-								// For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
-								type = analysisContext.registerClass(typeText, ClassType.CLASS);
-							}
-						}
-					}
-				}
-			}
-			// array type field
-			else if (referenceTypeContext.unannArrayType() != null) {
-				Java8Parser.UnannArrayTypeContext arrayTypeContext = referenceTypeContext.unannArrayType();
-				Type aryBaseType = null;
-				if (arrayTypeContext.unannClassOrInterfaceType() != null) {
-					String classOrInterfaceTypeText = arrayTypeContext.unannClassOrInterfaceType().getText();
-					if (isPrimitive(classOrInterfaceTypeText)) {
-						aryBaseType = new Type(classOrInterfaceTypeText, Type.Kind.PRIMITIVE);
-					} else {
-						aryBaseType = analysisContext.getClass(classOrInterfaceTypeText);
-						if (aryBaseType == null) {
-							if (analysisContext.isExcluded(classOrInterfaceTypeText)) {
-								aryBaseType = new Class(classOrInterfaceTypeText, ClassType.CLASS);
-							} else {
-								aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
-							}
-						}
-					}
-				} else if (arrayTypeContext.unannPrimitiveType() != null) {
-					aryBaseType = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
-				}
-				checkState(aryBaseType != null, Msgs.get(FAILED_TO_FIND_MEMBER_TYPE, arrayTypeContext.getText()));
-				List<Type> types = new ArrayList<>();
-				types.add(aryBaseType);
-				type = new Collection(arrayTypeContext.getText(), types);
+				type = getReferenceType(referenceTypeContext);
+			} else if (referenceTypeContext.unannArrayType() != null) {
+				type = getArrayType(referenceTypeContext.unannArrayType());
 			}
 		}
 		checkState(type != null, Msgs.get(FAILED_TO_FIND_MEMBER_TYPE, analysisContext.getCurrentClass().getName()));
 		return type;
 	}
 
-	private boolean isPrimitive(String text) {
+	private Type getPrimitiveType(Java8Parser.UnannPrimitiveTypeContext primitiveTypeContext) {
+		return new Type(primitiveTypeContext.getText(), Type.Kind.PRIMITIVE);
+
+	}
+
+	private Type getReferenceType(Java8Parser.UnannReferenceTypeContext referenceTypeContext) {
+		Type type = null;
+		String typeText = referenceTypeContext.getText();
+		if (isPrimitiveClass(typeText)) // For example, types like String, Integer, and etc are just processed as primitive
+		{
+			type = new Type(typeText, Type.Kind.PRIMITIVE);
+		}
+		else if (isCollection(typeText))
+		{
+			List<Java8Parser.ReferenceTypeContext> java8RefTypes = new ArrayList<>();
+			findJava8ParserReferenceTypes(referenceTypeContext, java8RefTypes);
+			List<Type> refTypes = getReferenceTypes(java8RefTypes);
+			type = new Collection(typeText, refTypes);
+		}
+		else
+		{
+			type = analysisContext.getType(typeText);
+			if (type == null) {
+				if (analysisContext.isExcluded(typeText)) {
+					type = new Class(typeText, ClassType.CLASS);
+				} else {
+					// For newly found reference type, just set as CLASS. Can be changed to INTERFACE later.
+					type = analysisContext.registerClass(typeText, ClassType.CLASS);
+				}
+			}
+		}
+		return type;
+	}
+
+	private Type getArrayType(Java8Parser.UnannArrayTypeContext arrayTypeContext) {
+		Type aryBaseType = null;
+		if (arrayTypeContext.unannClassOrInterfaceType() != null) {
+			String classOrInterfaceTypeText = arrayTypeContext.unannClassOrInterfaceType().getText();
+			if (isPrimitiveClass(classOrInterfaceTypeText)) {
+				aryBaseType = new Type(classOrInterfaceTypeText, Type.Kind.PRIMITIVE);
+			} else {
+				aryBaseType = analysisContext.getClass(classOrInterfaceTypeText);
+				if (aryBaseType == null) {
+					if (analysisContext.isExcluded(classOrInterfaceTypeText)) {
+						aryBaseType = new Class(classOrInterfaceTypeText, ClassType.CLASS);
+					} else {
+						aryBaseType = analysisContext.registerClass(classOrInterfaceTypeText, ClassType.CLASS);
+					}
+				}
+			}
+		} else if (arrayTypeContext.unannPrimitiveType() != null) {
+			aryBaseType = new Type(arrayTypeContext.unannPrimitiveType().getText(), Type.Kind.PRIMITIVE);
+		}
+		checkState(aryBaseType != null, Msgs.get(FAILED_TO_FIND_MEMBER_TYPE, arrayTypeContext.getText()));
+		List<Type> types = new ArrayList<>();
+		types.add(aryBaseType);
+		return new Collection(arrayTypeContext.getText(), types);
+	}
+
+
+
+	private boolean isPrimitiveClass(String text) {
 		String[] types = { "Byte", "Short", "Integer", "Long", "Character", "Float", "Double", "Boolean", "String"};
 		for (String type : types) {
 			if (text.startsWith(type)) { return true; }
@@ -273,12 +282,12 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			if (isCollection(context.getText())) {
 				continue;
 			}
-			if (isPrimitive(context.getText())) {
+			if (isPrimitiveClass(context.getText())) {
 				refTypes.add(new Type(context.getText(), Type.Kind.PRIMITIVE));
 			} else {
 				Type t = analysisContext.getType(context.getText());
 				if (t == null) {
-					if (isPrimitive(context.getText())) {
+					if (isPrimitiveClass(context.getText())) {
 						t = new Type(context.getText(), Type.Kind.PRIMITIVE);
 					} else {
 						if (analysisContext.isExcluded(context.getText())) {
