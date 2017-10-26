@@ -1,6 +1,8 @@
 package org.robinbird.analyser;
 
 import net.bytebuddy.implementation.bytecode.Throw;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mockito.Mockito;
@@ -10,6 +12,7 @@ import org.mockito.stubbing.Answer;
 import org.robinbird.parser.java8.Java8Parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -154,42 +157,6 @@ public class Java8AnalyserMockUtil {
 	}
 
 	/**
-	 * Mock Java8Parser.UnannTypeContext for primitive and reference types
-	 * @param whichType can be primitive, reference_primitiveClass, reference_collection, reference_array, and reference
-	 * @return mocked UnannTypeContext
-	 */
-	/*public static Java8Parser.UnannTypeContext mockTypeContext(String whichType) {
-		Java8Parser.UnannTypeContext typeContext = Mockito.mock(Java8Parser.UnannTypeContext.class);
-		if (whichType == "primitive") {
-			Java8Parser.UnannPrimitiveTypeContext primitiveTypeContext = mockPrimitiveTypeContext();
-			when(typeContext.unannPrimitiveType()).thenReturn(primitiveTypeContext);
-		} else if (whichType.contains("reference")) {
-			Java8Parser.UnannReferenceTypeContext referenceTypeContext = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
-			when(typeContext.unannReferenceType()).thenReturn(referenceTypeContext);
-			Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = Mockito.mock(Java8Parser.UnannClassOrInterfaceTypeContext.class);
-			Java8Parser.UnannArrayTypeContext arrayTypeContext = Mockito.mock(Java8Parser.UnannArrayTypeContext.class);
-			if (whichType.contains("primitiveClass")) {
-				when(referenceTypeContext.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
-				when(referenceTypeContext.getText()).thenReturn("String");
-			} else if (whichType.contains("collection")) {
-				when(referenceTypeContext.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
-				when(referenceTypeContext.getText()).thenReturn("List<List<String>>");
-				// need to check...
-			} else if (whichType.contains("array")) {
-				when(referenceTypeContext.unannArrayType()).thenReturn(arrayTypeContext);
-				if (whichType.contains("primitiveArray")) {
-
-				} else {
-
-				}
-			} else {
-
-			}
-		}
-		return typeContext;
-	}*/
-
-	/**
 	 * Mock Java8Parser.UnannTypeContext with given UnannPrimitiveTypeContext
 	 * @param primitiveTypeContext primitive type context
 	 * @return UnannTypeContext returning primitive type context
@@ -212,6 +179,32 @@ public class Java8AnalyserMockUtil {
 	}
 
 	/**
+	 * Mock Java8Parser.UnannArrayTypeContext with given UnannPrimitiveTypeContext
+	 * @param primitiveTypeContext primitive type context
+	 * @return UnannArrayTypeContext returning primitive type context
+	 */
+	public static Java8Parser.UnannArrayTypeContext mockArrayTypeContext(Java8Parser.UnannPrimitiveTypeContext primitiveTypeContext) {
+		Java8Parser.UnannArrayTypeContext aryContext = Mockito.mock(Java8Parser.UnannArrayTypeContext.class);
+		when(aryContext.unannPrimitiveType()).thenReturn(primitiveTypeContext);
+		String aryText = primitiveTypeContext.getText() + "[]";
+		when(aryContext.getText()).thenReturn(aryText);
+		return aryContext;
+	}
+
+	/**
+	 * Mock Java8Parser.UnannArrayTypeContext with given UnannClassOrInterfaceTypeContext
+	 * @param classOrInterfaceTypeContext class or interface type context
+	 * @return UnannArrayTypeContext returning class or interface type context
+	 */
+	public static Java8Parser.UnannArrayTypeContext mockArrayTypeContext(Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext) {
+		Java8Parser.UnannArrayTypeContext aryContext = Mockito.mock(Java8Parser.UnannArrayTypeContext.class);
+		when(aryContext.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
+		String aryText = classOrInterfaceTypeContext.getText() + "[]";
+		when(aryContext.getText()).thenReturn(aryText);
+		return aryContext;
+	}
+
+	/**
 	 * Mock primitive type context for "int"
 	 * @return mocked primitive type context
 	 */
@@ -231,7 +224,42 @@ public class Java8AnalyserMockUtil {
 		when(referenceTypeContext.getText()).thenReturn(typeText);
 		Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = Mockito.mock(Java8Parser.UnannClassOrInterfaceTypeContext.class);
 		when(referenceTypeContext.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
+		when(classOrInterfaceTypeContext.getText()).thenReturn(typeText);
 		return referenceTypeContext;
+	}
+
+	/**
+	 * Mock ParseTree having 3 Java8Parser.ReferenceTypeContext
+	 * @return mocked ParseTree having 3 Java8Parser.ReferenceTypeContext
+	 */
+	public static ParseTree mockParseTreeHavingReferenceTypeContext() {
+		ParserRuleContext root = new ParserRuleContext();
+		ParserRuleContext c1 = new Java8Parser.ReferenceTypeContext(root, 1);
+		ParserRuleContext c2 = new ParserRuleContext(root, 1);
+		root.addChild(c1); root.addChild(c2);
+		ParserRuleContext c11 = new ParserRuleContext(c1, 1);
+		ParserRuleContext c12 = new Java8Parser.ReferenceTypeContext(c1, 1);
+		c1.addChild(c11); c1.addChild(c12);
+		ParserRuleContext c21 = new Java8Parser.ReferenceTypeContext(c2, 1);
+		c2.addChild(c21);
+		return root;
+	}
+
+	/**
+	 * Mock list of Java8Parser.ReferenceTypeContext:
+	 * { List<Integer>, Integer, TestClass1, Excluded1, TestClass2, TestClass1, Excluded2 }.
+	 * @return mocked list of Java8Parser.ReferenceTypeContext
+	 */
+	public static List<Java8Parser.ReferenceTypeContext> mockListOfReferenceTypeContexts() {
+		List<Java8Parser.ReferenceTypeContext> refTypes = new ArrayList<>();
+		List<String> texts
+			= Arrays.asList("List<Integer>", "Integer", "TestClass1", "Excluded1", "TestClass2", "TestClass1", "Excluded2");
+		for (String s : texts) {
+			Java8Parser.ReferenceTypeContext rtc = Mockito.mock(Java8Parser.ReferenceTypeContext.class);
+			when(rtc.getText()).thenReturn(s);
+			refTypes.add(rtc);
+		}
+		return refTypes;
 	}
 
 }

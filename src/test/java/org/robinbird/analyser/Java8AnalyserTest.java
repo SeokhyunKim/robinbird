@@ -1,5 +1,6 @@
 package org.robinbird.analyser;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.ClassType;
+import org.robinbird.model.Collection;
 import org.robinbird.model.Package;
 import org.robinbird.model.Repository;
 import org.robinbird.model.Type;
@@ -248,6 +250,38 @@ public class Java8AnalyserTest {
 		assertTrue(type.getName().equals("TestClass"));
 		assertTrue(type.getKind() == Type.Kind.REFERENCE);
 		assertNull(analysisContext.getClass("TestClass"));
+	}
+
+	@Test
+	public void findJava8ParserReferenceTypes_can_find_all_ReferenceTypeContext_from_ParseTree() throws Exception {
+		ParseTree tree = mockParseTreeHavingReferenceTypeContext();
+		List<Java8Parser.ReferenceTypeContext> refTypes = new ArrayList<>();
+		Method findJava8ParserReferenceTypes
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(),
+			"findJava8ParserReferenceTypes",
+			ParseTree.class, List.class);
+		findJava8ParserReferenceTypes.invoke(java8Analyser, tree, refTypes);
+		assertTrue(refTypes.size() == 3);
+	}
+
+	@Test
+	public void getReferenceTypes_can_return_List_of_Type_from_List_of_ReferenceTypeContext() throws Exception {
+		List<Java8Parser.ReferenceTypeContext> refTypes = mockListOfReferenceTypeContexts();
+		Method getReferenceTypes
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getReferenceTypes", List.class);
+		analysisContext.setExcludedClassPatterns(Arrays.asList(Pattern.compile("Excluded.*")));
+		List<Type> types = (List<Type>)getReferenceTypes.invoke(java8Analyser, refTypes);
+		assertTrue(types.size() == 6);
+		assertTrue(analysisContext.getClasses().size() == 2);
+	}
+
+	@Test
+	public void getArrayType_can_recognize_primitive_type_array() throws Exception {
+		Java8Parser.UnannArrayTypeContext atc = mockArrayTypeContext(mockPrimitiveTypeContext());
+		Method getArrayType
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getArrayType", Java8Parser.UnannArrayTypeContext.class);
+		Collection collection = (Collection)getArrayType.invoke(java8Analyser, atc);
+		assertTrue(collection.getTypes().get(0).getName().equals("int"));
 	}
 
 

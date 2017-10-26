@@ -287,14 +287,10 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			} else {
 				Type t = analysisContext.getType(context.getText());
 				if (t == null) {
-					if (isPrimitiveClass(context.getText())) {
-						t = new Type(context.getText(), Type.Kind.PRIMITIVE);
+					if (analysisContext.isExcluded(context.getText())) {
+						t = new Class(context.getText(), ClassType.CLASS);
 					} else {
-						if (analysisContext.isExcluded(context.getText())) {
-							t = new Class(context.getText(), ClassType.CLASS);
-						} else {
-							t = analysisContext.registerClass(context.getText(), ClassType.CLASS);
-						}
+						t = analysisContext.registerClass(context.getText(), ClassType.CLASS);
 					}
 				}
 				refTypes.add(t);
