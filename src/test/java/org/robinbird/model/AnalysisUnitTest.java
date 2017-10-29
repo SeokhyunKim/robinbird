@@ -1,10 +1,9 @@
 package org.robinbird.model;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.robinbird.TestUtils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -18,15 +17,6 @@ import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
  * Created by seokhyun on 6/3/17.
  */
 public class AnalysisUnitTest {
-
-	private String rootTestPath;
-
-	@Before
-	public void setup() {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		rootTestPath = s + "/src/test/resources/test_directory/AnalysisUnitTest";
-	}
 
 	@Test
 	public void can_analysis_files() throws IOException {
@@ -148,9 +138,7 @@ public class AnalysisUnitTest {
 		AnalysisContext ac = au.analysis(null, null);
 	}
 
-	private String getTestPath(String testPath) {
-		return rootTestPath + testPath;
+	private String getTestPath(String path) {
+		return TestUtils.getTestPath("/AnalysisUnitTest"+path);
 	}
-
-
 }

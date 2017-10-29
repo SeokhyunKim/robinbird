@@ -62,6 +62,11 @@ public class Java8AnalyserTest {
 	}
 
 	@Test
+	public void can_return_analysisContext() {
+		assertTrue(java8Analyser.getAnalysisContext() == analysisContext);
+	}
+
+	@Test
 	public void enterNormalClassDeclaration_can_register_new_normal_class() {
 		java8Analyser.enterNormalClassDeclaration(classDeclarationContext);
 		assertTrue(repository.size() == 1);
@@ -219,6 +224,24 @@ public class Java8AnalyserTest {
 	}
 
 	@Test
+	public void when_a_collection_is_given_then_getType_can_create_Collection_Type() throws Exception {
+		Method getType = TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getType", Java8Parser.UnannTypeContext.class);
+		Java8Parser.UnannReferenceTypeContext root = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
+		when(root.getText()).thenReturn("List<int>");
+		Java8Parser.UnannReferenceTypeContext c1 = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
+		Java8Parser.UnannReferenceTypeContext c2 = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
+		when(root.getChild(0)).thenReturn(c1);
+		when(root.getChild(1)).thenReturn(c2);
+		Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = Mockito.mock(Java8Parser.UnannClassOrInterfaceTypeContext.class);
+		when(root.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
+		Java8Parser.UnannTypeContext typeContext = mockTypeContext(root);
+		java8Analyser.enterNormalClassDeclaration(classDeclarationContext);
+		Type type = (Type)getType.invoke(java8Analyser, typeContext);
+		java8Analyser.exitNormalClassDeclaration(classDeclarationContext);
+		assertTrue(type instanceof Collection);
+	}
+
+	@Test
 	public void when_a_class_type_is_given_then_getType_can_create_REFERENCE_Type() throws Exception {
 		Method getType = TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getType", Java8Parser.UnannTypeContext.class);
 		Java8Parser.UnannTypeContext typeContext = mockTypeContext(mockReferenceTypeContex("TestClass"));
@@ -253,6 +276,18 @@ public class Java8AnalyserTest {
 	}
 
 	@Test
+	public void when_array_type_is_given_then_getType_can_create_Collection_Type() throws Exception {
+		Method getType = TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getType", Java8Parser.UnannTypeContext.class);
+		Java8Parser.UnannArrayTypeContext atc = mockArrayTypeContext(mockPrimitiveTypeContext());
+		Java8Parser.UnannReferenceTypeContext rtc = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
+		when(rtc.unannArrayType()).thenReturn(atc);
+		java8Analyser.enterNormalClassDeclaration(classDeclarationContext);
+		Type type = (Type)getType.invoke(java8Analyser, mockTypeContext(rtc));
+		java8Analyser.exitNormalClassDeclaration(classDeclarationContext);
+		assertTrue(type instanceof Collection);
+	}
+
+	@Test
 	public void findJava8ParserReferenceTypes_can_find_all_ReferenceTypeContext_from_ParseTree() throws Exception {
 		ParseTree tree = mockParseTreeHavingReferenceTypeContext();
 		List<Java8Parser.ReferenceTypeContext> refTypes = new ArrayList<>();
@@ -282,6 +317,39 @@ public class Java8AnalyserTest {
 			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getArrayType", Java8Parser.UnannArrayTypeContext.class);
 		Collection collection = (Collection)getArrayType.invoke(java8Analyser, atc);
 		assertTrue(collection.getTypes().get(0).getName().equals("int"));
+	}
+
+	@Test
+	public void getArrayType_can_recognize_primitive_class_array() throws Exception {
+		Java8Parser.UnannArrayTypeContext atc
+			= mockArrayTypeContext(mockClassOrInterfaceTypeContext("Integer"));
+		Method getArrayType
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getArrayType", Java8Parser.UnannArrayTypeContext.class);
+		Collection collection = (Collection)getArrayType.invoke(java8Analyser, atc);
+		assertTrue(collection.getTypes().get(0).getName().equals("Integer"));
+	}
+
+	@Test
+	public void getArrayType_can_recognize_class_array() throws Exception {
+		Java8Parser.UnannArrayTypeContext atc
+			= mockArrayTypeContext(mockClassOrInterfaceTypeContext("TestClass"));
+		Method getArrayType
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getArrayType", Java8Parser.UnannArrayTypeContext.class);
+		Collection collection = (Collection)getArrayType.invoke(java8Analyser, atc);
+		assertTrue(collection.getTypes().get(0).getName().equals("TestClass"));
+		assertTrue(analysisContext.getClasses().size() == 1);
+	}
+
+	@Test
+	public void getArrayType_can_filter_out_excluded_pattern() throws Exception {
+		Java8Parser.UnannArrayTypeContext atc
+			= mockArrayTypeContext(mockClassOrInterfaceTypeContext("Excluded"));
+		Method getArrayType
+			= TestUtils.getAccessiblePrivateMethod(java8Analyser.getClass(), "getArrayType", Java8Parser.UnannArrayTypeContext.class);
+		analysisContext.setExcludedClassPatterns(Arrays.asList(Pattern.compile("Excluded")));
+		Collection collection = (Collection)getArrayType.invoke(java8Analyser, atc);
+		assertTrue(collection.getTypes().get(0).getName().equals("Excluded"));
+		assertTrue(analysisContext.getClasses().size() == 0);
 	}
 
 

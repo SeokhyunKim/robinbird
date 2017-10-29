@@ -217,15 +217,25 @@ public class Java8AnalyserMockUtil {
 	/**
 	 * Mock reference type context which returns typeText
 	 * @param typeText string for type text of returned mock
-	 * @return mo
+	 * @return mocked UnannReferenceTypeContext
 	 */
 	public static Java8Parser.UnannReferenceTypeContext mockReferenceTypeContex(String typeText) {
 		Java8Parser.UnannReferenceTypeContext referenceTypeContext = Mockito.mock(Java8Parser.UnannReferenceTypeContext.class);
 		when(referenceTypeContext.getText()).thenReturn(typeText);
 		Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = Mockito.mock(Java8Parser.UnannClassOrInterfaceTypeContext.class);
 		when(referenceTypeContext.unannClassOrInterfaceType()).thenReturn(classOrInterfaceTypeContext);
-		when(classOrInterfaceTypeContext.getText()).thenReturn(typeText);
 		return referenceTypeContext;
+	}
+
+	/**
+	 * Mock ClassOrInterface type context which returns typeText
+	 * @param typeText string for type text of returned mock
+	 * @return mocked UnannClassOrInterfaceTypeContext
+	 */
+	public static Java8Parser.UnannClassOrInterfaceTypeContext mockClassOrInterfaceTypeContext(String typeText) {
+		Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = Mockito.mock(Java8Parser.UnannClassOrInterfaceTypeContext.class);
+		when(classOrInterfaceTypeContext.getText()).thenReturn(typeText);
+		return classOrInterfaceTypeContext;
 	}
 
 	/**

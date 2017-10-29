@@ -19,22 +19,11 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 		sa.appendLine("@startuml");
 		for (Package classPackage : analysisContext.getPackages()) {
 			sa.appendLine("package " + classPackage.getName() + " {");
-			//for (Class classObj : analysisContext.getClasses()) {
 			for (Class classObj : classPackage.getClassList()) {
 				// class name, member variables, and member functions
 				sa.appendLine(String.format("class %s {", classObj.getName()));
 				sa.append(printMemberVariables(classObj.getMemberVariables()));
 				sa.appendLine("}");
-				/*/ inheritance
-				if (classObj.getParent() != null) {
-					sa.appendLine(removeGenerics(classObj.getParent().getName()) + " <|-- " + removeGenerics(classObj.getName()));
-				}
-				// interfaces
-				if (classObj.getInterfaces().size() > 0) {
-					for (Class interfaceOfClassObj : classObj.getInterfaces()) {
-						sa.appendLine(removeGenerics(interfaceOfClassObj.getName()) + " <|.. " + removeGenerics(classObj.getName()));
-					}
-				}*/
 			}
 			sa.appendLine("}");
 		}
@@ -88,9 +77,9 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 		switch (accessModifier) {
 			case PUBLIC: return "+";
 			case PRIVATE: return "-";
-			case PROTECTED: return "#";
 		}
-		return "-";
+		// protected
+		return "#";
 	}
 
 	private String attachQuotes(String text) {

@@ -29,7 +29,7 @@ public class Application {
 		System.out.print(acPresent.present(ac));
 	}
 
-	AnalysisContextPresentation createPresentation(PresentationType ptype) {
+	private AnalysisContextPresentation createPresentation(PresentationType ptype) {
 		AnalysisContextPresentation presentation;
 		switch (ptype) {
 			case SIMPLE:
