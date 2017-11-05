@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisUnit;
 import org.robinbird.presentation.AnalysisContextPresentation;
+import org.robinbird.presentation.GMLPresentation;
 import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.PresentationType;
 import org.robinbird.presentation.SimplePresentation;
@@ -32,6 +33,9 @@ public class Application {
 	private AnalysisContextPresentation createPresentation(PresentationType ptype) {
 		AnalysisContextPresentation presentation;
 		switch (ptype) {
+			case GML:
+				presentation = new GMLPresentation();
+				break;
 			case SIMPLE:
 				presentation = new SimplePresentation();
 				break;

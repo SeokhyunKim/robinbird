@@ -31,6 +31,13 @@ public class Class extends Type {
 		this.classType = classType;
 	}
 
+	public String getFullName() {
+		if (classPackage != null) {
+			return classPackage.getName() + "." + getName();
+		}
+		return getName();
+	}
+
 	public String toString() {
 		return classType.toString() + ": " + this.getName();
 	}
