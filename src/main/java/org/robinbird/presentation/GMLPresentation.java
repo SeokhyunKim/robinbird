@@ -46,6 +46,7 @@ public class GMLPresentation implements AnalysisContextPresentation {
 			String secondId = removeGenerics(((Class)r.getSecond()).getFullName());
 			appendEdgeString(sa, firstId, secondId);
 		}
+		sa.appendLine("]");
 		return sa.toString();
 	}
 
