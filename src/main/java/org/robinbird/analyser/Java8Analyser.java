@@ -33,7 +33,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	public void setAnalysisContext(AnalysisContext analysisContext) { this.analysisContext = analysisContext; }
 	public AnalysisContext getAnalysisContext() { return analysisContext; }
 
-	private enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE};
+	private enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE, INNER_CLASS};
 	State state = State.NONE;
 
 	@Override
@@ -59,6 +59,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 		String className = ctx.Identifier().getText() + getTemplateClassParameters(ctx.typeParameters());
 		if (analysisContext.isExcluded(className)) {
 			state = State.EXCLUDED_TYPE;
+			return;
+		}
+		if (analysisContext.getCurrentClass() != null) {
+			state = State.INNER_CLASS;
+			analysisContext.pushCurrentClass(new Class(className, ClassType.CLASS));
 			return;
 		}
 		state = State.PARSING_CLASS;
@@ -90,12 +95,12 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 			}
 		}
-		analysisContext.setCurrentClass(c);
+		analysisContext.pushCurrentClass(c);
 	}
 
 	@Override
 	public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
-		analysisContext.setCurrentClass(null);
+		analysisContext.popCurrentClass();
 		analysisContext.setCurrentPackage(null);
 	}
 
@@ -106,6 +111,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			state = State.EXCLUDED_TYPE;
 			return;
 		}
+		if (analysisContext.getCurrentClass() != null) {
+			state = State.INNER_CLASS;
+			analysisContext.pushCurrentClass(new Class(interfaceName, ClassType.INTERFACE));
+			return;
+		}
 		state = State.PARSING_INTERFACE;
 		Class c = analysisContext.getClass(interfaceName);
 		if (c != null) {
@@ -113,19 +123,19 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 		} else {
 			c = analysisContext.registerClass(interfaceName, ClassType.INTERFACE);
 		}
-		analysisContext.setCurrentClass(c);
+		analysisContext.pushCurrentClass(c);
 	}
 
 	@Override
 	public void exitNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-		analysisContext.setCurrentClass(null);
+		analysisContext.popCurrentClass();
 		analysisContext.setCurrentPackage(null);
 	}
 
 	@Override
 	public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
 		if (analysisContext.isParsingEnum()) { return; }
-		if (state == State.EXCLUDED_TYPE) { return; }
+		if (state == State.EXCLUDED_TYPE || state == State.INNER_CLASS) { return; }
 		checkState(analysisContext.getCurrentClass() != null, Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
 		if (analysisContext.isCurrentClassTerminal()) { return; }
 

@@ -87,11 +87,12 @@ public class AnalysisContextTest {
 	@Test
 	public void test_isCurrentClassTerminal() {
 		AnalysisContext analysisContext = createTestAnalysisContext();
-		analysisContext.setCurrentClass(analysisContext.getClass("Class1"));
+		analysisContext.pushCurrentClass(analysisContext.getClass("Class1"));
 		analysisContext.setTerminalClassPatterns(Arrays.asList(Pattern.compile("Class\\d+")));
 		assertTrue(analysisContext.isCurrentClassTerminal());
+		analysisContext.popCurrentClass();
 
-		analysisContext.setCurrentClass(null);
+		analysisContext.pushCurrentClass(null);
 		analysisContext.setTerminalClassPatterns(null);
 		assertFalse(analysisContext.isCurrentClassTerminal());
 	}
@@ -110,11 +111,12 @@ public class AnalysisContextTest {
 	@Test
 	public void test_isCurrentClassExcluded() {
 		AnalysisContext analysisContext = createTestAnalysisContext();
-		analysisContext.setCurrentClass(analysisContext.getClass("Class1"));
+		analysisContext.pushCurrentClass(analysisContext.getClass("Class1"));
 		analysisContext.setExcludedClassPatterns(Arrays.asList(Pattern.compile("Class\\d+")));
 		assertTrue(analysisContext.isCurrentClassExcluded());
+		analysisContext.popCurrentClass();
 
-		analysisContext.setCurrentClass(null);
+		analysisContext.pushCurrentClass(null);
 		analysisContext.setExcludedClassPatterns(null);
 		assertFalse(analysisContext.isCurrentClassExcluded());
 	}
