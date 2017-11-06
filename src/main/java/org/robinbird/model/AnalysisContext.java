@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -25,9 +26,7 @@ public class AnalysisContext {
 
 	private Repository<Type> types;
 	private Repository<Package> packages;
-
-	@Getter
-	private Class currentClass;
+	private Stack<Class> currentClasses = new Stack<>();
 
 	@Getter @Setter
 	private Package currentPackage;
@@ -53,12 +52,26 @@ public class AnalysisContext {
 		this.packages = packages;
 	}
 
-	public void setCurrentClass(Class c) {
+	public void pushCurrentClass(Class c) {
 		if (c != null && currentPackage != null) {
 			currentPackage.addClass(c);
 			c.setClassPackage(currentPackage);
 		}
-		currentClass = c;
+		currentClasses.push(c);
+	}
+
+	public Class popCurrentClass() {
+		if (currentClasses.empty()) {
+			return null;
+		}
+		return currentClasses.pop();
+	}
+
+	public Class getCurrentClass() {
+		if (currentClasses.empty()) {
+			return null;
+		}
+		return currentClasses.peek();
 	}
 
 	public Type getType(String name) {
@@ -84,8 +97,8 @@ public class AnalysisContext {
 	}
 
 	public boolean isCurrentClassTerminal() {
-		if (currentClass == null) { return false; }
-		return isTerminal(currentClass.getName());
+		if (getCurrentClass() == null) { return false; }
+		return isTerminal(getCurrentClass().getName());
 	}
 
 	public boolean isExcluded(String identifier) {
@@ -99,8 +112,8 @@ public class AnalysisContext {
 	}
 
 	public boolean isCurrentClassExcluded() {
-		if (currentClass == null) { return false; }
-		return isExcluded(currentClass.getName());
+		if (getCurrentClass() == null) { return false; }
+		return isExcluded(getCurrentClass().getName());
 	}
 
 	public Class getClass(String name, ClassType ctype) {

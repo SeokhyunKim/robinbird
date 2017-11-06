@@ -1,5 +1,6 @@
 package org.robinbird.model;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.robinbird.TestUtils;
 
@@ -136,6 +137,17 @@ public class AnalysisUnitTest {
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(path));
 		AnalysisContext ac = au.analysis(null, null);
+	}
+
+	@Test
+	public void inner_classes_are_ignored() {
+		String path = getTestPath("/ignore_inner_classes");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, null);
+
+		assertTrue(ac.getClasses().size() == 1);
 	}
 
 	private String getTestPath(String path) {

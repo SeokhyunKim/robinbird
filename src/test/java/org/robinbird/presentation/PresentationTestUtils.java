@@ -25,17 +25,22 @@ public class PresentationTestUtils {
 		Class classB = analysisContext.registerClass("ClassB", ClassType.CLASS);
 		Class interfaceC = analysisContext.registerClass("InterfaceC", ClassType.INTERFACE);
 		Class classD = analysisContext.registerClass("ClassD", ClassType.CLASS);
-		analysisContext.setCurrentClass(parentA);
-		analysisContext.setCurrentClass(classA);
+		analysisContext.pushCurrentClass(parentA); // register to the test package
+		analysisContext.popCurrentClass();
+		analysisContext.pushCurrentClass(classA);
 		classA.setParent(parentA);
 		classA.addMember(new Member(AccessModifier.PRIVATE, classB, "m1"));
-		analysisContext.setCurrentClass(classB);
+		analysisContext.popCurrentClass();
+		analysisContext.pushCurrentClass(classB);
 		classB.addMember(new Member(AccessModifier.PUBLIC, classA, "m2"));
 		classB.addMember(new Member(AccessModifier.PROTECTED, classD, "mm"));
 		classB.addInterface(interfaceC);
-		analysisContext.setCurrentClass(interfaceC);
-		analysisContext.setCurrentClass(classD);
+		analysisContext.popCurrentClass();
+		analysisContext.pushCurrentClass(interfaceC);
+		analysisContext.popCurrentClass();
+		analysisContext.pushCurrentClass(classD);
 		classD.addMember(new Member(AccessModifier.PROTECTED, classA, "m3"));
+		analysisContext.popCurrentClass();
 		analysisContext.update();
 		return analysisContext;
 	}
