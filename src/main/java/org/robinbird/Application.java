@@ -1,19 +1,18 @@
 package org.robinbird;
 
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.model.AnalysisContext;
-import org.robinbird.model.AnalysisUnit;
-import org.robinbird.presentation.AnalysisContextPresentation;
-import org.robinbird.presentation.GMLPresentation;
-import org.robinbird.presentation.PlantUMLPresentation;
-import org.robinbird.presentation.PresentationType;
-import org.robinbird.presentation.SimplePresentation;
-import org.robinbird.utils.AppArguments;
-import org.slf4j.impl.SimpleLogger;
+import org.robinbird.code.model.AnalysisContext;
+import org.robinbird.code.model.AnalysisUnit;
+import org.robinbird.code.presentation.AnalysisContextPresentation;
+import org.robinbird.code.presentation.GMLPresentation;
+import org.robinbird.code.presentation.PlantUMLPresentation;
+import org.robinbird.code.presentation.PresentationType;
+import org.robinbird.code.presentation.SimplePresentation;
+import org.robinbird.common.utils.AppArguments;
 
 import java.nio.file.Paths;
 
-import static org.robinbird.model.AnalysisUnit.Language.JAVA8;
+import static org.robinbird.code.model.AnalysisUnit.Language.JAVA8;
 
 /**
  * Created by seokhyun on 5/26/17.
