@@ -26,4 +26,22 @@ public class MemberFunction extends Member {
 		super(accessModifier, type, name);
 		this.arguments = arguments;
 	}
+
+	public String getSignature() {
+		return MemberFunction.createMethodSignature(getName(), arguments);
+	}
+
+	public static String createMethodSignature(String methodName, List<Type> params) {
+		String signature = methodName;
+		if (params != null) {
+			for (Type t : params) {
+				signature += "_" + t.getName();
+				if (t.isVarargs()) {
+					signature += "varargs";
+				}
+			}
+		}
+		return signature;
+
+	}
 }

@@ -53,7 +53,11 @@ public class Class extends Type {
 	}
 
 	public void addMemberFunction(MemberFunction f) {
-		checkState(!f.getName().isEmpty());
-		memberFunctions.put(f.getName(), f);
+		checkState(!f.getSignature().isEmpty());
+		memberFunctions.put(f.getSignature(), f);
+	}
+
+	public MemberFunction getMemberFunction(String signature) {
+		return memberFunctions.get(signature);
 	}
 }

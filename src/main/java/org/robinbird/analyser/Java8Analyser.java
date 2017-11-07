@@ -3,14 +3,8 @@ package org.robinbird.analyser;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.robinbird.model.AccessModifier;
-import org.robinbird.model.AnalysisContext;
-import org.robinbird.model.Analyser;
+import org.robinbird.model.*;
 import org.robinbird.model.Class;
-import org.robinbird.model.ClassType;
-import org.robinbird.model.Collection;
-import org.robinbird.model.Member;
-import org.robinbird.model.Type;
 import org.robinbird.model.Package;
 import org.robinbird.parser.java8.Java8BaseListener;
 import org.robinbird.parser.java8.Java8Parser;
@@ -23,7 +17,9 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.robinbird.utils.Msgs.Key.*;
 
 /**
- * Created by seokhyun on 5/26/17.
+ * Based on ANTLR generated Java8BaseListener, building AnalysisContext from java8 source codes
+ *
+ * TODO: currently, same class name in different packages will make problems. Need to fix this.
  */
 @Slf4j
 public class Java8Analyser extends Java8BaseListener implements Analyser {
@@ -81,7 +77,6 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			}
 			c.setParent(parent);
 		}
-		// TO DO : write UTs
 		if (ctx.superinterfaces() != null) {
 			Java8Parser.SuperinterfacesContext superinterfacesContext = ctx.superinterfaces();
 			if (superinterfacesContext.interfaceTypeList() != null) {
@@ -132,12 +127,17 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 		analysisContext.setCurrentPackage(null);
 	}
 
+	private boolean isFiltered() {
+		if (analysisContext.isParsingEnum()) { return true; }
+		if (state == State.EXCLUDED_TYPE || state == State.INNER_CLASS) { return true; }
+		checkState(analysisContext.getCurrentClass() != null, Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
+		if (analysisContext.isCurrentClassTerminal()) { return true; }
+		return false;
+	}
+
 	@Override
 	public void enterFieldDeclaration(Java8Parser.FieldDeclarationContext ctx) {
-		if (analysisContext.isParsingEnum()) { return; }
-		if (state == State.EXCLUDED_TYPE || state == State.INNER_CLASS) { return; }
-		checkState(analysisContext.getCurrentClass() != null, Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
-		if (analysisContext.isCurrentClassTerminal()) { return; }
+		if (isFiltered()) { return; }
 
 		AccessModifier accessModifier = getAccessModifier(ctx.fieldModifier());
 		Type type = getType(ctx.unannType());
@@ -146,6 +146,68 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 		for (String var : vars) {
 			analysisContext.getCurrentClass().addMember(new Member(accessModifier, type, var));
 		}
+	}
+
+	@Override
+	public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
+		if (isFiltered()) { return; }
+
+		List<Type> params = getMethodParameterList(ctx.methodHeader().methodDeclarator());
+		String methodName = ctx.methodHeader().methodDeclarator().Identifier().getText();
+		String signature = MemberFunction.createMethodSignature(methodName, params);
+		MemberFunction mf = analysisContext.getCurrentClass().getMemberFunction(signature);
+		if (mf == null) {
+			AccessModifier accessModifier = getMethodAccessModifier(ctx.methodModifier());
+			Type returnType;
+			if (ctx.methodHeader().result().unannType() != null) {
+				returnType = getType(ctx.methodHeader().result().unannType());
+			} else {
+				checkState(ctx.methodHeader().result().getText().equals("void"), Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
+				returnType = new Type("void", Type.Kind.PRIMITIVE);
+			}
+			mf = new MemberFunction(accessModifier, returnType, methodName, params);
+			analysisContext.getCurrentClass().addMemberFunction(mf);
+		}
+	}
+
+
+
+	private List<Type> getMethodParameterList(Java8Parser.MethodDeclaratorContext ctx) {
+		if (ctx.formalParameterList() != null) {
+			List<Type> paramList = new ArrayList<>();
+			Java8Parser.FormalParametersContext fpc = ctx.formalParameterList().formalParameters();
+			Java8Parser.LastFormalParameterContext lfpc = ctx.formalParameterList().lastFormalParameter();
+			if (fpc != null) {
+				for (Java8Parser.FormalParameterContext c : fpc.formalParameter()) {
+					paramList.add(getType(c.unannType()));
+				}
+			}
+			if (lfpc != null) {
+				if (lfpc.formalParameter() != null) {
+					paramList.add(getType(lfpc.formalParameter().unannType()));
+				}
+				// varargs case
+				else {
+					Type t = getType(lfpc.unannType());
+					t.setVarargs(true);
+					paramList.add(t);
+				}
+			}
+			return paramList;
+		}
+		return null;
+	}
+
+	@Override public void enterMethodBody(Java8Parser.MethodBodyContext ctx) {
+		//System.out.println("enterMethodBody:\n" + ctx.getText());
+	}
+
+	@Override public void enterMethodInvocation(Java8Parser.MethodInvocationContext ctx) {
+		//System.out.println("enterMethodInvocation:\n" + ctx.getText());
+	}
+
+	@Override public void enterMethodReference(Java8Parser.MethodReferenceContext ctx) {
+		//System.out.println("enterMethodReference:\n" + ctx.getText());
 	}
 
 	private String getTemplateClassParameters(Java8Parser.TypeParametersContext ctx) {
@@ -171,7 +233,19 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			try {
 				accessModifier = AccessModifier.fromDescription(modifierContext.getText());
 			} catch (IllegalArgumentException e) {
-				continue;
+				continue; // there can be string other than public/private/protected like static
+			}
+		}
+		return accessModifier;
+	}
+
+	private AccessModifier getMethodAccessModifier(List<Java8Parser.MethodModifierContext> methodModifierContexts) {
+		AccessModifier accessModifier = AccessModifier.PRIVATE;
+		for (Java8Parser.MethodModifierContext mmc : methodModifierContexts) {
+			try {
+				accessModifier = AccessModifier.fromDescription(mmc.getText());
+			} catch (IllegalArgumentException e) {
+				continue; // there can be string other than public/private/protected like static
 			}
 		}
 		return accessModifier;

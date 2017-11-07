@@ -26,6 +26,9 @@ public class ApplicationTest {
 		assertTrue(output.contains("class SimpleClass"));
 		assertTrue(output.contains("- a : int"));
 		assertTrue(output.contains("+ b : float"));
+		assertTrue(output.contains("+ fn1(int) : int"));
+		assertTrue(output.contains("# fn2(int) : int"));
+		assertTrue(output.contains("- fn3(int) : SimpleClass"));
 	}
 
 	@Test
@@ -35,7 +38,6 @@ public class ApplicationTest {
 		String[] args = new String[] { "-r", getTestPath("/ApplicationTest"), "-p", "SIMPLE" };
 		Application.main(args);
 		String output = testOut.toString();
-		System.out.println(output);
 		assertTrue(output.contains("Packages"));
 		assertTrue(output.contains("org.robinbird.test"));
 		assertTrue(output.contains("Classes"));
@@ -43,6 +45,9 @@ public class ApplicationTest {
 		assertTrue(output.contains("b : float"));
 		assertTrue(output.contains("Types"));
 		assertTrue(output.contains("SimpleClass"));
+		assertTrue(output.contains(""));
+		assertTrue(output.contains(""));
+		assertTrue(output.contains(""));
 	}
 
 	@Test
