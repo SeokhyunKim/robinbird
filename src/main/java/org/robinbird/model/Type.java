@@ -1,6 +1,7 @@
 package org.robinbird.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import static org.robinbird.model.Type.Kind.PRIMITIVE;
 import static org.robinbird.model.Type.Kind.REFERENCE;
@@ -8,15 +9,18 @@ import static org.robinbird.model.Type.Kind.REFERENCE;
 /**
  * Created by seokhyun on 5/31/17.
  */
+@Getter
 public class Type extends Repositable {
 
 	public enum Kind { PRIMITIVE, REFERENCE};
 
-	@Getter private Kind kind;
+	private Kind kind;
+	@Setter private boolean varargs;
 
 	public Type(String name, Kind kind) {
 		super(name);
 		this.kind = kind;
+		this.varargs = false;
 	}
 
 	public String toString() {

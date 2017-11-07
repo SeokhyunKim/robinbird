@@ -150,6 +150,18 @@ public class AnalysisUnitTest {
 		assertTrue(ac.getClasses().size() == 1);
 	}
 
+	@Test
+	public void can_read_member_functions() {
+		String path = getTestPath("/method_test");
+
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(Paths.get(path));
+		AnalysisContext ac = au.analysis(null, null);
+
+		assertTrue(ac.getClass("TestClass").getMemberFunctions().size() == 4);
+		assertTrue(ac.getClass("TestClass2").getMemberFunctions().size() == 1);
+	}
+
 	private String getTestPath(String path) {
 		return TestUtils.getTestPath("/AnalysisUnitTest"+path);
 	}

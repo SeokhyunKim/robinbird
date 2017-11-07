@@ -352,5 +352,10 @@ public class Java8AnalyserTest {
 		assertTrue(analysisContext.getClasses().size() == 0);
 	}
 
+	@Test
+	public void getMethodSitnature_can_generate_method_signature_string() throws Exception {
+
+	}
+
 
 }

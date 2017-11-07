@@ -3,6 +3,7 @@ package org.robinbird.presentation;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
+import org.robinbird.model.MemberFunction;
 import org.robinbird.model.Relation;
 import org.robinbird.model.Type;
 import org.robinbird.model.Package;
@@ -31,6 +32,9 @@ public class SimplePresentation implements AnalysisContextPresentation {
 			}
 			sa.appendLine(classObj.getName());
 			for (Map.Entry<String, Member> entry : classObj.getMemberVariables().entrySet()) {
+				sa.appendLine(String.format("\t%s : %s", entry.getKey(), entry.getValue().getType().getName()));
+			}
+			for (Map.Entry<String, MemberFunction> entry :  classObj.getMemberFunctions().entrySet()) {
 				sa.appendLine(String.format("\t%s : %s", entry.getKey(), entry.getValue().getType().getName()));
 			}
 		}

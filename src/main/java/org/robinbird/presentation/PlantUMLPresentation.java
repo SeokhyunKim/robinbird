@@ -4,9 +4,13 @@ import org.robinbird.model.AccessModifier;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
 import org.robinbird.model.Member;
+import org.robinbird.model.MemberFunction;
 import org.robinbird.model.Package;
 import org.robinbird.model.Relation;
+import org.robinbird.model.Type;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -23,6 +27,7 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 				// class name, member variables, and member functions
 				sa.appendLine(String.format("class %s {", classObj.getName()));
 				sa.append(printMemberVariables(classObj.getMemberVariables()));
+				sa.append(printMemberFunctions(classObj.getMemberFunctions().values()));
 				sa.appendLine("}");
 			}
 			sa.appendLine("}");
@@ -69,6 +74,26 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 			sa.append("\t").append(convertAccessModifier(entry.getValue().getAccessModifier()))
 				.append(" ");
 			sa.append(entry.getKey()).append(" : ").appendLine(entry.getValue().getType().getName());
+		}
+		return sa.toString();
+	}
+
+	private String printMemberFunctions(Collection<MemberFunction> memberFunctions) {
+		StringAppender sa = new StringAppender();
+		for (MemberFunction mf : memberFunctions) {
+			sa.append("\t").append(convertAccessModifier(mf.getAccessModifier())).append(" ");
+			sa.append(mf.getName()).append("(");
+			if (mf.getArguments() != null) {
+				Iterator<Type> itr = mf.getArguments().iterator();
+				while (itr.hasNext()) {
+					Type t = itr.next();
+					sa.append(t.getName());
+					if (itr.hasNext()) {
+						sa.append(", ");
+					}
+				}
+			}
+			sa.append(") : ").appendLine(mf.getType().getName());
 		}
 		return sa.toString();
 	}
