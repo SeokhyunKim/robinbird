@@ -21,6 +21,7 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 	public String present(AnalysisContext analysisContext) {
 		StringAppender sa = new StringAppender();
 		sa.appendLine("@startuml");
+		sa.appendLine("left to right direction");
 		for (Package classPackage : analysisContext.getPackages()) {
 			sa.appendLine("package " + classPackage.getName() + " {");
 			for (Class classObj : classPackage.getClassList()) {
