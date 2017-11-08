@@ -3,6 +3,7 @@ package org.robinbird;
 import lombok.extern.slf4j.Slf4j;
 import org.robinbird.code.model.AnalysisContext;
 import org.robinbird.code.model.AnalysisUnit;
+import org.robinbird.code.presentation.AbstractedClassesPresentation;
 import org.robinbird.code.presentation.AnalysisContextPresentation;
 import org.robinbird.code.presentation.GMLPresentation;
 import org.robinbird.code.presentation.PlantUMLPresentation;
@@ -25,13 +26,16 @@ public class Application {
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(appArgs.getSourceRootPath()));
 		AnalysisContext ac = au.analysis(appArgs.getTerminalClassPatterns(), appArgs.getExcludedClassPatterns());
-		AnalysisContextPresentation acPresent = createPresentation(appArgs.getPresentationType());
+		AnalysisContextPresentation acPresent = createPresentation(appArgs.getPresentationType(), appArgs);
 		System.out.print(acPresent.present(ac));
 	}
 
-	private AnalysisContextPresentation createPresentation(PresentationType ptype) {
+	private AnalysisContextPresentation createPresentation(PresentationType ptype, AppArguments args) {
 		AnalysisContextPresentation presentation;
 		switch (ptype) {
+			case ABSTRACTED_CLASSES:
+				presentation = new AbstractedClassesPresentation(args.getDepth());
+				break;
 			case GML:
 				presentation = new GMLPresentation();
 				break;

@@ -4,6 +4,9 @@ import org.robinbird.code.model.AnalysisContext;
 import org.robinbird.code.model.Class;
 import org.robinbird.code.model.Package;
 import org.robinbird.code.model.Relation;
+import org.robinbird.graph.model.Edge;
+import org.robinbird.graph.model.Graph;
+import org.robinbird.graph.model.Node;
 
 /**
  * Created by seokhyun on 10/31/17.
@@ -45,6 +48,20 @@ public class GMLPresentation implements AnalysisContextPresentation {
 			String firstId = removeGenerics(((Class)r.getFirst()).getFullName());
 			String secondId = removeGenerics(((Class)r.getSecond()).getFullName());
 			appendEdgeString(sa, firstId, secondId);
+		}
+		sa.appendLine("]");
+		return sa.toString();
+	}
+
+	public String present(Graph g) {
+		StringAppender sa = new StringAppender();
+		sa.appendLine("graph");
+		sa.appendLine("[");
+		for (Node n : g.getNodes()) {
+			appendNodeString(sa, n.getName(), n.getName());
+			for (Edge e : n.getEdges()) {
+				appendEdgeString(sa, e.getSource().getName(), e.getTarget().getName());
+			}
 		}
 		sa.appendLine("]");
 		return sa.toString();
