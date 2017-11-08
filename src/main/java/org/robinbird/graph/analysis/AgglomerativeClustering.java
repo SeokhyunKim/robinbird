@@ -29,6 +29,7 @@ public class AgglomerativeClustering {
 		for (Class c : classes) {
 			ClusterNode cn = new ClusterNode(c);
 			nameToClusterNodes.put(c.getName(), cn);
+			System.out.println("new cn node: " + c.getName());
 			cnodes.add(cn);
 		}
 		return cnodes;
@@ -36,9 +37,18 @@ public class AgglomerativeClustering {
 
 	public static ClusterNode cluster(List<ClusterNode> cnodes) {
 		Set<ClusterNode> roots = new HashSet(cnodes);
+		System.out.println("num initial roots: " + roots.size());
 		for (Pair<Node> p : pairs) {
 			ClusterNode cn1 = nameToClusterNodes.get(p.getFirst().getName());
 			ClusterNode cn2 = nameToClusterNodes.get(p.getSecond().getName());
+			if (cn1 == null ) {
+				System.out.println("not found cluster node: " + p.getFirst().getName());
+				continue;
+			}
+			if (cn2 == null ) {
+				System.out.println("not found cluster node: " + p.getSecond().getName());
+				continue;
+			}
 			ClusterNode parent = new ClusterNode();
 			parent.addChild(cn1);
 			parent.addChild(cn2);
