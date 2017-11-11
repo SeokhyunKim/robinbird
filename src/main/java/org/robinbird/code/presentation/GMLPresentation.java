@@ -4,9 +4,9 @@ import org.robinbird.code.model.AnalysisContext;
 import org.robinbird.code.model.Class;
 import org.robinbird.code.model.Package;
 import org.robinbird.code.model.Relation;
-import org.robinbird.graph.model.Edge;
-import org.robinbird.graph.model.Graph;
-import org.robinbird.graph.model.Node;
+import org.robinbird.graph.Edge;
+import org.robinbird.graph.Graph;
+import org.robinbird.graph.Node;
 
 /**
  * Created by seokhyun on 10/31/17.

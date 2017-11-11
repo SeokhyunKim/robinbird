@@ -1,4 +1,4 @@
-package org.robinbird.graph.model;
+package org.robinbird.graph;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -24,7 +24,8 @@ public class Msgs {
 		REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN,
 		LIST_FOR_PACKAGE_NAME_IS_EMPTY,
 		CANNOT_CREATE_GRAPH_NODE_FROM_TYPE,
-		FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION
+		FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION,
+		FAILED_TO_FIND_AGGCLUSTER_NODE
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -43,7 +44,8 @@ public class Msgs {
 			.put(Key.REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN, "Regular expression pattern for exclusion is not given.")
 			.put(Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY, "List for defining package name is empty.")
 			.put(Key.CANNOT_CREATE_GRAPH_NODE_FROM_TYPE, "Cannot create graph node from Type %s.")
-			.put(Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION, "Failed to get associated type from Collection %s.l")
+			.put(Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION, "Failed to get associated type from Collection %s.")
+			.put(Key.FAILED_TO_FIND_AGGCLUSTER_NODE, "Failed to find agglomerative clustering node %s.")
 			.build();
 	}
 

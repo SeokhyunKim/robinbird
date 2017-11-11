@@ -1,10 +1,5 @@
-package org.robinbird.graph.analysis;
+package org.robinbird.graph;
 
-import org.robinbird.graph.model.Edge;
-import org.robinbird.graph.model.Graph;
-import org.robinbird.graph.model.Node;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -16,6 +16,11 @@ public class StringAppender {
 		return this;
 	}
 
+	public StringAppender newLine() {
+		stringBuffer.append("\n");
+		return this;
+	}
+
 	public String toString() {
 		return stringBuffer.toString();
 	}

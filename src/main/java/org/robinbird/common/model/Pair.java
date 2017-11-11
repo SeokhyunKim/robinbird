@@ -1,6 +1,7 @@
 package org.robinbird.common.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 /**
@@ -12,12 +13,12 @@ public class Pair<T> implements Comparable<Pair> {
 	@Getter @Setter
 	private float valueForSorting;
 
-	public Pair(T p1, T p2) {
+	public Pair(@NonNull final T p1, @NonNull final T p2) {
 		this.first = p1;
 		this.second = p2;
 	}
 
-	public Pair(T p1, T p2, float value) {
+	public Pair(@NonNull final T p1, @NonNull final T p2, float value) {
 		this(p1, p2);
 		setValueForSorting(value);
 	}

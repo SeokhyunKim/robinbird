@@ -1,9 +1,8 @@
-package org.robinbird.graph.model;
+package org.robinbird.graph;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import org.robinbird.common.model.Repositable;
 
 /**
  * Created by seokhyun on 11/7/17.

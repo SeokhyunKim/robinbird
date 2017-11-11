@@ -33,7 +33,7 @@ public class AppArguments {
 		PRESENTATION1("-p"), PRESENTATION2("--presentation"),
 		TERMINAL_CLASS1("-tc"), TERMINAL_CLASS2("--terminal-class"),
 		EXCLUDED_CLASS1("-ec"), EXCLUDED_CLASS2("--excluded-class"),
-		DEPTH1("-d"), DEPTH2("--depth");
+		SCORE1("-s"), SCORE2("--score");
 
 		private final String name;
 		private static Map<String, ArgType> argTypeMap;
@@ -57,7 +57,7 @@ public class AppArguments {
 	@NonNull private PresentationType presentationType;
 	@NonNull private List<Pattern> terminalClassPatterns;
 	@NonNull private List<Pattern> excludedClassPatterns;
-	private int depth;
+	private float score;
 
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();
@@ -67,7 +67,7 @@ public class AppArguments {
 		List<Pattern> excludePatterns = new ArrayList<>();
 		argsBuilder.terminalClassPatterns(terminalPatterns);
 		argsBuilder.excludedClassPatterns(excludePatterns);
-		argsBuilder.depth(1);
+		argsBuilder.score(1.0f);
 		// parse parameters
 		for (int i=0; i<args.length;) {
 			ArgType at = ArgType.getArgType(args[i]);
@@ -118,9 +118,9 @@ public class AppArguments {
 					}
 					i += 2;
 					break;
-				case DEPTH1:
-				case DEPTH2:
-					argsBuilder.depth(Integer.parseInt(args[i + 1]));
+				case SCORE1:
+				case SCORE2:
+					argsBuilder.score(Integer.parseInt(args[i + 1]));
 					i += 2;
 					break;
 			}

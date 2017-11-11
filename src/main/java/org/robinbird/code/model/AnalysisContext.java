@@ -143,7 +143,6 @@ public class AnalysisContext {
 		}
 
 		c = new Class(name, ctype);
-		System.out.println("register class: " + name);
 		types.register(c);
 		return c;
 	}

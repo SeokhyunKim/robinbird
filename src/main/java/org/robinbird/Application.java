@@ -34,7 +34,7 @@ public class Application {
 		AnalysisContextPresentation presentation;
 		switch (ptype) {
 			case ABSTRACTED_CLASSES:
-				presentation = new AbstractedClassesPresentation(args.getDepth());
+				presentation = new AbstractedClassesPresentation(args.getScore());
 				break;
 			case GML:
 				presentation = new GMLPresentation();

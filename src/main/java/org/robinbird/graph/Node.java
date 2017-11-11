@@ -1,4 +1,4 @@
-package org.robinbird.graph.model;
+package org.robinbird.graph;
 
 import lombok.Getter;
 import org.robinbird.common.model.Repositable;

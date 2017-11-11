@@ -1,4 +1,4 @@
-package org.robinbird.graph.model;
+package org.robinbird.graph;
 
 import lombok.NonNull;
 import org.robinbird.code.model.Class;
@@ -36,7 +36,6 @@ public class Graph {
 	}
 
 	public Node createNode(@NonNull final String name) {
-		System.out.println("create node: " + name);
 		return nodes.register(new Node(name));
 	}
 
