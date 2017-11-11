@@ -6,6 +6,7 @@ import org.robinbird.graph.model.ClusterNode;
 import org.robinbird.graph.model.Node;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,14 +18,14 @@ import java.util.Set;
  */
 public class AgglomerativeClustering {
 
-	private static Map<String, ClusterNode> nameToClusterNodes = new HashMap<>();
-	private static List<Pair<Node>> pairs;
+	private Map<String, ClusterNode> nameToClusterNodes = new HashMap<>();
+	final private List<Pair<Node>> pairs;
 
-	public static void setPairs(List<Pair<Node>> pairList) {
-		pairs = pairList;
+	public AgglomerativeClustering(final List<Pair<Node>> pairs) {
+		this.pairs = pairs;
 	}
 
-	public static List<ClusterNode> initiate(List<Class> classes) {
+	public List<ClusterNode> initiate(List<Class> classes) {
 		List<ClusterNode> cnodes = new ArrayList<>();
 		for (Class c : classes) {
 			ClusterNode cn = new ClusterNode(c);
@@ -35,9 +36,8 @@ public class AgglomerativeClustering {
 		return cnodes;
 	}
 
-	public static ClusterNode cluster(List<ClusterNode> cnodes) {
+	public List<ClusterNode> cluster(List<ClusterNode> cnodes) {
 		Set<ClusterNode> roots = new HashSet(cnodes);
-		System.out.println("num initial roots: " + roots.size());
 		for (Pair<Node> p : pairs) {
 			ClusterNode cn1 = nameToClusterNodes.get(p.getFirst().getName());
 			ClusterNode cn2 = nameToClusterNodes.get(p.getSecond().getName());
@@ -59,13 +59,13 @@ public class AgglomerativeClustering {
 			nameToClusterNodes.put(p.getSecond().getName(), parent);
 		}
 		if (roots.size() == 1) {
-			return roots.iterator().next();
+			return new ArrayList<>(roots);
 		}
 		ClusterNode root = new ClusterNode();
 		for (ClusterNode r : roots) {
 			root.addChild(r);
 		}
-		return root;
+		return Arrays.asList(root);
 	}
 
 }

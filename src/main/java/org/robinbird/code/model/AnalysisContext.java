@@ -128,6 +128,7 @@ public class AnalysisContext {
 		Type t = getType(name);
 		if (t != null) { return t; }
 		t = new Type(name, Type.Kind.REFERENCE);
+		System.out.println("register type: " + name);
 		types.register(t);
 		return t;
 	}
@@ -142,6 +143,7 @@ public class AnalysisContext {
 		}
 
 		c = new Class(name, ctype);
+		System.out.println("register class: " + name);
 		types.register(c);
 		return c;
 	}
@@ -181,8 +183,7 @@ public class AnalysisContext {
 				String cardinality = "1";
 				if (associated instanceof Collection) {
 					Collection c = (Collection)associated;
-					checkState(c.getTypes().size() > 0);
-					associated = c.getTypes().get(c.getTypes().size()-1);
+					associated = c.getAssociatedType();
 					log.debug("associated is changed for collection: {}", associated.toString());
 					cardinality = "*";
 				}

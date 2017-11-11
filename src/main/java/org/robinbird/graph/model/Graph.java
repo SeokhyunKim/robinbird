@@ -2,10 +2,15 @@ package org.robinbird.graph.model;
 
 import lombok.NonNull;
 import org.robinbird.code.model.Class;
+import org.robinbird.code.model.Collection;
 import org.robinbird.code.model.Member;
+import org.robinbird.code.model.Type;
 import org.robinbird.common.model.Repository;
+import org.robinbird.common.utils.Msgs;
 
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Created by seokhyun on 11/8/17.
@@ -31,6 +36,7 @@ public class Graph {
 	}
 
 	public Node createNode(@NonNull final String name) {
+		System.out.println("create node: " + name);
 		return nodes.register(new Node(name));
 	}
 
@@ -42,7 +48,15 @@ public class Graph {
 				if (m.getType().isPrimitiveType()) {
 					continue;
 				}
-				Node t = g.createNode(m.getType().getName());
+				Type type = m.getType();
+				Node t = null;
+				if (type instanceof Class) {
+					t = g.createNode(type.getName());
+				} else if (type instanceof Collection) {
+					Collection col = (Collection)type;
+					t = g.createNode(col.getAssociatedType().getName());
+				}
+				checkState(t != null, Msgs.get(Msgs.Key.CANNOT_CREATE_GRAPH_NODE_FROM_TYPE, type.getName()));
 				n.addEdge(t);
 				t.addEdge(n);
 			}

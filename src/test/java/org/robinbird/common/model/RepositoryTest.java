@@ -1,8 +1,10 @@
-package org.robinbird.code.model;
+package org.robinbird.common.model;
 
 import org.junit.Test;
-import org.robinbird.common.model.Repositable;
-import org.robinbird.common.model.Repository;
+import org.robinbird.code.model.Class;
+import org.robinbird.code.model.ClassType;
+import org.robinbird.code.model.Collection;
+import org.robinbird.code.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;

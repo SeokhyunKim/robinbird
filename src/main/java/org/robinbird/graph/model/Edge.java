@@ -11,7 +11,7 @@ import org.robinbird.common.model.Repositable;
 @Getter
 @EqualsAndHashCode
 public class Edge {
-	Node source, target;
+	final Node source, target;
 
 	Edge(@NonNull final Node source, @NonNull final Node target) {
 		this.source = source;

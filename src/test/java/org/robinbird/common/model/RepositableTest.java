@@ -1,11 +1,8 @@
-package org.robinbird.code.model;
+package org.robinbird.common.model;
 
 import be.joengenduvel.java.verifiers.ToStringVerifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
-import org.robinbird.common.model.Repositable;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by seokhyun on 8/28/17.

@@ -1,6 +1,7 @@
 package org.robinbird.graph.model;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.robinbird.code.model.Class;
 
 import java.util.ArrayList;
@@ -12,25 +13,24 @@ import java.util.List;
 @Getter
 public class Cluster {
 
-	private ClusterNode root;
-	private List<ClusterNode> leafNodes;
+	private List<ClusterNode> roots;
+	private ClusteringAlgorithm clusteringAlgorithm;
 
-	public interface ClusterInitiator {
-		List<ClusterNode> initiate(List<Class> classes);
+	public Cluster(@NonNull final ClusteringAlgorithm clusteringAlgorithm) {
+		this.clusteringAlgorithm = clusteringAlgorithm;
 	}
 
-	public interface ClusteringAlgorithm {
-		ClusterNode cluster(List<ClusterNode> leafNodes);
-	}
-
-	public void create(ClusterInitiator initiator, ClusteringAlgorithm algo, List<Class> classes) {
-		leafNodes = initiator.initiate(classes);
-		root = algo.cluster(leafNodes);
+	public List<ClusterNode> create(List<Class> classes) {
+		List<ClusterNode> leaves = clusteringAlgorithm.initiate(classes);
+		roots = clusteringAlgorithm.cluster(leaves);
+		return roots;
 	}
 
 	public List<ClusterNode> getNodesAtDepth(int depth) {
 		List<ClusterNode> nodes = new ArrayList<>();
-		getNodesAtDepthHelper(root, 1, depth, nodes);
+		roots.forEach(root -> {
+			getNodesAtDepthHelper(root, 1, depth, nodes);
+		});
 		return nodes;
 	}
 

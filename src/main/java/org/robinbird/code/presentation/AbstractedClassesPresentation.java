@@ -39,36 +39,32 @@ public class AbstractedClassesPresentation implements AnalysisContextPresentatio
 			}
 		}
 		Collections.sort(pairs);
-		for (Pair<Node> p : pairs) {
-			System.out.println(p.getFirst().getName() + " : " + p.getSecond().getName() + " : " + p.getValueForSorting());
-		}
 
 		return "";
 
+		/*AgglomerativeClustering.setPairs(pairs);
+		Cluster cluster = new Cluster();
+		cluster.create(AgglomerativeClustering::initiate, AgglomerativeClustering::cluster, analysisContext.getClasses());
+		List<ClusterNode> nodes = cluster.getNodesAtDepth(depth);
+		System.out.println("nodes at depth " + depth + ": " + nodes.size());
+		StringAppender sa = new StringAppender();
+		nodes.forEach(n -> sa.append(printClusterNode(n)));
 
-//		AgglomerativeClustering.setPairs(pairs);
-//		Cluster cluster = new Cluster();
-//		cluster.create(AgglomerativeClustering::initiate, AgglomerativeClustering::cluster, analysisContext.getClasses());
-//		List<ClusterNode> nodes = cluster.getNodesAtDepth(depth);
-//		System.out.println("nodes at depth " + depth + ": " + nodes.size());
-//		StringAppender sa = new StringAppender();
-//		nodes.forEach(n -> sa.append(printClusterNode(n)));
-//
-//		// relations
-//		for (Relation r : analysisContext.getRelations()) {
-//			String firstName = removeGenerics(r.getFirst().getName());
-//			String secondName = removeGenerics(r.getSecond().getName());
-//			if (r.getFirstCardinality() == null) {
-//				sa.appendLine(firstName + " --> " + secondName);
-//			} else if (r.getSecondCardinality() == null) {
-//				sa.appendLine(firstName + " <-- " + secondName);
-//			} else {
-//				sa.appendLine(firstName + " -- " + secondName);
-//			}
-//		}
-//		sa.appendLine("@enduml");
-//
-//		return sa.toString();
+		// relations
+		for (Relation r : analysisContext.getRelations()) {
+			String firstName = removeGenerics(r.getFirst().getName());
+			String secondName = removeGenerics(r.getSecond().getName());
+			if (r.getFirstCardinality() == null) {
+				sa.appendLine(firstName + " --> " + secondName);
+			} else if (r.getSecondCardinality() == null) {
+				sa.appendLine(firstName + " <-- " + secondName);
+			} else {
+				sa.appendLine(firstName + " -- " + secondName);
+			}
+		}
+		sa.appendLine("@enduml");
+
+		return sa.toString();*/
 	}
 
 	private String removeGenerics(String name) {
