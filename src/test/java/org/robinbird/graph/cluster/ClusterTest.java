@@ -34,9 +34,9 @@ public class ClusterTest {
 		root.addChild(c2);
 		Node nodeMock = Mockito.mock(Node.class);
 		Mockito.when(nodeMock.getName()).thenReturn("test");
-		ClusterNode c11 = new ClusterNode(nodeMock, );
-		ClusterNode c12 = new ClusterNode();
-		c12.addGraphNode(nodeMock);
+		ClusterNode c11 = new ClusterNode(nodeMock, 1.0f);
+		ClusterNode c12 = new ClusterNode(nodeMock);
+		c12.setScore(1.0f);
 		c1.addChild(c11);
 		c1.addChild(c12);
 		List<ClusterNode> roots = Arrays.asList(root);
@@ -55,12 +55,11 @@ public class ClusterTest {
 	}
 
 	@Test
-	public void getNodesAtDepth_can_find_exact_nodes_in_given_depth() {
+	public void findClusterNodesWithScore_can_find_nodes() {
 		Cluster c = new Cluster(clusteringMethod);
 		c.create(null);
-		assertTrue(c.getClusterNodesAtDepth(1).size() == 1);
-		assertTrue(c.getClusterNodesAtDepth(2).size() == 2);
-		assertTrue(c.getClusterNodesAtDepth(3).size() == 2);
+		List<ClusterNode> nodes = c.findClusterNodesWithScore(1.0f, (nd, s) -> (nd.getScore()==s));
+		assertTrue(nodes.size() == 2);
 	}
 
 	@Test

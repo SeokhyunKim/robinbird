@@ -18,13 +18,27 @@ public class ClusterNode {
 	@Setter private float score;
 
 	public ClusterNode() {}
+	public ClusterNode(@NonNull final Node node) {
+		addGraphNode(node);
+	}
 	public ClusterNode(@NonNull final Node node, final float score) {
 		addGraphNode(node, score);
 	}
 
-	public int addGraphNode(@NonNull final Node node, float score) {
+	public int addGraphNode(@NonNull final Node node) {
 		graphNodes.add(node);
+		return graphNodes.size();
+	}
+
+	public int addGraphNode(@NonNull final Node node, float score) {
 		this.score = score;
+		return addGraphNode(node);
+	}
+
+	public int addGraphNodes(@NonNull final ClusterNode cn) {
+		if (this != cn) {
+			graphNodes.addAll(cn.getGraphNodes());
+		}
 		return graphNodes.size();
 	}
 

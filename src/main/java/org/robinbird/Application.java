@@ -5,9 +5,10 @@ import org.robinbird.code.model.AnalysisContext;
 import org.robinbird.code.model.AnalysisUnit;
 import org.robinbird.code.presentation.AbstractedClassesPresentation;
 import org.robinbird.code.presentation.AnalysisContextPresentation;
+import org.robinbird.code.presentation.CLUSTERING_METHOD;
 import org.robinbird.code.presentation.GMLPresentation;
 import org.robinbird.code.presentation.PlantUMLPresentation;
-import org.robinbird.code.presentation.PresentationType;
+import org.robinbird.code.presentation.PRESENTATION_TYPE;
 import org.robinbird.code.presentation.SimplePresentation;
 import org.robinbird.common.utils.AppArguments;
 
@@ -30,11 +31,12 @@ public class Application {
 		System.out.print(acPresent.present(ac));
 	}
 
-	private AnalysisContextPresentation createPresentation(PresentationType ptype, AppArguments args) {
+	private AnalysisContextPresentation createPresentation(PRESENTATION_TYPE ptype, AppArguments args) {
 		AnalysisContextPresentation presentation;
 		switch (ptype) {
 			case ABSTRACTED_CLASSES:
-				presentation = new AbstractedClassesPresentation(args.getScore());
+				CLUSTERING_METHOD cmethod = CLUSTERING_METHOD.getClusteringMethod(args.getClusteringType());
+				presentation = new AbstractedClassesPresentation(cmethod, args.getScore());
 				break;
 			case GML:
 				presentation = new GMLPresentation();

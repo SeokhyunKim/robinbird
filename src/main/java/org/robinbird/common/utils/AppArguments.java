@@ -6,7 +6,9 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.robinbird.code.presentation.PresentationType;
+import org.robinbird.code.presentation.AbstractedClassesPresentation;
+import org.robinbird.code.presentation.CLUSTERING_METHOD;
+import org.robinbird.code.presentation.PRESENTATION_TYPE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +35,7 @@ public class AppArguments {
 		PRESENTATION1("-p"), PRESENTATION2("--presentation"),
 		TERMINAL_CLASS1("-tc"), TERMINAL_CLASS2("--terminal-class"),
 		EXCLUDED_CLASS1("-ec"), EXCLUDED_CLASS2("--excluded-class"),
+		CLUSTERING_TYPE1("-ct"), CLUSTERING_TYPE2("--clustering-type"),
 		SCORE1("-s"), SCORE2("--score");
 
 		private final String name;
@@ -54,19 +57,21 @@ public class AppArguments {
 	}
 
 	@NonNull private String sourceRootPath;
-	@NonNull private PresentationType presentationType;
+	@NonNull private PRESENTATION_TYPE presentationType;
 	@NonNull private List<Pattern> terminalClassPatterns;
 	@NonNull private List<Pattern> excludedClassPatterns;
+	@NonNull private String clusteringType;
 	private float score;
 
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();
 		//default values
-		argsBuilder.presentationType(PresentationType.PLANTUML);
+		argsBuilder.presentationType(PRESENTATION_TYPE.PLANTUML);
 		List<Pattern> terminalPatterns = new ArrayList<>();
 		List<Pattern> excludePatterns = new ArrayList<>();
 		argsBuilder.terminalClassPatterns(terminalPatterns);
 		argsBuilder.excludedClassPatterns(excludePatterns);
+		argsBuilder.clusteringType(CLUSTERING_METHOD.HIERARCHICAL_CUSTERING.getName());
 		argsBuilder.score(1.0f);
 		// parse parameters
 		for (int i=0; i<args.length;) {
@@ -86,7 +91,7 @@ public class AppArguments {
 				case PRESENTATION2:
 					try {
 						if (i+1 >= args.length) { throw new IllegalArgumentException(); }
-						PresentationType ptype = PresentationType.valueOf(args[i + 1]);
+						PRESENTATION_TYPE ptype = PRESENTATION_TYPE.valueOf(args[i + 1]);
 						argsBuilder.presentationType(ptype);
 					} catch (IllegalArgumentException e) {
 						log.warn(Msgs.get(PRESENTATION_OPTION_IS_NOT_VALID, (i+1<args.length ? args[i+1] : "Not given") + " Using default value."));
@@ -120,7 +125,14 @@ public class AppArguments {
 					break;
 				case SCORE1:
 				case SCORE2:
+					checkState(i+1<args.length, Msgs.get(SCORE_FOR_CLUSTERING_IS_NOT_GIVEN));
 					argsBuilder.score(Integer.parseInt(args[i + 1]));
+					i += 2;
+					break;
+				case CLUSTERING_TYPE1:
+				case CLUSTERING_TYPE2:
+					checkState(i+1<args.length, Msgs.get(CLUSTERING_TYPE_IS_NOT_GIVEN));
+					argsBuilder.clusteringType(args[i + 1]);
 					i += 2;
 					break;
 			}

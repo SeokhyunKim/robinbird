@@ -58,15 +58,19 @@ public class AgglomerativeClustering implements ClusteringMethod {
 			ClusterNode cn2 = nameToClusterNodes.get(secondName);
 			checkState(cn1 != null, Msgs.get(FAILED_TO_FIND_AGGCLUSTER_NODE, firstName));
 			checkState(cn2 != null, Msgs.get(FAILED_TO_FIND_AGGCLUSTER_NODE, secondName));
+			if (cn1 == cn2) {
+				continue;
+			}
 			ClusterNode parent = new ClusterNode();
 			parent.addChild(cn1);
 			parent.addChild(cn2);
 			parent.setScore(cn1.getScore() + cn2.getScore());
+			parent.addGraphNodes(cn1);
+			parent.addGraphNodes(cn2);
 			roots.remove(cn1);
 			roots.remove(cn2);
 			roots.add(parent);
-			nameToClusterNodes.put(firstName, parent);
-			nameToClusterNodes.put(secondName, parent);
+			updateNameToClusterNodes(parent.getGraphNodes(), parent);
 		}
 
 		if (roots.size() == 1) {
@@ -74,9 +78,20 @@ public class AgglomerativeClustering implements ClusteringMethod {
 			return new ArrayList<>(roots);
 		}
 		root = new ClusterNode();
+		float rootScore = 0.0f;
 		for (ClusterNode r : roots) {
+			rootScore += r.getScore();
 			root.addChild(r);
 		}
+		root.setScore(rootScore);
 		return Arrays.asList(root);
 	}
+
+	private void updateNameToClusterNodes(List<Node> graphNodes, ClusterNode newClusterNode) {
+		for (Node nd : graphNodes) {
+			nameToClusterNodes.put(nd.getName(), newClusterNode);
+		}
+	}
+
+
 }

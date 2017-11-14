@@ -2,7 +2,7 @@ package org.robinbird.common.utils;
 
 import be.joengenduvel.java.verifiers.ToStringVerifier;
 import org.junit.Test;
-import org.robinbird.code.presentation.PresentationType;
+import org.robinbird.code.presentation.PRESENTATION_TYPE;
 
 import java.io.IOException;
 
@@ -98,21 +98,21 @@ public class AppArgumentsTest {
 	public void can_read_presentation_type() {
 		String[] args = new String[]{"-r", "/test", "--presentation", "SIMPLE"};
 		AppArguments appArgs = AppArguments.parseArguments(args);
-		assertTrue(appArgs.getPresentationType().equals(PresentationType.SIMPLE));
+		assertTrue(appArgs.getPresentationType().equals(PRESENTATION_TYPE.SIMPLE));
 	}
 
 	@Test
 	public void when_wrong_presentation_type_is_given_use_default_type() {
 		String[] args = new String[]{"-r", "/test", "--presentation", "WRONG"};
 		AppArguments appArgs = AppArguments.parseArguments(args);
-		assertTrue(appArgs.getPresentationType().equals(PresentationType.PLANTUML));
+		assertTrue(appArgs.getPresentationType().equals(PRESENTATION_TYPE.PLANTUML));
 	}
 
 	@Test
 	public void when_presentation_type_is_not_given_use_default_type() {
 		String[] args = new String[]{"-r", "/test", "--presentation"};
 		AppArguments appArgs = AppArguments.parseArguments(args);
-		assertTrue(appArgs.getPresentationType().equals(PresentationType.PLANTUML));
+		assertTrue(appArgs.getPresentationType().equals(PRESENTATION_TYPE.PLANTUML));
 	}
 
 	@Test

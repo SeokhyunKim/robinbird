@@ -25,7 +25,9 @@ public class Msgs {
 		LIST_FOR_PACKAGE_NAME_IS_EMPTY,
 		CANNOT_CREATE_GRAPH_NODE_FROM_TYPE,
 		FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION,
-		FAILED_TO_FIND_AGGCLUSTER_NODE
+		FAILED_TO_FIND_AGGCLUSTER_NODE,
+		SCORE_FOR_CLUSTERING_IS_NOT_GIVEN,
+		CLUSTERING_TYPE_IS_NOT_GIVEN
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -46,6 +48,8 @@ public class Msgs {
 			.put(Key.CANNOT_CREATE_GRAPH_NODE_FROM_TYPE, "Cannot create graph node from Type %s.")
 			.put(Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION, "Failed to get associated type from Collection %s.")
 			.put(Key.FAILED_TO_FIND_AGGCLUSTER_NODE, "Failed to find agglomerative clustering node %s.")
+			.put(Key.SCORE_FOR_CLUSTERING_IS_NOT_GIVEN, "Score for controling clustering method was not given.")
+			.put(Key.CLUSTERING_TYPE_IS_NOT_GIVEN, "Clustering type was not given.")
 			.build();
 	}
 

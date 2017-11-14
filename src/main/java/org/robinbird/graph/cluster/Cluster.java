@@ -22,25 +22,25 @@ public class Cluster {
 		this.clusteringMethod = clusteringMethod;
 	}
 
-	List<ClusterNode> create(Graph g) {
+	public List<ClusterNode> create(Graph g) {
 		roots = clusteringMethod.cluster(g);
 		return roots;
 	}
 
-	public List<ClusterNode> getClusterNodesWithScore(float score) {
+	public List<ClusterNode> findClusterNodesWithScore(float score, ScoreMatch matcher) {
 		List<ClusterNode> nodes = new ArrayList<>();
-		roots.forEach(root -> getClusterNodesWithScoreHelper(root, score, nodes));
+		roots.forEach(root -> findClusterNodesWithScoreHelper(root, score, matcher, nodes));
 		return nodes;
 	}
 
-	private void getClusterNodesWithScoreHelper(ClusterNode node, float score, List<ClusterNode> nodes) {
-		if (node.getScore() <= score) {
+	private void findClusterNodesWithScoreHelper(ClusterNode node, float score, ScoreMatch matcher, List<ClusterNode> nodes) {
+		if (matcher.match(node, score)) {
 			nodes.add(node);
 			return;
 		}
 		if (node.getChildren() != null) {
 			for (ClusterNode cn : node.getChildren()) {
-				getClusterNodesWithScoreHelper(cn, score, nodes);
+				findClusterNodesWithScoreHelper(cn, score, matcher, nodes);
 			}
 		}
 	}
@@ -59,6 +59,7 @@ public class Cluster {
 			return;
 		}
 		sa.append(Integer.toString(node.hashCode()));
+		sa.append("("+Float.toString(node.getScore())+")");
 		if (node.getGraphNodes().size() > 0) {
 			sa.append("{ ");
 			for (Node nd : node.getGraphNodes()) {

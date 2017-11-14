@@ -17,8 +17,6 @@ public class AgglomerativeClusteringTest {
 		AgglomerativeClustering clustering = new AgglomerativeClustering();
 		Cluster c = new Cluster(clustering);
 		List<ClusterNode> roots = c.create(GraphTestUtils.createTestGraph());
-		System.out.println(c.getClusterNodesWithScore(1.0f).size());
-		System.out.println(c.printClusterTrees());
 		assertTrue(roots.size() == 1);
 	}
 

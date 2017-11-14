@@ -1,9 +1,12 @@
 package org.robinbird.code.presentation;
 
 import org.robinbird.code.model.AnalysisContext;
-import org.robinbird.code.model.Class;
+import org.robinbird.graph.Graph;
+import org.robinbird.graph.cluster.AgglomerativeClustering;
+import org.robinbird.graph.cluster.Cluster;
+import org.robinbird.graph.cluster.ClusterNode;
+import org.robinbird.graph.cluster.ClusteringMethod;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,13 +14,23 @@ import java.util.List;
  */
 public class AbstractedClassesPresentation implements AnalysisContextPresentation {
 
+	private ClusteringMethod clusteringMethod;
 	private float score;
 
-	public AbstractedClassesPresentation(float score) {
+	public AbstractedClassesPresentation(CLUSTERING_METHOD cmethod, float score) {
+		this.clusteringMethod = createClusteringMethod(cmethod);
 		this.score = score;
 	}
 
 	public String present(AnalysisContext analysisContext) {
+		Graph g = Graph.createGraphFromClasses(analysisContext.getClasses());
+		Cluster c = new Cluster(clusteringMethod);
+		c.create(g);
+		List<ClusterNode> nodes = c.findClusterNodesWithScore(score, (nd, s) -> (nd.getScore() <= s));
+		System.out.println("nodes with score: " + nodes.size());
+		//System.out.println(c.printClusterTrees());
+
+
 		return "";
 		/*Graph g = Graph.createGraphFromClasses(analysisContext.getClasses());
 		float[][] dist = FloydAlgorithm.calculateDistances(g);
@@ -87,4 +100,12 @@ public class AbstractedClassesPresentation implements AnalysisContextPresentatio
 			getAllClassesFromClusterNode(child, classes);
 		}
 	}*/
+
+	private ClusteringMethod createClusteringMethod(CLUSTERING_METHOD cmethod) {
+		switch (cmethod) {
+			case HIERARCHICAL_CUSTERING:
+			default:
+				return new AgglomerativeClustering();
+		}
+	}
 }
