@@ -56,19 +56,19 @@ public class Graph {
 					t = g.createNode(col.getAssociatedType().getName());
 				}
 				checkState(t != null, Msgs.get(Msgs.Key.CANNOT_CREATE_GRAPH_NODE_FROM_TYPE, type.getName()));
-				n.addEdge(t);
+				n.addDependency(t);
 				t.addEdge(n);
 			}
 			if (c.getParent() != null) {
 				Node p = g.createNode(c.getParent().getName());
-				n.addEdge(p);
+				n.addParent(p);
 				p.addEdge(n);
 			}
 			if (c.getInterfaces().size() > 0) {
 				for (Class i : c.getInterfaces()) {
 					Node itf = g.createNode(i.getName());
 					itf.addEdge(n);
-					n.addEdge(itf);
+					n.addInterface(itf);
 				}
 			}
 		}

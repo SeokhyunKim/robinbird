@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class PresentationTestUtils {
 
 	public static AnalysisContext createTestAnalysisContext() {
-		AnalysisContext analysisContext = new AnalysisContext(new Repository<Type>(), new Repository<Package>());
+		AnalysisContext analysisContext = new AnalysisContext(new Repository<>(), new Repository<>());
 		Package pkg = analysisContext.registerPackage(Arrays.asList("com", "test", "pkg"));
 		analysisContext.setCurrentPackage(pkg);
 		Class parentA = analysisContext.registerClass("ParentOfA<T>", ClassType.CLASS);

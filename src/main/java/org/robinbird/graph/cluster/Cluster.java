@@ -27,20 +27,20 @@ public class Cluster {
 		return roots;
 	}
 
-	public List<ClusterNode> findClusterNodesWithScore(float score, ScoreMatch matcher) {
+	public List<ClusterNode> findClusterNodesWithScore(float score1, float score2, ScoreMatch matcher) {
 		List<ClusterNode> nodes = new ArrayList<>();
-		roots.forEach(root -> findClusterNodesWithScoreHelper(root, score, matcher, nodes));
+		roots.forEach(root -> findClusterNodesWithScoreHelper(root, score1, score2, matcher, nodes));
 		return nodes;
 	}
 
-	private void findClusterNodesWithScoreHelper(ClusterNode node, float score, ScoreMatch matcher, List<ClusterNode> nodes) {
-		if (matcher.match(node, score)) {
+	private void findClusterNodesWithScoreHelper(ClusterNode node, float score1, float score2, ScoreMatch matcher, List<ClusterNode> nodes) {
+		if (matcher.match(node, score1, score2)) {
 			nodes.add(node);
 			return;
 		}
 		if (node.getChildren() != null) {
 			for (ClusterNode cn : node.getChildren()) {
-				findClusterNodesWithScoreHelper(cn, score, matcher, nodes);
+				findClusterNodesWithScoreHelper(cn, score1, score2, matcher, nodes);
 			}
 		}
 	}

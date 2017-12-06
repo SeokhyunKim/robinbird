@@ -20,4 +20,14 @@ public class AgglomerativeClusteringTest {
 		assertTrue(roots.size() == 1);
 	}
 
+	@Test
+	public void test_findClusterNodes_withAgglomerativeClustering() {
+		AgglomerativeClustering clustering = new AgglomerativeClustering();
+		Cluster c = new Cluster(clustering);
+		c.create(GraphTestUtils.createTestGraph());
+		List<ClusterNode> nodes = c.findClusterNodesWithScore(1.0f, 3.5f, ScoreMatchers::range);
+		System.out.println(c.printClusterTrees());
+		assertTrue(nodes.size() == 3);
+	}
+
 }

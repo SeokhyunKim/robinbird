@@ -6,7 +6,9 @@ import org.robinbird.TestUtils;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -46,12 +48,11 @@ public class AnalysisUnitTest {
 		AnalysisContext ac = au.analysis(null, null);
 
 		assertTrue(ac.getTypes().size() == 2);
-		assertTrue(ac.getTypes().get(0).getName().equals("Test1"));
-		Class c1 = (Class)ac.getTypes().get(0);
-		assertTrue(c1.getClassType() == ClassType.CLASS);
-		assertTrue(ac.getTypes().get(1).getName().equals("Test2"));
-		Class c2 = (Class)ac.getTypes().get(1);
-		assertTrue(c2.getClassType() == ClassType.INTERFACE);
+		List<String> names = ac.getTypes().stream().map(t -> t.getName()).collect(Collectors.toList());
+		assertTrue(names.contains("Test1"));
+		assertTrue(names.contains("Test2"));
+		assertTrue(ac.getClass("Test1").getClassType() == ClassType.CLASS);
+		assertTrue(ac.getClass("Test2").getClassType() == ClassType.INTERFACE);
 	}
 
 	@Test

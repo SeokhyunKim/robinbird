@@ -36,7 +36,7 @@ public class Application {
 		switch (ptype) {
 			case ABSTRACTED_CLASSES:
 				CLUSTERING_METHOD cmethod = CLUSTERING_METHOD.getClusteringMethod(args.getClusteringType());
-				presentation = new AbstractedClassesPresentation(cmethod, args.getScore());
+				presentation = new AbstractedClassesPresentation(cmethod, args.getScore1(), args.getScore2());
 				break;
 			case GML:
 				presentation = new GMLPresentation();

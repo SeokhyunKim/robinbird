@@ -58,7 +58,7 @@ public class ClusterTest {
 	public void findClusterNodesWithScore_can_find_nodes() {
 		Cluster c = new Cluster(clusteringMethod);
 		c.create(null);
-		List<ClusterNode> nodes = c.findClusterNodesWithScore(1.0f, (nd, s) -> (nd.getScore()==s));
+		List<ClusterNode> nodes = c.findClusterNodesWithScore(1.0f, 2.0f, ScoreMatchers::range);
 		assertTrue(nodes.size() == 2);
 	}
 

@@ -15,6 +15,9 @@ import java.util.List;
 public class ClusterNode {
 	private List<Node> graphNodes = new ArrayList<>();
 	private List<ClusterNode> children = new ArrayList<>();
+	private List<ClusterNode> parents = new ArrayList<>();
+	private List<ClusterNode> interfaces = new ArrayList<>();
+	private List<ClusterNode> dependencies = new ArrayList<>();
 	@Setter private float score;
 
 	public ClusterNode() {}
@@ -45,5 +48,22 @@ public class ClusterNode {
 	public int addChild(@NonNull final ClusterNode node) {
 		children.add(node);
 		return children.size();
+	}
+
+	public int addParent(@NonNull final ClusterNode node) {
+		return addNode(parents, node);
+	}
+
+	public int addInterface(@NonNull final ClusterNode node) {
+		return addNode(interfaces, node);
+	}
+
+	public int addDependencies(@NonNull final ClusterNode node) {
+		return addNode(dependencies, node);
+	}
+
+	private int addNode(final List<ClusterNode> nodes, final ClusterNode node) {
+		nodes.add(node);
+		return nodes.size();
 	}
 }

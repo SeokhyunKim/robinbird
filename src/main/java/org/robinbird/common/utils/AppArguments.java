@@ -36,7 +36,8 @@ public class AppArguments {
 		TERMINAL_CLASS1("-tc"), TERMINAL_CLASS2("--terminal-class"),
 		EXCLUDED_CLASS1("-ec"), EXCLUDED_CLASS2("--excluded-class"),
 		CLUSTERING_TYPE1("-ct"), CLUSTERING_TYPE2("--clustering-type"),
-		SCORE1("-s"), SCORE2("--score");
+		SCORE11("-s1"), SCORE12("--score1"),
+		SCORE21("-s2"), SCORE22("--score2");
 
 		private final String name;
 		private static Map<String, ArgType> argTypeMap;
@@ -61,7 +62,7 @@ public class AppArguments {
 	@NonNull private List<Pattern> terminalClassPatterns;
 	@NonNull private List<Pattern> excludedClassPatterns;
 	@NonNull private String clusteringType;
-	private float score;
+	private float score1, score2;
 
 	public static AppArguments parseArguments(String[] args) throws IllegalArgumentException {
 		AppArgumentsBuilder argsBuilder = AppArguments.builder();
@@ -72,7 +73,8 @@ public class AppArguments {
 		argsBuilder.terminalClassPatterns(terminalPatterns);
 		argsBuilder.excludedClassPatterns(excludePatterns);
 		argsBuilder.clusteringType(CLUSTERING_METHOD.HIERARCHICAL_CUSTERING.getName());
-		argsBuilder.score(1.0f);
+		argsBuilder.score1(1.0f);
+		argsBuilder.score2(2.0f);
 		// parse parameters
 		for (int i=0; i<args.length;) {
 			ArgType at = ArgType.getArgType(args[i]);
@@ -123,10 +125,16 @@ public class AppArguments {
 					}
 					i += 2;
 					break;
-				case SCORE1:
-				case SCORE2:
+				case SCORE11:
+				case SCORE12:
 					checkState(i+1<args.length, Msgs.get(SCORE_FOR_CLUSTERING_IS_NOT_GIVEN));
-					argsBuilder.score(Integer.parseInt(args[i + 1]));
+					argsBuilder.score1(Integer.parseInt(args[i + 1]));
+					i += 2;
+					break;
+				case SCORE21:
+				case SCORE22:
+					checkState(i+1<args.length, Msgs.get(SCORE_FOR_CLUSTERING_IS_NOT_GIVEN));
+					argsBuilder.score2(Integer.parseInt(args[i + 1]));
 					i += 2;
 					break;
 				case CLUSTERING_TYPE1:

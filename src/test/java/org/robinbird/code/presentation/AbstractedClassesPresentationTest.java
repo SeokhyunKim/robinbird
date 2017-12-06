@@ -20,7 +20,8 @@ public class AbstractedClassesPresentationTest {
 
 	@Test
 	public void testPresent() {
-		AbstractedClassesPresentation presentation = new AbstractedClassesPresentation(CLUSTERING_METHOD.HIERARCHICAL_CUSTERING, 1);
+
+		AbstractedClassesPresentation presentation = new AbstractedClassesPresentation(CLUSTERING_METHOD.HIERARCHICAL_CUSTERING, 1, 6);
 		String present = presentation.present(analysisContext);
 //		assertTrue(present.contains("graph"));
 //		assertTrue(present.contains("node"));

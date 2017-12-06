@@ -5,6 +5,6 @@ package org.robinbird.graph.cluster;
  */
 public interface ScoreMatch {
 
-	boolean match(ClusterNode node, float score);
+	boolean match(ClusterNode node, float minScore, float maxScore);
 
 }

@@ -13,6 +13,9 @@ import java.util.List;
 public class Node extends Repositable {
 
 	private List<Edge> edges = new ArrayList<>();
+	private List<Edge> parents = new ArrayList<>();
+	private List<Edge> interfaces = new ArrayList<>();
+	private List<Edge> dependencies = new ArrayList<>();
 
 	public Node(final String name) {
 		super(name);
@@ -24,5 +27,23 @@ public class Node extends Repositable {
 			return;
 		}
 		edges.add(edge);
+	}
+
+	public void addParent(Node target) {
+		Edge edge = new Edge(this, target);
+		parents.add(edge);
+		addEdge(target);
+	}
+
+	public void addInterface(Node target) {
+		Edge edge = new Edge(this, target);
+		interfaces.add(edge);
+		addEdge(target);
+	}
+
+	public void addDependency(Node target) {
+		Edge edge = new Edge(this, target);
+		dependencies.add(edge);
+		addEdge(target);
 	}
 }
