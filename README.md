@@ -8,8 +8,31 @@ So, robinbird and PlantUML can make class diagram like below almost automaticall
 ![Class diagram sample](/sample.png)
 
 ## Prerequistes
-* Install PlantUML.
-* PlantUML is not required to run robinbird, but it is required to generate diagram based on robinbird-created script.
+* Install PlantUML command line tool.
+  * Mac OS
+    ```
+    brew install plantuml
+    ```
+  * Other OSes
+    * will be updated later
+* PlantUML is not required to run robinbird,
+but it is required to generate diagram based on robinbird-created script.
+
+## How to Compile and Install
+* Clone robinbird
+```
+git clone https://github.com/SeokhyunKim/robinbird.git
+```
+* robinbird is using gradle wrapper
+```
+./gradlew build
+```
+* Distribution file is generated under build/distributions. Copy to any directory you want
+* set path
+```
+export PATH=$PATH:YOUR_INSTALL_DIRECTORY/robinbird/bin
+```
+* That's it!
 
 ## Simpe Usage
 * Generate PlantUML script
@@ -22,6 +45,6 @@ So, robinbird and PlantUML can make class diagram like below almost automaticall
     * svg is scalable vector format
     
 ## Detailed Usage Options
-* Will be updated.
+* Try 'robinbird help' on command line.
 
  
