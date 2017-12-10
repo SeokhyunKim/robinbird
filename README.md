@@ -40,9 +40,13 @@ export PATH=$PATH:YOUR_INSTALL_DIRECTORY/robinbird/bin
   * PlantUML script will be printed out. So, just redirect stdout to a text file.
 * Then, use PlantUML to convert the script to a diagram
   * plantuml sample.txt
+    * sample.png will be created which has your class diagram.
   * If generated diagram is not fitted into a file, try svg format
     * plantuml -tsvg sample.txt
     * svg is scalable vector format
+* That's pretty much! Other options are for tweaking your class diagram.
+* Other features like sequence diagram and EXCITING abstracted architecture diagram will be coming.
+  * what is abstracted architecture diagram? That's what we're investigating. It's kind of research, so still vague now.
     
 ## Detailed Usage Options
 * Try 'robinbird help' on command line.
