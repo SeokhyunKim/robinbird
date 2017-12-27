@@ -12,7 +12,9 @@ import org.robinbird.code.presentation.PRESENTATION_TYPE;
 import org.robinbird.code.presentation.SimplePresentation;
 import org.robinbird.code.presentation.StringAppender;
 import org.robinbird.common.utils.AppArguments;
+import org.robinbird.common.utils.Util;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.robinbird.code.model.AnalysisUnit.Language.JAVA8;
@@ -25,6 +27,7 @@ public class Application {
 
 	public void run(AppArguments appArgs) {
 		log.info("Start app with args: " + appArgs.toString());
+		log.info("\n" + Util.printMemoryInfo());
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(Paths.get(appArgs.getSourceRootPath()));
 		AnalysisContext ac = au.analysis(appArgs.getTerminalClassPatterns(), appArgs.getExcludedClassPatterns());
@@ -54,6 +57,8 @@ public class Application {
 	}
 
 	public static void main(String[] args) {
+		Path currentRelativePath = Paths.get("");
+		System.out.println(currentRelativePath.toString());
 		if (args.length<1 || args[0].equalsIgnoreCase("help")) {
 			printHelp();
 			return;
@@ -63,20 +68,19 @@ public class Application {
 		app.run(appArgs);
 	}
 
-	public static void printHelp() {
+	private static void printHelp() {
 		StringAppender sa = new StringAppender();
-		sa.appendLine("Usage:");
-		sa.appendLine("robinbird [option-type option-value]*\n");
+		sa.appendLine("Usage: robinbird [option-type option-value]*\n");
 		sa.appendLine("Examples:");
 		sa.appendLine("robinbird -root your_root_path_for_source_codes");
 		sa.appendLine("  // will generate PlantUML class diagram script for the given root");
 		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
 		sa.appendLine("  // will generate PlantUML class diagrams from root_path excluding classes matched with Java regular expression 'EscludedClass.*'\n");
-		sa.appendLine("Optjon Types");
-		sa.appendLine("-r  or  -root\tspecify root path of source codes");
-		sa.appendLine("-p  or  -presentation\tset presentation type. default is PLANTUML. Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES");
-		sa.appendLine("-tc or  -terminal-class\tClasses matched with this regular expression will be only shown their names in class diagram");
-		sa.appendLine("-ec or  -excluded-class\tClasses matched with this regular expression will not be shown in class diagram");
+		sa.appendLine("Optjon Types:");
+		sa.appendLine("-r  or  -root\t\t\t\tspecify root path of source codes");
+		sa.appendLine("-p  or  -presentation\t\t\tset presentation type. default is PLANTUML. Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES");
+		sa.appendLine("-tc or  -terminal-class\t\t\tClasses matched with this regular expression will be only shown their names in class diagram");
+		sa.appendLine("-ec or  -excluded-class\t\t\tClasses matched with this regular expression will not be shown in class diagram");
 		sa.appendLine("-s1 or --score1, and -s2 or --score2\texperimental things for ABSTRACTED_CLASSES");
 		System.out.println(sa.toString());
 	}

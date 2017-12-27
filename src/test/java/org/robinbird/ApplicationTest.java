@@ -1,9 +1,12 @@
 package org.robinbird;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.TestUtils.getTestPath;
@@ -63,5 +66,18 @@ public class ApplicationTest {
 		assertTrue(output.contains("edge"));
 		assertTrue(output.contains("source org.robinbird.test.SimpleClass"));
 		assertTrue(output.contains("target org.robinbird.test.TestClass"));
+	}
+
+	@Ignore
+	@Test
+	public void infiniteCompilingCaseOfANTLR() {
+		String[] args = new String[] { "-r", ppp("BlockManager.java")};
+		Application.main(args);
+	}
+
+	private String ppp(String ss) {
+		Path currentRelativePath = Paths.get("");
+		String s = currentRelativePath.toAbsolutePath().toString();
+		return s + "/src/test/resources/test_antlr/"+ss;
 	}
 }
