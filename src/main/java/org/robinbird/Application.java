@@ -70,12 +70,12 @@ public class Application {
 
 	private static void printHelp() {
 		StringAppender sa = new StringAppender();
-		sa.appendLine("Usage: robinbird [option-type option-value]*\n");
+		sa.appendLine("Usage: robinbird option-type option-value ...\n");
 		sa.appendLine("Examples:");
 		sa.appendLine("robinbird -root your_root_path_for_source_codes");
-		sa.appendLine("  // will generate PlantUML class diagram script for the given root");
+		sa.appendLine("  . This will generate PlantUML class diagram script for the given root");
 		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
-		sa.appendLine("  // will generate PlantUML class diagrams from root_path excluding classes matched with Java regular expression 'EscludedClass.*'\n");
+		sa.appendLine("  . This will generate PlantUML class diagrams from root_path excluding classes matched with Java regular expression 'EscludedClass.*'\n");
 		sa.appendLine("Optjon Types:");
 		sa.appendLine("-r  or  -root\t\t\t\tspecify root path of source codes");
 		sa.appendLine("-p  or  -presentation\t\t\tset presentation type. default is PLANTUML. Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES");
