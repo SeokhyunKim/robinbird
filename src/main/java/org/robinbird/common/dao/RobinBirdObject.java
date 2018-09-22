@@ -1,4 +1,4 @@
-package org.robinbird.common.model;
+package org.robinbird.common.dao;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public class Repositable {
+public class RobinBirdObject {
 
 	@Setter  protected int id;
 	@NonNull final protected String name;
@@ -20,8 +20,8 @@ public class Repositable {
 	@Override
 	final public boolean equals(Object o) {
 		if (o == this) return true;
-		if (!(o instanceof Repositable)) return false;
-		Repositable other = (Repositable) o;
+		if (!(o instanceof RobinBirdObject)) return false;
+		RobinBirdObject other = (RobinBirdObject) o;
 		return this.getName().equals(other.getName());
 	}
 

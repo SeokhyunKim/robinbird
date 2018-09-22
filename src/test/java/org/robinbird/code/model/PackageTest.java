@@ -2,7 +2,7 @@ package org.robinbird.code.model;
 
 import be.joengenduvel.java.verifiers.ToStringVerifier;
 import org.junit.Test;
-import org.robinbird.common.model.Repositable;
+import org.robinbird.common.dao.RobinBirdObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class PackageTest {
 	@Test
 	public void test_toString() {
 		Package p = new Package(Arrays.asList("org", "robinbird", "test"));
-		ToStringVerifier.forClass(Repositable.class).ignore("$jacocoData").containsAllPrivateFields(p);
+		ToStringVerifier.forClass(RobinBirdObject.class).ignore("$jacocoData").containsAllPrivateFields(p);
 	}
 
 	@Test(expected = IllegalStateException.class)

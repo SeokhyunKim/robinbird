@@ -6,7 +6,6 @@ import org.robinbird.graph.Graph;
 import org.robinbird.graph.cluster.AgglomerativeClustering;
 import org.robinbird.graph.cluster.Cluster;
 import org.robinbird.graph.cluster.ClusterNode;
-import org.robinbird.graph.cluster.ClusteringMethod;
 import org.robinbird.graph.cluster.ScoreMatchers;
 
 import java.util.List;
@@ -17,10 +16,10 @@ import java.util.List;
 @Slf4j
 public class AbstractedClassesPresentation implements AnalysisContextPresentation {
 
-	private ClusteringMethod clusteringMethod;
+	private org.robinbird.graph.cluster.ClusteringMethod clusteringMethod;
 	private float score1, score2;
 
-	public AbstractedClassesPresentation(CLUSTERING_METHOD cmethod, float score1, float score2) {
+	public AbstractedClassesPresentation(ClusteringMethod cmethod, float score1, float score2) {
 		this.clusteringMethod = createClusteringMethod(cmethod);
 		this.score1 = score1;
 		this.score2 = score2;
@@ -49,7 +48,7 @@ public class AbstractedClassesPresentation implements AnalysisContextPresentatio
 		return sa.toString();
 	}
 
-	private ClusteringMethod createClusteringMethod(CLUSTERING_METHOD cmethod) {
+	private org.robinbird.graph.cluster.ClusteringMethod createClusteringMethod(ClusteringMethod cmethod) {
 		switch (cmethod) {
 			case HIERARCHICAL_CUSTERING:
 			default:

@@ -1,6 +1,6 @@
 package org.robinbird.code.model;
 
-import org.robinbird.common.model.Repositable;
+import org.robinbird.common.dao.RobinBirdObject;
 import org.robinbird.common.utils.Msgs;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import static org.robinbird.common.utils.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY
 /**
  * Created by seokhyun on 7/23/17.
  */
-public class Package extends Repositable {
+public class Package extends RobinBirdObject {
 
 	private static String DELIMITER = ".";
 

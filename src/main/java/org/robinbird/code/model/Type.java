@@ -2,7 +2,7 @@ package org.robinbird.code.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.robinbird.common.model.Repositable;
+import org.robinbird.common.dao.RobinBirdObject;
 
 import static org.robinbird.code.model.Type.Kind.PRIMITIVE;
 import static org.robinbird.code.model.Type.Kind.REFERENCE;
@@ -11,7 +11,7 @@ import static org.robinbird.code.model.Type.Kind.REFERENCE;
  * Created by seokhyun on 5/31/17.
  */
 @Getter
-public class Type extends Repositable {
+public class Type extends RobinBirdObject {
 
 	public enum Kind { PRIMITIVE, REFERENCE};
 

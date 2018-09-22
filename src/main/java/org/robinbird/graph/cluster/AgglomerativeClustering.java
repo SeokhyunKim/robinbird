@@ -1,7 +1,7 @@
 package org.robinbird.graph.cluster;
 
 import lombok.Getter;
-import org.robinbird.common.model.Pair;
+import org.robinbird.common.dao.Pair;
 import org.robinbird.common.utils.Msgs;
 import org.robinbird.graph.FloydAlgorithm;
 import org.robinbird.graph.Graph;

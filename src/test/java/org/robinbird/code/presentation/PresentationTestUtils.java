@@ -6,8 +6,7 @@ import org.robinbird.code.model.Class;
 import org.robinbird.code.model.ClassType;
 import org.robinbird.code.model.Member;
 import org.robinbird.code.model.Package;
-import org.robinbird.common.model.Repository;
-import org.robinbird.code.model.Type;
+import org.robinbird.common.dao.Repository;
 
 import java.util.Arrays;
 

@@ -5,7 +5,7 @@ import org.robinbird.code.model.Class;
 import org.robinbird.code.model.Collection;
 import org.robinbird.code.model.Member;
 import org.robinbird.code.model.Type;
-import org.robinbird.common.model.Repository;
+import org.robinbird.common.dao.Repository;
 import org.robinbird.common.utils.Msgs;
 
 import java.util.List;

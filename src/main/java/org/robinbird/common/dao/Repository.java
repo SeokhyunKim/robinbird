@@ -1,4 +1,4 @@
-package org.robinbird.common.model;
+package org.robinbird.common.dao;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by seokhyun on 5/31/17.
  */
 @Slf4j
-public class Repository<T extends Repositable> {
+public class Repository<T extends RobinBirdObject> {
 	private List<T> repositableList;
 	private Map<String, Integer> repositableMap;
 

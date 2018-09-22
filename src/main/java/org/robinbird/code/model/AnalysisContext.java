@@ -3,7 +3,7 @@ package org.robinbird.code.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.common.model.Repository;
+import org.robinbird.common.dao.Repository;
 import org.robinbird.exception.ExistingTypeNameException;
 import org.robinbird.common.utils.Msgs;
 
