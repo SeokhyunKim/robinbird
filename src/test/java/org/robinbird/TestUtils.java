@@ -13,6 +13,9 @@ public class TestUtils {
 	static {
 		Path currentRelativePath = Paths.get("");
 		String s = currentRelativePath.toAbsolutePath().toString();
+		if (s.contains(".idea/modules")) {
+			s = s.replace(".idea/modules", "");
+		}
 		rootTestPath = s + "/src/test/resources/test_directory";
 	}
 

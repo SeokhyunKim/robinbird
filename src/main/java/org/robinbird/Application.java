@@ -2,6 +2,7 @@ package org.robinbird;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -40,9 +41,19 @@ public class Application {
 		au.addPath(Paths.get(rootPath));
 		String[] terminalClasses = commandLine.getOptionValues("tc");
 		String[] excludedClasses = commandLine.getOptionValues("ec");
-		List<Pattern> terminalPatterns = Arrays.stream(terminalClasses).map(Pattern::compile).collect(Collectors.toList());
-		List<Pattern> excludedPatterns = Arrays.stream(excludedClasses).map(Pattern::compile).collect(Collectors.toList());
+		List<Pattern> terminalPatterns =
+				Optional.ofNullable(terminalClasses)
+						.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
+						.orElse(null);
+		List<Pattern> excludedPatterns =
+				Optional.ofNullable(excludedClasses)
+						.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
+						.orElse(null);
 		String presentation = commandLine.getOptionValue("p");
+		// default presentation option
+		if (presentation == null) {
+			presentation = PresentationType.PLANTUML.name();
+		}
 		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
 		AnalysisContextPresentation acPresent = createPresentation(PresentationType.valueOf(presentation), commandLine);
 		System.out.print(acPresent.present(ac));
@@ -116,12 +127,14 @@ public class Application {
 		final Option root = Option.builder("r")
 									.longOpt("root")
 									.desc("specify root path of source codes")
+									.hasArg()
 									.build();
 		final Option presentation =
 				Option.builder("p")
 						.longOpt("presentation")
 						.desc("set presentation type. default is PLANTUML. " +
 									  "Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES")
+						.hasArg()
 						.build();
 		final Option terminalClass =
 				Option.builder("tc")
@@ -139,16 +152,19 @@ public class Application {
 				Option.builder("ct")
 						.longOpt("clustering-type")
 						.desc("experimental clustering type for ABSTRACTED_CLASSES")
+						.hasArg()
 						.build();
 		final Option score1 =
 				Option.builder("s1")
 						.longOpt("score1")
 						.desc("experimental things for ABSTRACTED_CLASSES")
+						.hasArg()
 						.build();
 		final Option score2 =
 				Option.builder("s2")
 						.longOpt("score2")
 						.desc("experimental things for ABSTRACTED_CLASSES")
+						.hasArg()
 						.build();
 		return new Options()
 					   .addOption(help)

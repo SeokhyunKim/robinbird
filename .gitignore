@@ -6,6 +6,7 @@ Thumbs.db
 bin
 target
 build/
+out/
 .gradle
 test_results/
 classes/

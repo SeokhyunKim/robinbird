@@ -11,9 +11,6 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.TestUtils.getTestPath;
 
-/**
- * Created by seokhyun on 10/27/17.
- */
 public class ApplicationTest {
 
 	@Test

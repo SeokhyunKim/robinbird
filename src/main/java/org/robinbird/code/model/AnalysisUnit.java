@@ -1,5 +1,6 @@
 package org.robinbird.code.model;
 
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -45,7 +46,7 @@ public class AnalysisUnit {
 		paths.add(p);
 	}
 
-	public AnalysisContext analysis(List<Pattern> terminalPatterns, List<Pattern> excludePatterns) {
+	public AnalysisContext analysis(@Nullable List<Pattern> terminalPatterns, @Nullable List<Pattern> excludePatterns) {
 		AnalysisContext analysisContext = new AnalysisContext();
 		if (terminalPatterns != null && terminalPatterns.size()>0) {
 			analysisContext.setTerminalClassPatterns(terminalPatterns);
