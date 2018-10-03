@@ -11,7 +11,13 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.TestUtils.getTestPath;
 
+@Ignore
 public class ApplicationTest {
+
+	@Test
+	public void dbTest() {
+		Application.main(null);
+	}
 
 	@Test
 	public void testApplication_with_PLANTUML() {

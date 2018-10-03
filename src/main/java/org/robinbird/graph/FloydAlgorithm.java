@@ -22,8 +22,8 @@ public class FloydAlgorithm {
 		}
 		for(Node n : nodes) {
 			for (Edge e : n.getEdges()) {
-				int i = e.getSource().getId();
-				int j = e.getTarget().getId();
+				int i = (int)e.getSource().getId();
+				int j = (int)e.getTarget().getId();
 				dist[i][j] = 1;
 			}
 		}

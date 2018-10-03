@@ -13,50 +13,87 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.robinbird.code.model.AnalysisContext;
-import org.robinbird.code.model.AnalysisUnit;
-import org.robinbird.code.presentation.AbstractedClassesPresentation;
-import org.robinbird.code.presentation.AnalysisContextPresentation;
-import org.robinbird.code.presentation.ClusteringMethod;
-import org.robinbird.code.presentation.GMLPresentation;
-import org.robinbird.code.presentation.PlantUMLPresentation;
-import org.robinbird.code.presentation.PresentationType;
-import org.robinbird.code.presentation.SimplePresentation;
-import org.robinbird.code.presentation.StringAppender;
-import org.robinbird.common.utils.Util;
+import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.model.AnalysisUnit;
+import org.robinbird.main.presentation.AbstractedClassesPresentation;
+import org.robinbird.main.presentation.AnalysisContextPresentation;
+import org.robinbird.main.presentation.ClusteringMethod;
+import org.robinbird.main.presentation.GMLPresentation;
+import org.robinbird.main.presentation.PlantUMLPresentation;
+import org.robinbird.main.presentation.PresentationType;
+import org.robinbird.main.presentation.SimplePresentation;
+import org.robinbird.main.presentation.StringAppender;
+import org.robinbird.main.dao.RobinbirdDao;
+import org.robinbird.main.util.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.robinbird.code.model.AnalysisUnit.Language.JAVA8;
+import static org.robinbird.main.model.AnalysisUnit.Language.JAVA8;
 
 @Slf4j
 public class Application {
 
+	private final static String SHELL_DIR = "shell.dir";
+
+	private String shellDir;
+
 	public void run(CommandLine commandLine) {
-		log.info("\n" + Util.printMemoryInfo());
+		shellDir = System.getProperty(SHELL_DIR);
+		if (shellDir == null) {
+			shellDir = System.getProperty("user.dir");
+			String msg =
+					"Cannot get current shell directory. Set shellDir with user.dir system property which is " + shellDir;
+			System.out.println(msg);
+			log.info(msg);
+		}
+		log.info("\n" + Utils.printMemoryInfo());
+
 		AnalysisUnit au = new AnalysisUnit(JAVA8);
-		// TODO: get shell dir and make both relative and absolute path work
-		String rootPath = commandLine.getOptionValue("r");
-		au.addPath(Paths.get(rootPath));
-		String[] terminalClasses = commandLine.getOptionValues("tc");
-		String[] excludedClasses = commandLine.getOptionValues("ec");
-		List<Pattern> terminalPatterns =
-				Optional.ofNullable(terminalClasses)
-						.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
-						.orElse(null);
-		List<Pattern> excludedPatterns =
-				Optional.ofNullable(excludedClasses)
-						.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
-						.orElse(null);
+		au.addPath(getRootPath(commandLine));
+
+		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
+		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
+
+		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
+		AnalysisContextPresentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
+		System.out.print(acPresent.present(ac));
+	}
+
+	private Path getRootPath(CommandLine commandLine) {
+		String rootPathStr = commandLine.getOptionValue("r");
+		if (rootPathStr == null) {
+			rootPathStr = "./";
+		}
+		Path rootPath = Paths.get(rootPathStr);
+		if (rootPath.isAbsolute()) {
+			return rootPath;
+		} else {
+			return (Paths.get(shellDir, rootPathStr));
+		}
+	}
+
+	private List<Pattern> convertStringsToPatterns(String[] strings) {
+		return Optional.ofNullable(strings)
+				.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
+				.orElse(null);
+	}
+
+	private PresentationType getPresentationType(CommandLine commandLine) {
 		String presentation = commandLine.getOptionValue("p");
 		// default presentation option
 		if (presentation == null) {
 			presentation = PresentationType.PLANTUML.name();
 		}
-		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
-		AnalysisContextPresentation acPresent = createPresentation(PresentationType.valueOf(presentation), commandLine);
-		System.out.print(acPresent.present(ac));
+		return PresentationType.valueOf(presentation);
+	}
+
+	private RobinbirdDao createDao(CommandLine commandLine) {
+		String dbFile = commandLine.getOptionValue("db");
+		if (dbFile == null) {
+			dbFile = "rb.db";
+		}
+		return null;
 	}
 
 	private AnalysisContextPresentation createPresentation(PresentationType ptype, CommandLine commandLine) {
@@ -114,6 +151,7 @@ public class Application {
 		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
 		sa.appendLine("  . This will generate PlantUML class diagrams from root_path excluding classes matched with Java regular " +
 							  "expression 'EscludedClass.*'\n");
+		sa.appendLine("Options:");
 
 		final HelpFormatter formatter = new HelpFormatter();
 		formatter.printHelp(formatter.getWidth()*2, sa.toString(), null, options, null);
@@ -134,6 +172,12 @@ public class Application {
 						.longOpt("presentation")
 						.desc("set presentation type. default is PLANTUML. " +
 									  "Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES")
+						.hasArg()
+						.build();
+		final Option db =
+				Option.builder("db")
+						.longOpt("database-file")
+						.desc("Local h2 database file")
 						.hasArg()
 						.build();
 		final Option terminalClass =
@@ -170,27 +214,11 @@ public class Application {
 					   .addOption(help)
 					   .addOption(root)
 					   .addOption(presentation)
+					   .addOption(db)
 					   .addOption(terminalClass)
 					   .addOption(excludedClass)
 					   .addOption(clusteringType)
 					   .addOption(score1)
 					   .addOption(score2);
-	}
-
-	private static void printHelp() {
-		StringAppender sa = new StringAppender();
-		sa.appendLine("Usage: robinbird option-type option-value ...\n");
-		sa.appendLine("Examples:");
-		sa.appendLine("robinbird -root your_root_path_for_source_codes");
-		sa.appendLine("  . This will generate PlantUML class diagram script for the given root");
-		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
-		sa.appendLine("  . This will generate PlantUML class diagrams from root_path excluding classes matched with Java regular expression 'EscludedClass.*'\n");
-		sa.appendLine("Optjon Types:");
-		sa.appendLine("-r  or  -root\t\t\t\tspecify root path of source codes");
-		sa.appendLine("-p  or  -presentation\t\t\tset presentation type. default is PLANTUML. Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES");
-		sa.appendLine("-tc or  -terminal-class\t\t\tClasses matched with this regular expression will be only shown their names in class diagram");
-		sa.appendLine("-ec or  -excluded-class\t\t\tClasses matched with this regular expression will not be shown in class diagram");
-		sa.appendLine("-s1 or --score1, and -s2 or --score2\texperimental things for ABSTRACTED_CLASSES");
-		System.out.println(sa.toString());
 	}
 }

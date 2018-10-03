@@ -1,7 +1,7 @@
 package org.robinbird.graph;
 
 import lombok.Getter;
-import org.robinbird.common.dao.RobinBirdObject;
+import org.robinbird.main.model.RobinbirdObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * Created by seokhyun on 11/7/17.
  */
 @Getter
-public class Node extends RobinBirdObject {
+public class Node extends RobinbirdObject {
 
 	private List<Edge> edges = new ArrayList<>();
 	private List<Edge> parents = new ArrayList<>();

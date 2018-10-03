@@ -1,11 +1,6 @@
 package org.robinbird.graph;
 
 import org.junit.Test;
-import org.robinbird.code.model.AccessModifier;
-import org.robinbird.code.model.Class;
-import org.robinbird.code.model.Member;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.assertTrue;
 
