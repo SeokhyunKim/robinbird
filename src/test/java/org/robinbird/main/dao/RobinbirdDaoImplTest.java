@@ -4,9 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManagerFactory;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.robinbird.main.model.RobinbirdObject;
 import org.robinbird.main.model.Type;

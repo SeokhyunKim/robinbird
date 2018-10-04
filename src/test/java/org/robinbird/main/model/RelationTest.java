@@ -1,10 +1,7 @@
 package org.robinbird.main.model;
 
-import be.joengenduvel.java.verifiers.ToStringVerifier;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -45,19 +42,6 @@ public class RelationTest {
 		r.setSecondCardinality("1");
 		assertTrue("1".equals(r.getFirstCardinality()));
 		assertTrue("1".equals(r.getSecondCardinality()));
-	}
-
-	@Test
-	public void check_equals_and_hashcode() {
-		EqualsVerifier.forClass(Relation.Key.class).verify();
-	}
-
-	@Test
-	public void check_toString() {
-		Relation r = Relation.create(new Type("abc", Type.Kind.PRIMITIVE), new Type("def", Type.Kind.REFERENCE));
-		ToStringVerifier.forClass(Relation.class).ignore("$jacocoData").containsAllPrivateFields(r);
-		Relation.Key k = Relation.createKey("first", "second");
-		ToStringVerifier.forClass(Relation.Key.class).ignore("$jacocoData").containsAllPrivateFields(k);
 	}
 
 	@Test(expected = IllegalStateException.class)

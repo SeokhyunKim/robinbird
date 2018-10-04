@@ -1,8 +1,5 @@
 package org.robinbird.main.model;
 
-import be.joengenduvel.java.verifiers.ToStringVerifier;
-import lombok.NonNull;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -33,19 +30,6 @@ public class MemberTest {
 	@Test(expected = NullPointerException.class)
 	public void failed_with_null_name() {
 		new Member(AccessModifier.PUBLIC, new Type("test", Type.Kind.PRIMITIVE), null);
-	}
-
-	@Test
-	public void test_equals_and_hashCode() {
-		EqualsVerifier.forClass(Member.class)
-						.withIgnoredAnnotations(NonNull.class)
-						.withRedefinedSubclass(MemberFunction.class).verify();
-	}
-
-	@Test
-	public void test_toString() {
-		Member m = createTestMember();
-		ToStringVerifier.forClass(Member.class).ignore("$jacocoData").containsAllPrivateFields(m);
 	}
 
 	private Member createTestMember() {

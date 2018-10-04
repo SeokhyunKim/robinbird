@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "robinbird", indexes = {@Index(columnList = "name")})
+@Table(indexes = {@Index(columnList = "name")})
 @Inheritance(strategy = JOINED)
 public class RobinbirdEntity {
 

@@ -4,9 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import lombok.Data;
 
-@Entity
 @Data
-@Table(name = "type")
+@Entity
 public class TypeEntity extends RobinbirdEntity {
 
     private String kind;
