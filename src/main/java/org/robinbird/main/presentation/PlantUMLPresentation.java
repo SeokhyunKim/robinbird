@@ -6,6 +6,7 @@ import org.robinbird.main.model.Class;
 import org.robinbird.main.model.Member;
 import org.robinbird.main.model.MemberFunction;
 import org.robinbird.main.model.Package;
+import org.robinbird.main.model.ParameterType;
 import org.robinbird.main.model.Relation;
 import org.robinbird.main.model.Type;
 
@@ -84,11 +85,11 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 		for (MemberFunction mf : memberFunctions) {
 			sa.append("\t").append(convertAccessModifier(mf.getAccessModifier())).append(" ");
 			sa.append(mf.getName()).append("(");
-			if (mf.getArguments() != null) {
-				Iterator<Type> itr = mf.getArguments().iterator();
+			if (mf.getParameters() != null) {
+				Iterator<ParameterType> itr = mf.getParameters().iterator();
 				while (itr.hasNext()) {
-					Type t = itr.next();
-					sa.append(t.getName());
+					ParameterType t = itr.next();
+					sa.append(t.getType().getName());
 					if (itr.hasNext()) {
 						sa.append(", ");
 					}

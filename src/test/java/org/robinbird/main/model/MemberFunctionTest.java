@@ -3,7 +3,6 @@ package org.robinbird.main.model;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -25,14 +24,15 @@ public class MemberFunctionTest {
 	@Test
 	public void test_create_member_function_with_arguments() {
 		MemberFunction f = createTestMemberFunction();
-		assertTrue( f.getArguments().get(0).getName() == "Integer");
-		assertTrue( f.getArguments().get(1).getName() == "Class1");
+		assertTrue( f.getParameters().get(0).getType().getName() == "Integer");
+		assertTrue( f.getParameters().get(1).getType().getName() == "Class1");
 	}
 
 	private MemberFunction createTestMemberFunction() {
 		return new MemberFunction(	AccessModifier.PUBLIC,
 			new Type("String", Type.Kind.REFERENCE),
 			"test1",
-			Arrays.asList(new Type("Integer", Type.Kind.PRIMITIVE), new Class("Class1")));
+			Arrays.asList(new ParameterType(new Type("Integer", Type.Kind.PRIMITIVE), false),
+						  new ParameterType(new Class("Class1"), false)));
 	}
 }

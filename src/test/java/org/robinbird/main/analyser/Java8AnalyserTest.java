@@ -16,7 +16,7 @@ import org.robinbird.main.model.Class;
 import org.robinbird.main.model.ClassType;
 import org.robinbird.main.model.Collection;
 import org.robinbird.main.model.Package;
-import org.robinbird.main.dao.Repository;
+import org.robinbird.main.repository.Repository;
 import org.robinbird.main.model.Type;
 import org.robinbird.parser.java8.Java8Parser;
 

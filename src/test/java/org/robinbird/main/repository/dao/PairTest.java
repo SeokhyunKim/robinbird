@@ -1,4 +1,4 @@
-package org.robinbird.main.dao;
+package org.robinbird.main.repository.dao;
 
 import org.junit.Test;
 

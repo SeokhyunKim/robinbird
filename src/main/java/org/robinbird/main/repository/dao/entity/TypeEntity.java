@@ -1,7 +1,6 @@
-package org.robinbird.main.dao.entity;
+package org.robinbird.main.repository.dao.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 import lombok.Data;
 
 @Data
@@ -9,7 +8,5 @@ import lombok.Data;
 public class TypeEntity extends RobinbirdEntity {
 
     private String kind;
-
-    private boolean varargs;
 
 }

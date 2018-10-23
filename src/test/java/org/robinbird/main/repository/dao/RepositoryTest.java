@@ -1,4 +1,4 @@
-package org.robinbird.main.dao;
+package org.robinbird.main.repository.dao;
 
 import org.junit.Test;
 import org.robinbird.main.model.Class;
@@ -9,6 +9,7 @@ import org.robinbird.main.model.Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.robinbird.main.repository.Repository;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package org.robinbird.main.dao;
+package org.robinbird.main.repository.dao;
 
 import java.util.List;
 import org.robinbird.main.model.RobinbirdObject;

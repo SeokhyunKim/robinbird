@@ -1,4 +1,4 @@
-package org.robinbird.main.dao.entity;
+package org.robinbird.main.repository.dao.entity;
 
 import static javax.persistence.InheritanceType.JOINED;
 

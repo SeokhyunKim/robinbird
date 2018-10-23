@@ -1,7 +1,8 @@
 package org.robinbird.main.model;
 
 import lombok.NonNull;
-import org.robinbird.main.dao.entity.TypeEntity;
+import org.robinbird.main.repository.dao.entity.ClassEntity;
+import org.robinbird.main.repository.dao.entity.TypeEntity;
 
 public class ModelConverter {
 
@@ -10,7 +11,12 @@ public class ModelConverter {
         entity.setName(type.getName());
         entity.setType(TypeEntity.class.getSimpleName());
         entity.setKind(type.getKind().name());
-        entity.setVarargs(type.isVarargs());
         return entity;
+    }
+
+    public static ClassEntity convert(@NonNull final Class classObj) {
+        ClassEntity entity = new ClassEntity();
+        return null;
+
     }
 }

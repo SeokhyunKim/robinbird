@@ -15,27 +15,27 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class MemberFunction extends Member {
 
-	private final List<Type> arguments;
+	private final List<ParameterType> parameters;
 
 	public MemberFunction(AccessModifier accessModifier, Type type, String name) {
 		super(accessModifier, type, name);
-		arguments = new ArrayList<>();
+		parameters = new ArrayList<>();
 	}
 
-	public MemberFunction(AccessModifier accessModifier, Type type, String name, List<Type> arguments) {
+	public MemberFunction(AccessModifier accessModifier, Type type, String name, List<ParameterType> parameters) {
 		super(accessModifier, type, name);
-		this.arguments = arguments;
+		this.parameters = parameters;
 	}
 
 	public String getSignature() {
-		return MemberFunction.createMethodSignature(getName(), arguments);
+		return MemberFunction.createMethodSignature(getName(), parameters);
 	}
 
-	public static String createMethodSignature(String methodName, List<Type> params) {
+	public static String createMethodSignature(String methodName, List<ParameterType> params) {
 		String signature = methodName;
 		if (params != null) {
-			for (Type t : params) {
-				signature += "_" + t.getName();
+			for (ParameterType t : params) {
+				signature += "_" + t.getType().getName();
 				if (t.isVarargs()) {
 					signature += "varargs";
 				}

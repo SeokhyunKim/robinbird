@@ -1,4 +1,4 @@
-package org.robinbird.main.dao.entity;
+package org.robinbird.main.repository.dao.entity;
 
 import lombok.NonNull;
 import org.robinbird.main.model.RobinbirdObject;
@@ -15,7 +15,6 @@ public class EntityConverter {
                 .id(typeEntity.getId())
                 .name(typeEntity.getName())
                 .kind(Type.Kind.valueOf(typeEntity.getKind()))
-                .varargs(typeEntity.isVarargs())
                 .build();
     }
 }

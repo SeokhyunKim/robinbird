@@ -152,7 +152,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
 		if (isFiltered()) { return; }
 
-		List<Type> params = getMethodParameterList(ctx.methodHeader().methodDeclarator());
+		List<ParameterType> params = getMethodParameterList(ctx.methodHeader().methodDeclarator());
 		String methodName = ctx.methodHeader().methodDeclarator().Identifier().getText();
 		String signature = MemberFunction.createMethodSignature(methodName, params);
 		MemberFunction mf = analysisContext.getCurrentClass().getMemberFunction(signature);
@@ -172,25 +172,23 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
 
 
-	private List<Type> getMethodParameterList(Java8Parser.MethodDeclaratorContext ctx) {
+	private List<ParameterType> getMethodParameterList(Java8Parser.MethodDeclaratorContext ctx) {
 		if (ctx.formalParameterList() != null) {
-			List<Type> paramList = new ArrayList<>();
+			List<ParameterType> paramList = new ArrayList<>();
 			Java8Parser.FormalParametersContext fpc = ctx.formalParameterList().formalParameters();
 			Java8Parser.LastFormalParameterContext lfpc = ctx.formalParameterList().lastFormalParameter();
 			if (fpc != null) {
 				for (Java8Parser.FormalParameterContext c : fpc.formalParameter()) {
-					paramList.add(getType(c.unannType()));
+					paramList.add(new ParameterType(getType(c.unannType()), false));
 				}
 			}
 			if (lfpc != null) {
 				if (lfpc.formalParameter() != null) {
-					paramList.add(getType(lfpc.formalParameter().unannType()));
+					paramList.add(new ParameterType(getType(lfpc.formalParameter().unannType()), false));
 				}
 				// varargs case
 				else {
-					Type t = getType(lfpc.unannType());
-					t.setVarargs(true);
-					paramList.add(t);
+					paramList.add(new ParameterType(getType(lfpc.unannType()), true));
 				}
 			}
 			return paramList;

@@ -1,4 +1,4 @@
-package org.robinbird.main.dao;
+package org.robinbird.main.repository.dao;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,9 +7,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.main.dao.entity.EntityConverter;
-import org.robinbird.main.dao.entity.RobinbirdEntity;
-import org.robinbird.main.dao.entity.TypeEntity;
+import org.robinbird.main.repository.dao.entity.ClassEntity;
+import org.robinbird.main.repository.dao.entity.EntityConverter;
+import org.robinbird.main.repository.dao.entity.RobinbirdEntity;
+import org.robinbird.main.repository.dao.entity.TypeEntity;
+import org.robinbird.main.model.Class;
 import org.robinbird.main.model.ModelConverter;
 import org.robinbird.main.model.RobinbirdObject;
 import org.robinbird.main.model.Type;
@@ -57,6 +59,10 @@ public class RobinbirdDaoImpl implements RobinbirdDao {
             tx.begin();
             if (newObject instanceof Type) {
                 TypeEntity entity = ModelConverter.convert((Type) newObject);
+                em.persist(entity);
+                id = entity.getId();
+            } else if (newObject instanceof Class) {
+                ClassEntity entity = ModelConverter.convert((Class) newObject);
                 em.persist(entity);
                 id = entity.getId();
             }

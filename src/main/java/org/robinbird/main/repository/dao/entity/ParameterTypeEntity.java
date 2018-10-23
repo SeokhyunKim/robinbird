@@ -1,4 +1,4 @@
-package org.robinbird.main.dao.entity;
+package org.robinbird.main.repository.dao.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,14 +7,12 @@ import lombok.Data;
 
 @Data
 @Entity
-public class MemberEntity {
+public class ParameterTypeEntity {
 
     @Id
     @GeneratedValue
     private long id;
 
-    private String accessModifier;
-    private String description;
-
-
+    private long typeId;
+    boolean varargs;
 }

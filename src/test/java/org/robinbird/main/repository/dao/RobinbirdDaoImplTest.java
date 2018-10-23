@@ -1,4 +1,4 @@
-package org.robinbird.main.dao;
+package org.robinbird.main.repository.dao;
 
 import static org.hamcrest.CoreMatchers.is;
 
@@ -15,12 +15,16 @@ public class RobinbirdDaoImplTest {
             (RobinbirdDaoImpl)RobinbirdDaoFactory.createDao("mem:");
 
     @Test
-    public void test_save_withType() {
+    public void test_save_and_load_Type() {
         Type type = Type.builder().kind(Type.Kind.REFERENCE).varargs(false).name("test").build();
         long id = daoImpl.save(type);
         RobinbirdObject obj = daoImpl.load(id);
         Assert.assertTrue(obj instanceof Type);
         Assert.assertThat(obj.getName(), is("test"));
+    }
+
+    @Test
+    public void test_load_Type() {
 
     }
 
