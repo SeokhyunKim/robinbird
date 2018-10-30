@@ -8,19 +8,21 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import org.apache.commons.lang3.Validate;
 
 @Getter
 @ToString
 @EqualsAndHashCode(exclude = {"name", "compositionTypes", "instances"})
 public class Type {
 
-    private final long id; // id is mainly for classes and interfaces. don't give id something like List<Integer>
+    @Nullable
+    private final Long id; // id is mainly for classes and interfaces. don't give id something like List<Integer>
     @NonNull
     private final TypeCategory category;
     @NonNull
     private final String name;
 
-    private final List<Type> compositionTypes;
+    private final List<Type> compositionTypes; // mainly for collections which have several related types
     private final List<Instance> instances; // mainly for member variables and functions
     private final List<Relation> relations; // mainly for inheritance and realization
 
@@ -48,10 +50,12 @@ public class Type {
     }
 
     public void addInstance(@NonNull final Instance instance) {
+        Validate.isTrue(instance != null, "Cannot add instance because instances is null");
         instances.add(instance);
     }
 
     public void removeInstance(@NonNull final Instance instance) {
+        Validate.isTrue(instances != null, "Cannot remove instance because instances is null");
         instances.removeIf(r -> r.equals(instance));
     }
 

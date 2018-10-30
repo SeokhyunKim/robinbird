@@ -1,23 +1,28 @@
 package org.robinbird.main.newrepository.dao.entity;
 
+import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(indexes = {@Index(columnList = "parentTypeId")})
-public class InstanceEntity {
+@Table(name = "instance", indexes = {@Index(columnList = "parentTypeId")})
+public class InstanceEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
-    private long id;
-
     private long parentTypeId;
+    @Id
     private long typeId;
+    @Id
     private String name;
+    @Column
     private String accessModifier;
 }

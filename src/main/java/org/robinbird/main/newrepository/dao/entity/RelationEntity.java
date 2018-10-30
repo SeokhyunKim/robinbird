@@ -1,5 +1,7 @@
 package org.robinbird.main.newrepository.dao.entity;
 
+import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,14 +11,15 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(indexes = {@Index(columnList = "parentTypeId")})
-public class RelationEntity {
+@Table(name = "relation", indexes = {@Index(columnList = "parentTypeId")})
+public class RelationEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
-    private long id;
-
     private long parentTypeId;
+    @Id
     private long typeId;
+    @Column
     private String category;
 }

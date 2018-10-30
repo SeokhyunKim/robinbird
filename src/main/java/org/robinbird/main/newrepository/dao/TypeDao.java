@@ -2,6 +2,7 @@ package org.robinbird.main.newrepository.dao;
 
 import java.util.List;
 import java.util.Optional;
+import org.robinbird.main.newrepository.dao.entity.CompositionTypeEntity;
 import org.robinbird.main.newrepository.dao.entity.InstanceEntity;
 import org.robinbird.main.newrepository.dao.entity.RelationEntity;
 import org.robinbird.main.newrepository.dao.entity.TypeEntity;
@@ -12,28 +13,31 @@ public interface TypeDao {
 
     Optional<TypeEntity> loadTypeEntity(String name);
 
-    List<TypeEntity> loadTypeEntities(List<Long> ids);
+    TypeEntity saveTypeEntity(TypeEntity typeEntity);
 
-    List<Long> loadCompositionTypeIds(long id);
+    void removeTypeEntity(TypeEntity typeEntity);
 
-//    List<InstanceEntity> loadInstanceEntities(long parentId);
-//
-//    List<RelationEntity> loadRelationEntities(long parentId);
+    List<CompositionTypeEntity> loadCompositionTypeEntities(long typeId);
 
-    TypeEntity saveTypeEntity(TypeEntity te);
+    CompositionTypeEntity saveCompositionTypeEntity(CompositionTypeEntity compositionTypeEntity);
 
-    void saveCompositionTypeIds(long parentId, List<Long> ids);
+    void removeCompositionTypeEntities(long typeId);
 
-//    InstanceEntity saveInstanceEntity(InstanceEntity ie);
-//
-//    RelationEntity saveReleationEntity(RelationEntity re);
+    List<InstanceEntity> loadInstanceEntities(long parentTypeId);
 
-    void deleteTypeEntity(TypeEntity te);
+    InstanceEntity saveInstanceEntity(InstanceEntity instanceEntity);
 
-    void deleteCompositionTypeIds(long parentId, List<Long> ids);
+    void removeInstanceEntity(InstanceEntity instanceEntity);
 
-//    void deleteInstanceEntity(InstanceEntity ie);
-//
-//    void deleteReleationEntity(RelationEntity re);
+    void removeInstanceEntities(long parentTypeId);
+
+    List<RelationEntity> loadRelationEntities(long parentTypeId);
+
+    RelationEntity saveRelationEntity(RelationEntity relationEntity);
+
+    void removeRelationEntity(RelationEntity relationEntity);
+
+    void removeRelationEntities(long parentTypeId);
+
 
 }

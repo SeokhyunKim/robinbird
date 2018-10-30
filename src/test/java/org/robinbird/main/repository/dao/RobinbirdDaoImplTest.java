@@ -5,13 +5,15 @@ import static org.hamcrest.CoreMatchers.is;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.robinbird.main.model.RobinbirdObject;
 import org.robinbird.main.model.Type;
 
+@Ignore
 public class RobinbirdDaoImplTest {
 
-    private RobinbirdDaoImpl daoImpl =
+    /*private RobinbirdDaoImpl daoImpl =
             (RobinbirdDaoImpl)RobinbirdDaoFactory.createDao("mem:");
 
     @Test
@@ -60,7 +62,7 @@ public class RobinbirdDaoImplTest {
         daoImpl.save(type1);
         Assert.assertTrue(daoImpl.isExist("test1"));
         Assert.assertFalse(daoImpl.isExist("notExisting"));
-    }
+    }*/
 
 
 }

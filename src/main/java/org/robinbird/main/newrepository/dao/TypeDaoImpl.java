@@ -1,6 +1,5 @@
 package org.robinbird.main.newrepository.dao;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import lombok.NonNull;
-import org.robinbird.main.newrepository.dao.entity.CompositionTypeRelation;
+import org.robinbird.main.newrepository.dao.entity.CompositionTypeEntity;
 import org.robinbird.main.newrepository.dao.entity.InstanceEntity;
 import org.robinbird.main.newrepository.dao.entity.RelationEntity;
 import org.robinbird.main.newrepository.dao.entity.TypeEntity;
@@ -22,125 +21,26 @@ public class TypeDaoImpl implements TypeDao {
     private final EntityManager em; // currently running with embedded mode and open this when app starts and close when app ends.
 
     private final Query loadTypeEntityWithNameQuery;
-    private final Query loadTypeEntitiesQuery;
-    private final Query loadCompositionTypeRelationQuery;
-//    private final Query loadInstanceEntityQuery;
-//    private final Query loadRelationEntityQuery;
+    private final Query loadCompositionTypeEntitiesQuery;
+    private final Query deleteCompositionTypeEntityQuery;
+    private final Query loadInstanceEntitiesQuery;
+    private final Query deleteInstanceEntitiesQuery;
+    private final Query loadRelationEntitiesQuery;
+    private final Query deleteRelationEntitiesQuery;
 
     public TypeDaoImpl(@NonNull final EntityManagerFactory emf) {
         this.emf = emf;
         this.em = emf.createEntityManager();
         loadTypeEntityWithNameQuery = em.createQuery("select te from TypeEntity te where te.name = :name");
-        loadTypeEntitiesQuery = em.createQuery("select te from TypeEntity te where te.id in (:ids)");
-        loadCompositionTypeRelationQuery = em.createQuery("select ctr from CompositionTypeRelation ctr where ctr.typeId = :id");
-//        loadInstanceEntityQuery = em.createQuery("select ie from InstanceEntity ie where ie.parentTypeId = :parentId");
-//        loadRelationEntityQuery = em.createQuery("select re from RelationEntity re where re.parentTypeId = :parentId");
+        loadCompositionTypeEntitiesQuery = em.createQuery("select cte from CompositionTypeEntity cte where cte.typeId = :typeId");
+        deleteCompositionTypeEntityQuery = em.createQuery("delete from CompositionTypeEntity cte where cte.typeId = :typeId");
+        loadInstanceEntitiesQuery = em.createQuery("select ie from InstanceEntity ie where ie.parentTypeId = :parentTypeId");
+        deleteInstanceEntitiesQuery = em.createQuery("delete from InstanceEntity ie where ie.parentTypeId = :parentTypeId");
+        loadRelationEntitiesQuery = em.createQuery("select re from RelationEntity re where re.parentTypeId = :parentTypeId");
+        deleteRelationEntitiesQuery = em.createQuery("delete from RelationEntity re where re.parentTypeId = :parentTypeId");
     }
 
-    public Optional<TypeEntity> loadTypeEntity(long id) {
-        TypeEntity entity = em.find(TypeEntity.class, id);
-        if (entity == null) {
-            return Optional.empty();
-        }
-        return Optional.of(entity);
-    }
-
-    public Optional<TypeEntity> loadTypeEntity(String name) {
-        List result = loadTypeEntityWithNameQuery.setParameter("name", name).getResultList();
-        if (result.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of((TypeEntity)result.get(0));
-    }
-
-    public List<TypeEntity> loadTypeEntities(List<Long> ids) {
-        List result = loadTypeEntitiesQuery.setParameter("ids", ids).getResultList();
-        if (result.isEmpty()) {
-            return ImmutableList.of();
-        }
-        Iterator iter = result.iterator();
-        List<TypeEntity> entities = new ArrayList<>(result.size());
-        while(iter.hasNext()) {
-            entities.add((TypeEntity)iter.next());
-        }
-        return entities;
-    }
-
-    public List<Long> loadCompositionTypeIds(long id) {
-        List result = loadCompositionTypeRelationQuery.setParameter("id", id).getResultList();
-        if (result.isEmpty()) {
-            return ImmutableList.of();
-        }
-        Iterator iter = result.iterator();
-        List<Long> ids = new ArrayList<>(result.size());
-        while(iter.hasNext()) {
-            ids.add(((CompositionTypeRelation)iter.next()).getCompositionTypeId());
-        }
-        return ids;
-    }
-    /*
-    public List<InstanceEntity> loadInstanceEntities(long parentId) {
-        List result = loadInstanceEntityQuery.setParameter("parentId", parentId).getResultList();
-        if (result.isEmpty()) {
-            return ImmutableList.of();
-        }
-        Iterator iter = result.iterator();
-        List<InstanceEntity> entities = new ArrayList<>(result.size());
-        while(iter.hasNext()) {
-            entities.add((InstanceEntity)iter.next());
-        }
-        return entities;
-    }
-
-    public List<RelationEntity> loadRelationEntities(long parentId) {
-        List result = loadRelationEntityQuery.setParameter("parentId", parentId).getResultList();
-        if (result.isEmpty()) {
-            return ImmutableList.of();
-        }
-        Iterator iter = result.iterator();
-        List<RelationEntity> entities = new ArrayList<>(result.size());
-        while(iter.hasNext()) {
-            entities.add((RelationEntity)iter.next());
-        }
-        return entities;
-
-    }*/
-
-    public TypeEntity saveTypeEntity(TypeEntity te) {
-        return transactional(te, em::persist);
-    }
-
-/*
-    public InstanceEntity saveInstanceEntity(InstanceEntity ie) {
-        return saveEntity(ie);
-    }
-
-    public RelationEntity saveReleationEntity(RelationEntity re) {
-        return saveEntity(re);
-    }*/
-
-    private <T> T saveEntity(T entity) {
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-            em.persist(entity);
-            em.flush();
-            tx.commit();
-        } catch (RuntimeException e) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw e;
-        }
-        return entity;
-    }
-    public void deleteTypeEntity(TypeEntity te) {
-        transactional(te, em::remove);
-    }
-
-
-    private <T> T transactional(T entity, Consumer<T> consumer) {
+    private <T> T transactional(@NonNull final T entity, @NonNull final Consumer<T> consumer) {
         EntityTransaction tx = null;
         try {
             tx = em.getTransaction();
@@ -157,16 +57,12 @@ public class TypeDaoImpl implements TypeDao {
         return entity;
     }
 
-    private void transactionalForCompositionTypeIds(long parentId, List<Long>ids, Consumer<CompositionTypeRelation> consumer) {
+    private void transactional(@NonNull final Query query) {
         EntityTransaction tx = null;
         try {
             tx = em.getTransaction();
             tx.begin();
-            for (Long id : ids) {
-                CompositionTypeRelation relation =
-                        CompositionTypeRelation.builder().typeId(parentId).compositionTypeId(id).build();
-                consumer.accept(relation);
-            }
+            query.executeUpdate();
             em.flush();
             tx.commit();
         } catch (RuntimeException e) {
@@ -177,23 +73,100 @@ public class TypeDaoImpl implements TypeDao {
         }
     }
 
-    public void saveCompositionTypeIds(long parentId, List<Long> ids) {
-        transactionalForCompositionTypeIds(parentId, ids, em::persist);
+    private <T> List<T> loadEntities(@NonNull final Query query, @NonNull final String paramName, final long id) {
+        List result = query.setParameter(paramName, id)
+                           .getResultList();
+        List<T> results = new ArrayList<>();
+        Iterator iter = result.iterator();
+        while (iter.hasNext()) {
+            results.add((T)iter.next());
+        }
+        return results;
     }
 
-
-
-    public void deleteCompositionTypeIds(long parentId, List<Long> ids) {
-        transactionalForCompositionTypeIds(parentId, ids, em::remove);
+    @Override
+    public Optional<TypeEntity> loadTypeEntity(final long id) {
+        TypeEntity entity = em.find(TypeEntity.class, id);
+        if (entity == null) {
+            return Optional.empty();
+        }
+        return Optional.of(entity);
     }
-/*
-    public void deleteInstanceEntity(InstanceEntity ie) {
+
+    @Override
+    public Optional<TypeEntity> loadTypeEntity(@NonNull final String name) {
+        List result = loadTypeEntityWithNameQuery.setParameter("name", name)
+                                                 .getResultList();
+        if (result.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of((TypeEntity)result.get(0));
+    }
+
+    @Override
+    public TypeEntity saveTypeEntity(@NonNull final TypeEntity te) {
+        return transactional(te, em::persist);
+    }
+
+    @Override
+    public void removeTypeEntity(@NonNull final TypeEntity te) {
+        transactional(te, em::remove);
+    }
+
+    @Override
+    public List<CompositionTypeEntity> loadCompositionTypeEntities(final long typeId) {
+        return loadEntities(loadCompositionTypeEntitiesQuery, "typeId", typeId);
+    }
+
+    @Override
+    public CompositionTypeEntity saveCompositionTypeEntity(@NonNull final CompositionTypeEntity compositionTypeEntity) {
+        return transactional(compositionTypeEntity, em::persist);
+    }
+
+    @Override
+    public void removeCompositionTypeEntities(final long typeId) {
+        transactional(deleteCompositionTypeEntityQuery.setParameter("typeId", typeId));
+    }
+
+    @Override
+    public List<InstanceEntity> loadInstanceEntities(final long parentTypeId) {
+        return loadEntities(loadInstanceEntitiesQuery, "parentTypeId", parentTypeId);
+    }
+
+    @Override
+    public InstanceEntity saveInstanceEntity(@NonNull final InstanceEntity instanceEntity) {
+        return transactional(instanceEntity, em::persist);
+    }
+
+    @Override
+    public void removeInstanceEntity(InstanceEntity instanceEntity) {
+        transactional(instanceEntity, em::remove);
+    }
+
+    @Override
+    public void removeInstanceEntities(long parentTypeId) {
+        transactional(deleteInstanceEntitiesQuery.setParameter("parentTypeId", parentTypeId));
+    }
+
+    @Override
+    public List<RelationEntity> loadRelationEntities(long parentTypeId) {
+        return loadEntities(loadRelationEntitiesQuery, "parentTypeId", parentTypeId);
+    }
+
+    @Override
+    public RelationEntity saveRelationEntity(RelationEntity relationEntity) {
+        return transactional(relationEntity, em::persist);
 
     }
 
-    public void deleteReleationEntity(RelationEntity re) {
-
+    @Override
+    public void removeRelationEntity(RelationEntity relationEntity) {
+        transactional(relationEntity, em::remove);
     }
-    */
+
+    @Override
+    public void removeRelationEntities(long parentTypeId) {
+        transactional(deleteRelationEntitiesQuery.setParameter("parentTypeId", parentTypeId));
+    }
 
 }
