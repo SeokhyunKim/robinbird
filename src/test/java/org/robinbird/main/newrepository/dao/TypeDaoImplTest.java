@@ -120,6 +120,23 @@ public class TypeDaoImplTest {
     }
 
     @Test
+    public void test_removeInstanceEntity() {
+        final InstanceEntity entity1 = new InstanceEntity();
+        entity1.setParentTypeId(new RandomDataGenerator().nextLong(1L, 1000L));
+        entity1.setTypeId(1L);
+        entity1.setAccessModifier(AccessModifier.PUBLIC.name());
+        entity1.setName("entity1");
+        daoImpl.saveInstanceEntity(entity1);
+
+        final List<InstanceEntity> loaded = daoImpl.loadInstanceEntities(entity1.getParentTypeId());
+        Assert.assertThat(loaded.size(), is(1));
+        Assert.assertThat(loaded.iterator().next().getName(), is("entity1"));
+
+        daoImpl.removeInstanceEntity(entity1);
+        Assert.assertTrue(daoImpl.loadInstanceEntities(entity1.getParentTypeId()).isEmpty());
+    }
+
+    @Test
     public void test_load_save_remove_RelationEntity() {
         final long parentTypeId = new RandomDataGenerator().nextLong(1L, 1000L);
 
@@ -143,5 +160,21 @@ public class TypeDaoImplTest {
 
         daoImpl.removeRelationEntities(parentTypeId);
         Assert.assertTrue(daoImpl.loadRelationEntities(parentTypeId).isEmpty());
+    }
+
+    @Test
+    public void test_removeRelationEntity() {
+        final RelationEntity entity1 = new RelationEntity();
+        entity1.setParentTypeId(new RandomDataGenerator().nextLong(1L, 1000L));
+        entity1.setTypeId(1L);
+        entity1.setCategory(RelationCategory.ASSOCIATION.name());
+        daoImpl.saveRelationEntity(entity1);
+
+        final List<RelationEntity> loaded = daoImpl.loadRelationEntities(entity1.getParentTypeId());
+        Assert.assertThat(loaded.size(), is(1));
+        Assert.assertThat(loaded.iterator().next().getCategory(), is(RelationCategory.ASSOCIATION.name()));
+
+        daoImpl.removeRelationEntity(entity1);
+        Assert.assertTrue(daoImpl.loadRelationEntities(entity1.getParentTypeId()).isEmpty());
     }
 }
