@@ -64,6 +64,22 @@ public class TypeDaoImplTest {
     }
 
     @Test
+    public void test_updateTypeEntity() {
+        final TypeEntity entity = new TypeEntity();
+        entity.setCategory(TypeCategory.CLASS.name());
+        entity.setName("test1");
+        daoImpl.saveTypeEntity(entity);
+
+        final Optional<TypeEntity> loaded = daoImpl.loadTypeEntity(entity.getId());
+        Assert.assertThat(loaded.get(), is(entity));
+
+        entity.setCategory("updated");
+        daoImpl.updateTypeEntity(entity);
+        final Optional<TypeEntity> updated = daoImpl.loadTypeEntity(entity.getId());
+        Assert.assertThat(updated.get(), is(entity));
+    }
+
+    @Test
     public void test_load_save_remove_CompositionTypeEntity() {
         final RandomDataGenerator generator = new RandomDataGenerator();
 
@@ -160,6 +176,25 @@ public class TypeDaoImplTest {
 
         daoImpl.removeRelationEntities(parentTypeId);
         Assert.assertTrue(daoImpl.loadRelationEntities(parentTypeId).isEmpty());
+    }
+
+    @Test
+    public void test_updateRelationEntity() {
+        final RelationEntity entity = new RelationEntity();
+        entity.setParentTypeId(new RandomDataGenerator().nextLong(1L, 1000L));
+        entity.setTypeId(new RandomDataGenerator().nextLong(1L, 1000L));
+        entity.setCategory(TypeCategory.CLASS.name());
+        daoImpl.saveRelationEntity(entity);
+
+        final List<RelationEntity> loaded = daoImpl.loadRelationEntities(entity.getParentTypeId());
+        Assert.assertThat(loaded.size(), is(1));
+        Assert.assertThat(loaded.get(0), is(entity));
+
+        entity.setCategory("updated");
+        daoImpl.updateRelationEntity(entity);
+        final List<RelationEntity> updated = daoImpl.loadRelationEntities(entity.getParentTypeId());
+        Assert.assertThat(updated.size(), is(1));
+        Assert.assertThat(updated.get(0), is(entity));
     }
 
     @Test

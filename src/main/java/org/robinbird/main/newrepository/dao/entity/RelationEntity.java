@@ -8,9 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
+@EqualsAndHashCode
 @Table(name = "relation", indexes = {@Index(columnList = "parentTypeId")})
 public class RelationEntity implements Serializable {
 

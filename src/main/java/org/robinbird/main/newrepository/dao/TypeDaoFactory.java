@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import lombok.NonNull;
-import org.robinbird.main.repository.dao.RobinbirdDaoImpl;
 
 public class TypeDaoFactory {
 

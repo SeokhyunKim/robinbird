@@ -6,9 +6,11 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
+@EqualsAndHashCode
 @Table(name = "type", indexes = {@Index(columnList = "name")})
 public class TypeEntity {
 

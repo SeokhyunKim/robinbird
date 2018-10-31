@@ -9,9 +9,11 @@ import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
+@EqualsAndHashCode
 @Table(name = "instance", indexes = {@Index(columnList = "parentTypeId")})
 public class InstanceEntity implements Serializable {
 
