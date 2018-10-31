@@ -1,7 +1,6 @@
 package org.robinbird.graph;
 
 import lombok.EqualsAndHashCode;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
 
 /**
@@ -14,15 +13,6 @@ public class EdgeTest {
 		public ExtendedEdge(Node n1, Node n2) {
 			super(n1, n2);
 		}
-	}
-
-	@Test
-	public void test_equals_and_hashcode() {
-		Node r = new Node("red");
-		Node b = new Node("black");
-		EqualsVerifier.forClass(Edge.class)
-			.withRedefinedSubclass(ExtendedEdge.class)
-			.withPrefabValues(Edge.class, new Edge(r, b), new Edge(b, r)).verify();
 	}
 
 	@Test(expected = NullPointerException.class)

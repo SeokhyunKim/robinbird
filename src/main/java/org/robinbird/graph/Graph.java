@@ -1,12 +1,12 @@
 package org.robinbird.graph;
 
 import lombok.NonNull;
-import org.robinbird.code.model.Class;
-import org.robinbird.code.model.Collection;
-import org.robinbird.code.model.Member;
-import org.robinbird.code.model.Type;
-import org.robinbird.common.model.Repository;
-import org.robinbird.common.utils.Msgs;
+import org.robinbird.main.model.Class;
+import org.robinbird.main.model.Collection;
+import org.robinbird.main.model.Member;
+import org.robinbird.main.model.Type;
+import org.robinbird.main.repository.Repository;
+import org.robinbird.main.util.Msgs;
 
 import java.util.List;
 

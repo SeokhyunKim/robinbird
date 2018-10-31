@@ -11,10 +11,13 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertTrue;
 import static org.robinbird.TestUtils.getTestPath;
 
-/**
- * Created by seokhyun on 10/27/17.
- */
+@Ignore
 public class ApplicationTest {
+
+	@Test
+	public void dbTest() {
+		Application.main(null);
+	}
 
 	@Test
 	public void testApplication_with_PLANTUML() {
@@ -46,7 +49,7 @@ public class ApplicationTest {
 		assertTrue(output.contains("Classes"));
 		assertTrue(output.contains("a : int"));
 		assertTrue(output.contains("b : float"));
-		assertTrue(output.contains("Types"));
+		assertTrue(output.contains("TypeCategory"));
 		assertTrue(output.contains("SimpleClass"));
 		assertTrue(output.contains(""));
 		assertTrue(output.contains(""));

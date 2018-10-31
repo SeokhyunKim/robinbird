@@ -1,8 +1,8 @@
 package org.robinbird.graph;
 
-import org.robinbird.code.model.AccessModifier;
-import org.robinbird.code.model.Class;
-import org.robinbird.code.model.Member;
+import org.robinbird.main.model.AccessModifier;
+import org.robinbird.main.model.Class;
+import org.robinbird.main.model.Member;
 
 import java.util.Arrays;
 

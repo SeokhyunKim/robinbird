@@ -46,12 +46,12 @@ echo location of your Java installation.
 goto fail
 
 :init
-@rem Get command-line arguments, handling Windows variants
+@rem Get command-line parameters, handling Windows variants
 
 if not "%OS%" == "Windows_NT" goto win9xME_args
 
 :win9xME_args
-@rem Slurp the command line arguments.
+@rem Slurp the command line parameters.
 set CMD_LINE_ARGS=
 set _SKIP=2
 
