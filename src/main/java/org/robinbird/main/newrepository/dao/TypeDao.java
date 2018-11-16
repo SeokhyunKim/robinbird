@@ -19,6 +19,8 @@ public interface TypeDao {
 
     void removeTypeEntity(TypeEntity typeEntity);
 
+    void removeTypeEntity(long id);
+
     List<CompositionTypeEntity> loadCompositionTypeEntities(long typeId);
 
     CompositionTypeEntity saveCompositionTypeEntity(CompositionTypeEntity compositionTypeEntity);
@@ -28,6 +30,8 @@ public interface TypeDao {
     List<InstanceEntity> loadInstanceEntities(long parentTypeId);
 
     InstanceEntity saveInstanceEntity(InstanceEntity instanceEntity);
+
+    InstanceEntity updateInstanceEntity(InstanceEntity instanceEntity);
 
     void removeInstanceEntity(InstanceEntity instanceEntity);
 

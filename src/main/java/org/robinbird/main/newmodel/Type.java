@@ -1,7 +1,9 @@
 package org.robinbird.main.newmodel;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -15,8 +17,8 @@ import org.apache.commons.lang3.Validate;
 @EqualsAndHashCode(exclude = {"name", "compositionTypes", "instances"})
 public class Type {
 
-    @Nullable
-    private final Long id; // id is mainly for classes and interfaces. don't give id something like List<Integer>
+    @NonNull
+    private final Long id;
     @NonNull
     private final TypeCategory category;
     @NonNull
@@ -27,25 +29,21 @@ public class Type {
     private final List<Relation> relations; // mainly for inheritance and realization
 
     @Builder
-    public Type(final long id, @NonNull final TypeCategory category,
-                @NonNull final String name, @Nullable final List<Type> compositionTypes) {
+    public Type(final long id, @NonNull final TypeCategory category, @NonNull final String name,
+                @Nullable final List<Type> compositionTypes,
+                @Nullable final List<Instance> instances,
+                @Nullable final List<Relation> relations) {
         this.id = id;
         this.category = category;
         this.name = name;
         if (this.category == TypeCategory.PRIMITIVE) {
-            instances = null;
-            relations = null;
-        } else {
-            instances = new ArrayList<>();
-            relations = new ArrayList<>();
-        }
-        if (this.category == TypeCategory.COLLECTION || this.category == TypeCategory.FUNCTION) {
-            this.compositionTypes = new ArrayList<>();
-            if (compositionTypes != null) {
-                this.compositionTypes.addAll(compositionTypes);
-            }
-        } else {
             this.compositionTypes = null;
+            this.instances = null;
+            this.relations = null;
+        } else {
+            this.compositionTypes = Optional.ofNullable(compositionTypes).orElse(new ArrayList<>());
+            this.instances = Optional.ofNullable(instances).orElse(new ArrayList<>());
+            this.relations = Optional.ofNullable(relations).orElse(new ArrayList<>());
         }
     }
 
@@ -59,9 +57,35 @@ public class Type {
         instances.removeIf(r -> r.equals(instance));
     }
 
+    public List<Instance> getInstances() {
+        return instances;
+    }
+
+    public void addRelation(@NonNull final Relation relation) {
+        Validate.isTrue(relations != null, "Cannot add relation because relations is null");
+        relations.add(relation);
+    }
+
+    public void removeRelation(@NonNull final Relation relation) {
+        Validate.isTrue(relations != null, "Cannot remove relation because relations is null");
+        relations.removeIf(r -> r.equals(relation));
+    }
+
     public List<Relation> getRelations() {
-        // todo: this will be derived from list of instances.
-        return null;
+        return relations;
+    }
+
+    public Type populate(@NonNull final List<Type> compositionTypes,
+                         @NonNull final List<Instance> instances,
+                         @NonNull final List<Relation> relations) {
+        return Type.builder()
+                   .id(this.id)
+                   .category(this.category)
+                   .name(this.name)
+                   .compositionTypes(compositionTypes)
+                   .instances(instances)
+                   .relations(relations)
+                   .build();
     }
 
     public String getSimpleName() {

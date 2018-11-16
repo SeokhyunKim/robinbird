@@ -24,7 +24,9 @@ public class TypeDaoImpl implements TypeDao {
     private final Query updateTypeEntityQuery;
     private final Query loadCompositionTypeEntitiesQuery;
     private final Query deleteCompositionTypeEntityQuery;
+    private final Query loadInstanceEntityQuery;
     private final Query loadInstanceEntitiesQuery;
+    private final Query updateInstanceEntityQuery;
     private final Query deleteInstanceEntitiesQuery;
     private final Query loadRelationEntityQuery;
     private final Query loadRelationEntitiesQuery;
@@ -38,7 +40,9 @@ public class TypeDaoImpl implements TypeDao {
         updateTypeEntityQuery = em.createQuery("update TypeEntity set name = :name, category = :category where id = :id");
         loadCompositionTypeEntitiesQuery = em.createQuery("select cte from CompositionTypeEntity cte where cte.typeId = :typeId");
         deleteCompositionTypeEntityQuery = em.createQuery("delete from CompositionTypeEntity cte where cte.typeId = :typeId");
+        loadInstanceEntityQuery = em.createQuery("select ie from InstanceEntity ie where ie.parentTypeId = :parentTypeId and ie.typeId = :typeId and ie.name = :name");
         loadInstanceEntitiesQuery = em.createQuery("select ie from InstanceEntity ie where ie.parentTypeId = :parentTypeId");
+        updateInstanceEntityQuery = em.createQuery("update InstanceEntity set accessModifier = :accessModifier where parentTypeId = :parentTypeId and typeId = :typeId and name = :name");
         deleteInstanceEntitiesQuery = em.createQuery("delete from InstanceEntity ie where ie.parentTypeId = :parentTypeId");
         loadRelationEntityQuery = em.createQuery("select re from RelationEntity re where re.parentTypeId = :parentTypeId and re.typeId = :typeId");
         loadRelationEntitiesQuery = em.createQuery("select re from RelationEntity re where re.parentTypeId = :parentTypeId");
@@ -132,6 +136,12 @@ public class TypeDaoImpl implements TypeDao {
     }
 
     @Override
+    public void removeTypeEntity(long id) {
+        Optional<TypeEntity> teOpt = loadTypeEntity(id);
+        teOpt.ifPresent(te -> transactional(te, em::remove));
+    }
+
+    @Override
     public List<CompositionTypeEntity> loadCompositionTypeEntities(final long typeId) {
         return loadEntities(loadCompositionTypeEntitiesQuery, "typeId", typeId);
     }
@@ -154,6 +164,23 @@ public class TypeDaoImpl implements TypeDao {
     @Override
     public InstanceEntity saveInstanceEntity(@NonNull final InstanceEntity instanceEntity) {
         return transactional(instanceEntity, em::persist);
+    }
+
+    @Override
+    public InstanceEntity updateInstanceEntity(InstanceEntity ie) {
+        List result = loadInstanceEntityQuery.setParameter("parentTypeId", ie.getParentTypeId())
+                                             .setParameter("typeId", ie.getTypeId())
+                                             .setParameter("name", ie.getName())
+                                             .getResultList();
+        if (result.isEmpty()) {
+            return null;
+        }
+        InstanceEntity loaded = (InstanceEntity)result.get(0);
+        transactional(updateInstanceEntityQuery.setParameter("accessModifier", ie.getAccessModifier())
+                                               .setParameter("parentTypeId", loaded.getParentTypeId())
+                                               .setParameter("typeId", loaded.getTypeId())
+                                               .setParameter("name", loaded.getName()));
+        return ie;
     }
 
     @Override
