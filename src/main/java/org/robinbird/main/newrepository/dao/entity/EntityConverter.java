@@ -39,7 +39,10 @@ public class EntityConverter {
         return Instance.builder()
                        .type(type)
                        .name(entity.getName())
-                       .accessModifier(AccessModifier.valueOf(entity.getAccessModifier()))
+                       .accessModifier(
+                    		   Optional.ofNullable(entity.getAccessModifier())
+                    		   	.map(AccessModifier::valueOf)
+                    		   	.orElse(null))
                        .build();
     }
 
@@ -48,7 +51,10 @@ public class EntityConverter {
         entity.setParentTypeId(parentType.getId());
         entity.setTypeId(instance.getType().getId());
         entity.setName(instance.getName());
-        entity.setAccessModifier(instance.getAccessModifier().name());
+        entity.setAccessModifier(
+        		Optional.ofNullable(instance.getAccessModifier())
+        			.map(AccessModifier::name)
+        			.orElse(null));
         return entity;
     }
 

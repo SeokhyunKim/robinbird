@@ -47,6 +47,12 @@ public class TypeRepositoryImpl implements TypeRepository {
     }
 
     public Type populateType(@NonNull final Type type) {
+    	if (type.getCategory() == TypeCategory.PRIMITIVE) {
+    		return type;
+    	}
+    	if (!getType(type.getId()).isPresent()) {
+    		return null;
+    	}
         final List<CompositionTypeEntity> ctes = dao.loadCompositionTypeEntities(type.getId());
         final List<InstanceEntity> ies = dao.loadInstanceEntities(type.getId());
         final List<RelationEntity> res = dao.loadRelationEntities(type.getId());
@@ -63,6 +69,12 @@ public class TypeRepositoryImpl implements TypeRepository {
     }
 
     public void updateType(@NonNull final Type type) {
+    	if (type.getCategory() == TypeCategory.PRIMITIVE) {
+    		return;
+    	}
+    	if (!getType(type.getId()).isPresent()) {
+    		return;
+    	}
         final List<Type> compositionTypes = type.getCompositionTypes();
         compositionTypes.forEach(ct -> {
             CompositionTypeEntity cte = EntityConverter.convert(ct, type);

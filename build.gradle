@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'antlr'
 apply plugin: 'application'
 apply plugin: 'jacoco'
+apply plugin: 'eclipse'
 
 //-----------------------------------------------------------------------------
 // application config
@@ -113,10 +114,10 @@ repositories {
 
 dependencies {
 	antlr "org.antlr:antlr4:4.5"
-	compileOnly "org.projectlombok:lombok:1.18.2"
-	testCompileOnly "org.projectlombok:lombok:1.18.2"
-	annotationProcessor "org.projectlombok:lombok:1.18.2"
-	testAnnotationProcessor  "org.projectlombok:lombok:1.18.2"
+	compileOnly "org.projectlombok:lombok:1.18.4"
+	testCompileOnly "org.projectlombok:lombok:1.18.4"
+	annotationProcessor "org.projectlombok:lombok:1.18.4"
+	testAnnotationProcessor  "org.projectlombok:lombok:1.18.4"
 	compile "com.google.guava:guava:22.0"
 	compile "commons-cli:commons-cli:1.4"
 	compile "org.apache.commons:commons-lang3:3.0"

@@ -23,7 +23,6 @@ import org.robinbird.main.presentation.PlantUMLPresentation;
 import org.robinbird.main.presentation.PresentationType;
 import org.robinbird.main.presentation.SimplePresentation;
 import org.robinbird.main.presentation.StringAppender;
-import org.robinbird.main.repository.dao.RobinbirdDao;
 import org.robinbird.main.util.Utils;
 
 import java.nio.file.Path;
@@ -86,14 +85,6 @@ public class Application {
 			presentation = PresentationType.PLANTUML.name();
 		}
 		return PresentationType.valueOf(presentation);
-	}
-
-	private RobinbirdDao createDao(CommandLine commandLine) {
-		String dbFile = commandLine.getOptionValue("db");
-		if (dbFile == null) {
-			dbFile = "rb.db";
-		}
-		return null;
 	}
 
 	private AnalysisContextPresentation createPresentation(PresentationType ptype, CommandLine commandLine) {
