@@ -10,5 +10,5 @@ public enum RelationCategory {
     REALIZATION,
     // for package and its members
     PACKAGE,
-    PACKAGE_TYPE
+    PACKAGE_MEMBER
 }

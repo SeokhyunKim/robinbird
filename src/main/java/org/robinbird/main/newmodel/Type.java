@@ -1,7 +1,6 @@
 package org.robinbird.main.newmodel;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -10,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.apache.commons.lang3.Validate;
 
 @Getter
 @ToString
@@ -48,12 +46,10 @@ public class Type {
     }
 
     public void addInstance(@NonNull final Instance instance) {
-        Validate.isTrue(instance != null, "Cannot add instance because instances is null");
         instances.add(instance);
     }
 
     public void removeInstance(@NonNull final Instance instance) {
-        Validate.isTrue(instances != null, "Cannot remove instance because instances is null");
         instances.removeIf(r -> r.equals(instance));
     }
 
@@ -62,12 +58,10 @@ public class Type {
     }
 
     public void addRelation(@NonNull final Relation relation) {
-        Validate.isTrue(relations != null, "Cannot add relation because relations is null");
         relations.add(relation);
     }
 
     public void removeRelation(@NonNull final Relation relation) {
-        Validate.isTrue(relations != null, "Cannot remove relation because relations is null");
         relations.removeIf(r -> r.equals(relation));
     }
 
