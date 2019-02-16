@@ -1,5 +1,7 @@
 package org.robinbird;
 
+import static org.robinbird.main.newmodel.AnalysisUnit.Language.JAVA8;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -13,22 +15,28 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.AnalysisUnit;
-import org.robinbird.main.presentation.AbstractedClassesPresentation;
-import org.robinbird.main.presentation.AnalysisContextPresentation;
-import org.robinbird.main.presentation.ClusteringMethod;
-import org.robinbird.main.presentation.GMLPresentation;
-import org.robinbird.main.presentation.PlantUMLPresentation;
-import org.robinbird.main.presentation.PresentationType;
-import org.robinbird.main.presentation.SimplePresentation;
-import org.robinbird.main.presentation.StringAppender;
+//import org.robinbird.main.model.AnalysisContext;
+//import org.robinbird.main.model.AnalysisUnit;
+import org.robinbird.main.newmodel.AnalysisContext;
+import org.robinbird.main.newmodel.AnalysisUnit;
+import org.robinbird.main.newpresentation.AbstractedClassesPresentation;
+import org.robinbird.main.newpresentation.AnalysisContextPresentation;
+import org.robinbird.main.newpresentation.ClusteringMethod;
+import org.robinbird.main.newpresentation.GMLPresentation;
+import org.robinbird.main.newpresentation.PlantUMLPresentation;
+import org.robinbird.main.newpresentation.PresentationType;
+import org.robinbird.main.newpresentation.SimplePresentation;
+import org.robinbird.main.newpresentation.StringAppender;
+import org.robinbird.main.newrepository.TypeRepository;
+import org.robinbird.main.newrepository.TypeRepositoryImpl;
+import org.robinbird.main.newrepository.dao.TypeDao;
+import org.robinbird.main.newrepository.dao.TypeDaoFactory;
 import org.robinbird.main.util.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.robinbird.main.model.AnalysisUnit.Language.JAVA8;
+//import static org.robinbird.main.model.AnalysisUnit.Language.JAVA8;
 
 @Slf4j
 public class Application {
@@ -54,9 +62,24 @@ public class Application {
 		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
 		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
 
+		final TypeDao typeDao = TypeDaoFactory.createDao(); // todo: add option to consider stored db file
+		final TypeRepository typeRepository = new TypeRepositoryImpl(typeDao);
+		AnalysisContext ac = au.analysis(typeRepository, terminalPatterns, excludedPatterns);
+		AnalysisContextPresentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
+		System.out.println(acPresent.present(ac));
+
+
+
+		// based on old model
+		/*AnalysisUnit au = new AnalysisUnit(JAVA8);
+		au.addPath(getRootPath(commandLine));
+
+		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
+		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
+
 		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
 		AnalysisContextPresentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
-		System.out.print(acPresent.present(ac));
+		System.out.print(acPresent.present(ac));*/
 	}
 
 	private Path getRootPath(CommandLine commandLine) {

@@ -1,17 +1,17 @@
-package org.robinbird.main.newrepository.dao.entity;
+package org.robinbird.main.newrepository2.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
-@EqualsAndHashCode
-@Table(name = "type", indexes = {@Index(columnList = "name"), @Index(columnList = "parentId")})
+@Table(name = "type", indexes = {@Index(columnList = "name")})
 public class TypeEntity {
 
     @Id
@@ -22,6 +22,4 @@ public class TypeEntity {
 
     private String category;
 
-    private long parentId;
-    
 }

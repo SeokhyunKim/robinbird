@@ -13,6 +13,10 @@ public interface TypeDao {
 
     Optional<TypeEntity> loadTypeEntity(String name);
 
+    List<TypeEntity> loadChildTypeEntities(long parentId);
+
+    List<TypeEntity> loadAllTypeEntities();
+
     TypeEntity saveTypeEntity(TypeEntity typeEntity);
 
     TypeEntity updateTypeEntity(TypeEntity typeEntity);

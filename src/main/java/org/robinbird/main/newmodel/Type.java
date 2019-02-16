@@ -12,49 +12,52 @@ import lombok.ToString;
 
 @Getter
 @ToString
-@EqualsAndHashCode(exclude = {"name", "compositionTypes", "instances"})
+@EqualsAndHashCode(exclude = {"name", "members", "relations"})
 public class Type {
 
+    private final long id;
     @NonNull
-    private final Long id;
-    @NonNull
-    private final TypeCategory category;
+    private TypeCategory category; // there is one case category can be updated. can be registered as CLASS and updated as INTERFACE later.
     @NonNull
     private final String name;
+    @Nullable
+    private final Type parentType;
 
-    private final List<Type> compositionTypes; // mainly for collections which have several related types
-    private final List<Instance> instances; // mainly for member variables and functions
+    private final List<Instance> members; // mainly for member variables and functions
     private final List<Relation> relations; // mainly for inheritance and realization
 
     @Builder
     public Type(final long id, @NonNull final TypeCategory category, @NonNull final String name,
-                @Nullable final List<Type> compositionTypes,
-                @Nullable final List<Instance> instances,
+                @Nullable final Type parentType,
+                @Nullable final List<Instance> members,
                 @Nullable final List<Relation> relations) {
         this.id = id;
         this.category = category;
         this.name = name;
+        this.parentType = parentType;
         if (this.category == TypeCategory.PRIMITIVE) {
-            this.compositionTypes = null;
-            this.instances = null;
+            this.members = null;
             this.relations = null;
         } else {
-            this.compositionTypes = Optional.ofNullable(compositionTypes).orElse(new ArrayList<>());
-            this.instances = Optional.ofNullable(instances).orElse(new ArrayList<>());
+            this.members = Optional.ofNullable(members).orElse(new ArrayList<>());
             this.relations = Optional.ofNullable(relations).orElse(new ArrayList<>());
         }
     }
 
+    public void updateTypeCategory(@NonNull final TypeCategory category) {
+        this.category = category;
+    }
+
     public void addInstance(@NonNull final Instance instance) {
-        instances.add(instance);
+        members.add(instance);
     }
 
     public void removeInstance(@NonNull final Instance instance) {
-        instances.removeIf(r -> r.equals(instance));
+        members.removeIf(r -> r.equals(instance));
     }
 
-    public List<Instance> getInstances() {
-        return instances;
+    public List<Instance> getMembers() {
+        return members;
     }
 
     public void addRelation(@NonNull final Relation relation) {
@@ -70,14 +73,13 @@ public class Type {
     }
 
     public Type populate(@NonNull final List<Type> compositionTypes,
-                         @NonNull final List<Instance> instances,
+                         @NonNull final List<Instance> members,
                          @NonNull final List<Relation> relations) {
         return Type.builder()
                    .id(this.id)
                    .category(this.category)
                    .name(this.name)
-                   .compositionTypes(compositionTypes)
-                   .instances(instances)
+                   .members(members)
                    .relations(relations)
                    .build();
     }
@@ -85,6 +87,10 @@ public class Type {
     public String getSimpleName() {
         // todo: get simple name from name
         return null;
+    }
+
+    public int compareTo(Type another) {
+        return this.getName().compareTo(another.getName());
     }
 
 }

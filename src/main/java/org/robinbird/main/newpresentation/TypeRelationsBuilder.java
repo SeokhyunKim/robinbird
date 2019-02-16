@@ -1,15 +1,12 @@
-package org.robinbird.main.presentation;
+package org.robinbird.main.newpresentation;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.robinbird.main.model.Relation;
-import org.robinbird.main.newmodel.AnalysisContext;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.robinbird.main.newmodel.AnalysisContext;
 import org.robinbird.main.newmodel.Instance;
 import org.robinbird.main.newmodel.Type;
 import org.robinbird.main.newmodel.TypeCategory;

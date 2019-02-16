@@ -19,6 +19,14 @@ public class EntityConverter {
                    .name(entity.getName()).build();
     }
 
+    public static TypeEntity convert(@NonNull final Type type) {
+        TypeEntity entity = new TypeEntity();
+        entity.setId(type.getId());
+        entity.setName(type.getName());
+        entity.setCategory(type.getCategory().name());
+        return entity;
+    }
+
     public static Type convert(@NonNull final CompositionTypeEntity cte, @NonNull final TypeDao dao) {
         return dao.loadTypeEntity(cte.getCompositionTypeId()).map(EntityConverter::convert).get();
     }

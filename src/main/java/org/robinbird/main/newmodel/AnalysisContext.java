@@ -6,6 +6,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.Validate;
+import org.robinbird.exception.ExistingTypeNameException;
 import org.robinbird.main.newmodel.Relation;
 import org.robinbird.main.newrepository.TypeRepository;
 import org.robinbird.main.util.Msgs;
@@ -70,17 +71,55 @@ public class AnalysisContext {
 		}
 		return typeOpt.get();
 	}
+
+	public List<Type> getClasses() {
+		return types.getTypes(TypeCategory.CLASS);
+	}
 	
 	public Type registerType(@NonNull final String name, @NonNull final TypeCategory tc) {
 		log.debug("register type: {}, {}", name, tc.name());
-		final Type alreadyRegistered = getType(name, tc);
+		final Type alreadyRegistered = getType(name);
 		if (alreadyRegistered != null) {
+		    // One possible case is registered as CLASS and updated as INTERFACE later.
+            // For now, don't check this case and just update category.
+		    if (alreadyRegistered.getCategory() != tc) {
+		        types.updateType(alreadyRegistered.updateTypeCategory(TypeCategory.INTERFACE);
+            }
 			return alreadyRegistered;
 		}
 		final Type newType = types.registerType(tc,  name);
 		log.info("newly registered type: {}", newType);
 		return newType;
 	}
+
+	public Type registerMethod(@NonNull final Type parentType, @NonNull AccessModifier accessModifier,
+							   @NonNull String methodName, @NonNull final List<Type> params) {
+		log.debug("register method: {}, {}, {}, {}", parentType.getName(), accessModifier, methodName, params);
+		Type curParentType = types.populateType(parentType);
+		curParentType.addRelation(Relation.builder().category(RelationCategory.MEMBER_FUNCTION)..build());
+
+
+	}
+
+	public Type registerCollection(@NonNull final String name, @NonNull final List<Type> refTypes) {
+		log.debug("register collection: name={}, refTypes={}", name, refTypes);
+
+		final Type newType = types.registerType(TypeCategory.COLLECTION, name);
+
+		newType.addCompositionTypes(refTypes);
+		types.updateType(newType);
+		return newType;
+	}
+
+	public Type registerPackage(@NonNull final List<String> packageNameList) {
+        final StringBuffer sb = new StringBuffer();
+        sb.append(packageNameList.get(0));
+        for (int i=1; i<packageNameList.size(); ++i) {
+            sb.append(".").append(packageNameList.get(i));
+        }
+        final String packageName = sb.toString();
+        return registerType(packageName, TypeCategory.PACKAGE);
+    }
 	
 	public boolean isTerminal(String identifier) {
 		if (terminalClassPatterns == null) { return false; }
@@ -111,7 +150,6 @@ public class AnalysisContext {
 		if (getCurrentClass() == null) { return false; }
 		return isExcluded(getCurrentClass().getName());
 	}
-	
 	
 }
 

@@ -74,7 +74,7 @@ public class TypeRepositoryImplTest {
         
         final Type populated = t.populate(ImmutableList.of(t2), ImmutableList.of(i), ImmutableList.of(r));
         Assert.assertNull(populated.getCompositionTypes());
-        Assert.assertNull(populated.getInstances());
+        Assert.assertNull(populated.getMembers());
         Assert.assertNull(populated.getRelations());
         
         repository.updateType(populated);
@@ -101,8 +101,8 @@ public class TypeRepositoryImplTest {
 		final Type populated2 = repository.populateType(loaded);
 		Assert.assertThat(populated2.getCompositionTypes().size(), is(1));
 		Assert.assertThat(populated2.getCompositionTypes().get(0), is(t2));
-		Assert.assertThat(populated2.getInstances().size(), is(1));
-		Assert.assertThat(populated2.getInstances().get(0), is(i));
+		Assert.assertThat(populated2.getMembers().size(), is(1));
+		Assert.assertThat(populated2.getMembers().get(0), is(i));
 		Assert.assertThat(populated2.getRelations().size(), is(1));
 		Assert.assertThat(populated2.getRelations().get(0), is(r));
     }

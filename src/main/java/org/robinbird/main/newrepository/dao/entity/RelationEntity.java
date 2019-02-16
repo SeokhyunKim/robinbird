@@ -24,4 +24,6 @@ public class RelationEntity implements Serializable {
     private long typeId;
     @Column
     private String category;
+    @Column
+    private int cardinality;
 }

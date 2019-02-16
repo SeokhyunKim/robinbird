@@ -59,15 +59,17 @@ public class TypeRepositoryImpl implements TypeRepository {
         final List<Type> compositionTypes = ctes.stream()
                                                 .map(cte -> EntityConverter.convert(cte, dao))
                                                 .collect(Collectors.toList());
-        final List<Instance> instances = ies.stream()
-                                            .map(ie -> EntityConverter.convert(ie, dao))
-                                            .collect(Collectors.toList());
+        final List<Instance> members = ies.stream()
+                                          .map(ie -> EntityConverter.convert(ie, dao))
+                                          .collect(Collectors.toList());
         final List<Relation> relations = res.stream()
                                             .map(re -> EntityConverter.convert(re, dao))
                                             .collect(Collectors.toList());
-        return type.populate(compositionTypes, instances, relations);
+        return type.populate(compositionTypes, members, relations);
     }
 
+    // todo: when contents of type is changed, not sure old things are deleted/updated and new stuffs are saved correctly.
+    // check this behavior.
     public void updateType(@NonNull final Type type) {
     	if (type.getCategory() == TypeCategory.PRIMITIVE) {
     		return;
@@ -75,12 +77,10 @@ public class TypeRepositoryImpl implements TypeRepository {
     	if (!getType(type.getId()).isPresent()) {
     		return;
     	}
-        final List<Type> compositionTypes = type.getCompositionTypes();
-        compositionTypes.forEach(ct -> {
-            CompositionTypeEntity cte = EntityConverter.convert(ct, type);
-            dao.saveCompositionTypeEntity(cte);
-        });
-        final List<Instance> instances = type.getInstances();
+
+    	dao.updateTypeEntity(EntityConverter.convert(type));
+
+        final List<Instance> instances = type.getMembers();
         instances.forEach(i -> {
             InstanceEntity ie = EntityConverter.convert(i, type);
             InstanceEntity updated = dao.updateInstanceEntity(ie);
@@ -96,5 +96,28 @@ public class TypeRepositoryImpl implements TypeRepository {
                 dao.saveRelationEntity(re);
             }
         });
+    }
+
+    public void addInstance(@NonNull final Type parentType, @NonNull final Instance instance) {
+        InstanceEntity ie = EntityConverter.convert(instance, parentType);
+        dao.saveInstanceEntity(ie);
+    }
+
+    public void addRelation(@NonNull final Type type, @NonNull final Relation relation) {
+        RelationEntity re = EntityConverter.convert(relation, type);
+        dao.saveRelationEntity(re);
+    }
+
+    public List<Type> getAllTypes() {
+        List<TypeEntity> entities = dao.loadAllTypeEntities();
+        return entities.stream().map(EntityConverter::convert).collect(Collectors.toList());
+    }
+
+    public List<Type> getTypes(@NonNull final TypeCategory category) {
+        List<TypeEntity> entities = dao.loadAllTypeEntities();
+        return entities.stream()
+                       .map(EntityConverter::convert)
+                       .filter(t -> t.getCategory() == category)
+                       .collect(Collectors.toList());
     }
 }
