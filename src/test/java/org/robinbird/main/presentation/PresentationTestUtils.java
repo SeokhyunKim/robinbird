@@ -1,12 +1,12 @@
 package org.robinbird.main.presentation;
 
-import org.robinbird.main.model.AccessModifier;
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.Class;
-import org.robinbird.main.model.ClassType;
-import org.robinbird.main.model.Member;
-import org.robinbird.main.model.Package;
-import org.robinbird.main.repository.Repository;
+import org.robinbird.main.oldmodel.AccessModifier;
+import org.robinbird.main.oldmodel.AnalysisContext;
+import org.robinbird.main.oldmodel.Class;
+import org.robinbird.main.oldmodel.ClassType;
+import org.robinbird.main.oldmodel.Member;
+import org.robinbird.main.oldmodel.Package;
+import org.robinbird.main.oldoldrepository.Repository;
 
 import java.util.Arrays;
 

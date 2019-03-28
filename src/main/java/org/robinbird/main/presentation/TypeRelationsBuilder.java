@@ -5,14 +5,13 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.robinbird.main.model.Relation;
-import org.robinbird.main.newmodel.AnalysisContext;
+import org.robinbird.main.oldmodel2.AnalysisContext;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.main.newmodel.Instance;
-import org.robinbird.main.newmodel.Type;
-import org.robinbird.main.newmodel.TypeCategory;
+import org.robinbird.main.oldmodel2.Instance;
+import org.robinbird.main.oldmodel2.Type;
+import org.robinbird.main.oldmodel2.TypeCategory;
 
 @Slf4j
 @Getter
@@ -52,7 +51,7 @@ class TypeRelationsBuilder {
 		// when seeing a collection member variable, changing associated type to the last type of the collection
 		// E.g. for Map<String, AnotherClass>, associated type is AnotherClass
 		Type givenAssociated = associated;
-		associated = associated.getLastCompositionType();
+		associated = null;//associated.getLastCompositionType();
 		if (associated == null) {
 			log.error("Collection has zero composition types. collection: {}", givenAssociated);
 			return null;

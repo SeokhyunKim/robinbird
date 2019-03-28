@@ -2,10 +2,10 @@ package org.robinbird.graph;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.robinbird.main.model.AccessModifier;
-import org.robinbird.main.model.Class;
-import org.robinbird.main.model.Member;
-import org.robinbird.main.model.Type;
+import org.robinbird.main.oldmodel.AccessModifier;
+import org.robinbird.main.oldmodel.Class;
+import org.robinbird.main.oldmodel.Member;
+import org.robinbird.main.oldmodel.Type;
 
 import java.util.Arrays;
 import java.util.List;

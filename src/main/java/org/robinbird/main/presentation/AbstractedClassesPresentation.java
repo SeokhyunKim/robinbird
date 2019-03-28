@@ -1,7 +1,7 @@
 package org.robinbird.main.presentation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.oldmodel.AnalysisContext;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.cluster.AgglomerativeClustering;
 import org.robinbird.graph.cluster.Cluster;

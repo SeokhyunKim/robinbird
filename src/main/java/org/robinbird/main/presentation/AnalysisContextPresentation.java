@@ -1,6 +1,6 @@
 package org.robinbird.main.presentation;
 
-import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.oldmodel.AnalysisContext;
 
 /**
  * Created by seokhyun on 6/7/17.

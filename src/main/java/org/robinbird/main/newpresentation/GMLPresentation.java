@@ -3,7 +3,7 @@ package org.robinbird.main.newpresentation;
 import org.robinbird.graph.Edge;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.Node;
-import org.robinbird.main.newmodel.AnalysisContext;
+import org.robinbird.main.oldmodel2.AnalysisContext;
 
 /**
  * Created by seokhyun on 10/31/17.

@@ -10,14 +10,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.robinbird.TestUtils;
 import org.robinbird.exception.ExistingTypeNameException;
-import org.robinbird.main.model.AccessModifier;
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.Class;
-import org.robinbird.main.model.ClassType;
-import org.robinbird.main.model.Collection;
-import org.robinbird.main.model.Package;
-import org.robinbird.main.repository.Repository;
-import org.robinbird.main.model.Type;
+import org.robinbird.main.oldmodel.AccessModifier;
+import org.robinbird.main.oldmodel.AnalysisContext;
+import org.robinbird.main.oldmodel.Class;
+import org.robinbird.main.oldmodel.ClassType;
+import org.robinbird.main.oldmodel.Collection;
+import org.robinbird.main.oldmodel.Package;
+import org.robinbird.main.oldoldrepository.Repository;
+import org.robinbird.main.oldmodel.Type;
 import org.robinbird.parser.java8.Java8Parser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,13 +47,13 @@ public class Java8AnalyserTest {
 
 	Repository<Type> repository;
 	AnalysisContext analysisContext;
-	Java8Analyser java8Analyser;
+	Java8AnalyserOld java8Analyser;
 
 	@Before
 	public void setup() {
 		repository = new Repository<>();
 		analysisContext = new AnalysisContext(repository, new Repository<Package>());
-		java8Analyser = new Java8Analyser();
+		java8Analyser = new Java8AnalyserOld();
 		java8Analyser.setAnalysisContext(analysisContext);
 
 		when(classDeclarationContext.Identifier()).thenReturn(identifier);

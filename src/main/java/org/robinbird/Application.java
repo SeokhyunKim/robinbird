@@ -1,6 +1,6 @@
 package org.robinbird;
 
-import static org.robinbird.main.newmodel.AnalysisUnit.Language.JAVA8;
+import static org.robinbird.main.oldmodel2.AnalysisUnit.Language.JAVA8;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,8 +17,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 //import org.robinbird.main.model.AnalysisContext;
 //import org.robinbird.main.model.AnalysisUnit;
-import org.robinbird.main.newmodel.AnalysisContext;
-import org.robinbird.main.newmodel.AnalysisUnit;
+import org.robinbird.main.oldmodel2.AnalysisContext;
+import org.robinbird.main.oldmodel2.AnalysisUnit;
 import org.robinbird.main.newpresentation.AbstractedClassesPresentation;
 import org.robinbird.main.newpresentation.AnalysisContextPresentation;
 import org.robinbird.main.newpresentation.ClusteringMethod;
@@ -27,10 +27,10 @@ import org.robinbird.main.newpresentation.PlantUMLPresentation;
 import org.robinbird.main.newpresentation.PresentationType;
 import org.robinbird.main.newpresentation.SimplePresentation;
 import org.robinbird.main.newpresentation.StringAppender;
-import org.robinbird.main.newrepository.TypeRepository;
-import org.robinbird.main.newrepository.TypeRepositoryImpl;
-import org.robinbird.main.newrepository.dao.TypeDao;
-import org.robinbird.main.newrepository.dao.TypeDaoFactory;
+import org.robinbird.main.oldrepository.TypeRepository;
+import org.robinbird.main.oldrepository.TypeRepositoryImpl;
+import org.robinbird.main.oldrepository.dao.TypeDao;
+import org.robinbird.main.oldrepository.dao.TypeDaoFactory;
 import org.robinbird.main.util.Utils;
 
 import java.nio.file.Path;

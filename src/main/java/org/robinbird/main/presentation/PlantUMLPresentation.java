@@ -1,14 +1,13 @@
 package org.robinbird.main.presentation;
 
-import org.robinbird.main.model.AccessModifier;
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.Class;
-import org.robinbird.main.model.Member;
-import org.robinbird.main.model.MemberFunction;
-import org.robinbird.main.model.Package;
-import org.robinbird.main.model.ParameterType;
-import org.robinbird.main.model.Relation;
-import org.robinbird.main.model.Type;
+import org.robinbird.main.oldmodel.AccessModifier;
+import org.robinbird.main.oldmodel.AnalysisContext;
+import org.robinbird.main.oldmodel.Class;
+import org.robinbird.main.oldmodel.Member;
+import org.robinbird.main.oldmodel.MemberFunction;
+import org.robinbird.main.oldmodel.Package;
+import org.robinbird.main.oldmodel.ParameterType;
+import org.robinbird.main.oldmodel.Relation;
 
 import java.util.Collection;
 import java.util.Iterator;

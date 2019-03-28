@@ -2,7 +2,7 @@ package org.robinbird.main.presentation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.oldmodel.AnalysisContext;
 
 import static org.junit.Assert.assertTrue;
 

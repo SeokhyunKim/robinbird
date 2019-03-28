@@ -1,6 +1,6 @@
 package org.robinbird.main.newpresentation;
 
-import org.robinbird.main.newmodel.AnalysisContext;
+import org.robinbird.main.oldmodel2.AnalysisContext;
 
 
 public interface AnalysisContextPresentation {

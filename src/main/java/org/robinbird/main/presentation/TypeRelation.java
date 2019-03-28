@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
-import org.robinbird.main.newmodel.Type;
+import org.robinbird.main.oldmodel2.Type;
 
 @Getter
 @ToString

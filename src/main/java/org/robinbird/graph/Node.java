@@ -1,7 +1,7 @@
 package org.robinbird.graph;
 
 import lombok.Getter;
-import org.robinbird.main.model.RobinbirdObject;
+import org.robinbird.main.oldmodel.RobinbirdObject;
 
 import java.util.ArrayList;
 import java.util.List;

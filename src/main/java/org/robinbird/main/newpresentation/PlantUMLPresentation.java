@@ -1,9 +1,6 @@
 package org.robinbird.main.newpresentation;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import org.robinbird.main.newmodel.AnalysisContext;
+import org.robinbird.main.oldmodel2.AnalysisContext;
 
 /**
  * Created by seokhyun on 6/9/17.

@@ -1,9 +1,9 @@
 package org.robinbird.main.presentation;
 
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.Class;
-import org.robinbird.main.model.Package;
-import org.robinbird.main.model.Relation;
+import org.robinbird.main.oldmodel.AnalysisContext;
+import org.robinbird.main.oldmodel.Class;
+import org.robinbird.main.oldmodel.Package;
+import org.robinbird.main.oldmodel.Relation;
 import org.robinbird.graph.Edge;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.Node;
