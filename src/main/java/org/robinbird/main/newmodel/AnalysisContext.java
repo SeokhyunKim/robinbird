@@ -82,9 +82,9 @@ public class AnalysisContext {
 		if (alreadyRegistered != null) {
 		    // One possible case is registered as CLASS and updated as INTERFACE later.
             // For now, don't check this case and just update category.
-		    if (alreadyRegistered.getCategory() != tc) {
-		        types.updateType(alreadyRegistered.updateTypeCategory(TypeCategory.INTERFACE);
-            }
+//		    if (alreadyRegistered.getCategory() != tc) {
+//		        types.updateType(alreadyRegistered.updateTypeCategory(AnalysisEntityCategory.INTERFACE);
+//            }
 			return alreadyRegistered;
 		}
 		final Type newType = types.registerType(tc,  name);
@@ -95,8 +95,10 @@ public class AnalysisContext {
 	public Type registerMethod(@NonNull final Type parentType, @NonNull AccessModifier accessModifier,
 							   @NonNull String methodName, @NonNull final List<Type> params) {
 		log.debug("register method: {}, {}, {}, {}", parentType.getName(), accessModifier, methodName, params);
-		Type curParentType = types.populateType(parentType);
-		curParentType.addRelation(Relation.builder().category(RelationCategory.MEMBER_FUNCTION)..build());
+//		Type curParentType = types.populateType(parentType);
+//		curParentType.addRelation(Relation.builder().category(RelationCategory.MEMBER_FUNCTION)..build());
+
+		return null;
 
 
 	}
@@ -106,7 +108,7 @@ public class AnalysisContext {
 
 		final Type newType = types.registerType(TypeCategory.COLLECTION, name);
 
-		newType.addCompositionTypes(refTypes);
+		//newType.addCompositionTypes(refTypes);
 		types.updateType(newType);
 		return newType;
 	}

@@ -32,7 +32,7 @@ public class SimplePresentationTest {
 		assertTrue(present.contains("m1 : ClassB"));
 		assertTrue(present.contains("m2 : ClassA"));
 		assertTrue(present.contains("m3 : ClassA"));
-		assertTrue(present.contains("// TypeCategory"));
+		assertTrue(present.contains("// AnalysisEntityCategory"));
 		System.out.println(present);
 	}
 }

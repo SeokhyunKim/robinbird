@@ -1,25 +1,25 @@
 package org.robinbird.main.newmodel2;
 
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-public class Type {
+@EqualsAndHashCode
+public class Type extends AnalysisEntity {
 
     private final long id;
     private final String name;
-    private final TypeCategory typeCategory;
+    private final AnalysisEntityCategory analysisEntityCategory;
 
-    @Builder
-    public Type(final long id, @NonNull final String name, @NonNull final TypeCategory typeCategory) {
+    protected Type(final long id, @NonNull final String name, @NonNull final AnalysisEntityCategory analysisEntityCategory) {
         this.id = id;
         this.name = name;
-        this.typeCategory = typeCategory;
+        this.analysisEntityCategory = analysisEntityCategory;
     }
 
     public String getSimpleName() {
-        int lastIdx = this.name.lastIndexOf(ModelKey.SEPERATOR);
+        int lastIdx = this.name.lastIndexOf(ModelConstants.SEPERATOR);
         if (lastIdx == -1 || (lastIdx + 1) >= (this.name.length() - 1)) {
             return this.name;
         }

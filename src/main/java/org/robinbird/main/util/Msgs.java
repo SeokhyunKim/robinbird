@@ -51,7 +51,7 @@ public class Msgs {
 			.put(Key.FAILED_TO_FIND_AGGCLUSTER_NODE, "Failed to find agglomerative clustering node %s.")
 			.put(Key.SCORE_FOR_CLUSTERING_IS_NOT_GIVEN, "Score for controling clustering method was not given.")
 			.put(Key.CLUSTERING_TYPE_IS_NOT_GIVEN, "Clustering type was not given.")
-			.put(Key.INVALID_TYPE_CATEGORY, "Invalid TypeCategory %s is used.")
+			.put(Key.INVALID_TYPE_CATEGORY, "Invalid AnalysisEntityCategory %s is used.")
 			.build();
 	}
 

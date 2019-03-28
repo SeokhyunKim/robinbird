@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class Function {
+public class Function extends AnalysisEntity {
 
     private final Type parent;
     private final List<Type> returnTypes; // there are a few languages returning multiple values from a function

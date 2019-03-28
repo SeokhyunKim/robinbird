@@ -113,9 +113,9 @@ public class AnalysisUnit {
 		switch(language) {
 			case JAVA8:
 			default:
-				Java8Analyser java8Analyser = new Java8Analyser();
-				java8Analyser.setAnalysisContext(analysisContext);;
-				listener = java8Analyser;
+				//Java8Analyser java8Analyser = new Java8Analyser();
+				//java8Analyser.setAnalysisContext(analysisContext);;
+				//listener = java8Analyser;
 				break;
 		}
 		return listener;

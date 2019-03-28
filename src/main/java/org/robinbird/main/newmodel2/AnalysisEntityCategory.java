@@ -1,6 +1,6 @@
 package org.robinbird.main.newmodel2;
 
-public enum TypeCategory {
+public enum AnalysisEntityCategory {
     PRIMITIVE,
     PACKAGE,
     CLASS,

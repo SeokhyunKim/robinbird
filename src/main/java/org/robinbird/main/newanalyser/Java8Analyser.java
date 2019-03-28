@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.robinbird.main.model.MemberFunction;
 import org.robinbird.main.newmodel.AccessModifier;
 import org.robinbird.main.newmodel.Analyser;
 import org.robinbird.main.newmodel.AnalysisContext;
@@ -145,11 +146,10 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 	@Override
 	public void enterMethodDeclaration(Java8Parser.MethodDeclarationContext ctx) {
 		if (isFiltered()) { return; }
-
+/*
 		List<Type> params = getMethodParameterList(ctx.methodHeader().methodDeclarator());
 		String methodName = ctx.methodHeader().methodDeclarator().Identifier().getText();
 		long parentId = analysisContext.getCurrentClass().getId();
-		Type methodType =
 		String signature = MemberFunction.createMethodSignature(methodName, params);
 		MemberFunction mf = analysisContext.getCurrentClass().getMemberFunction(signature);
 		if (mf == null) {
@@ -163,7 +163,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 			}
 			mf = new MemberFunction(accessModifier, returnType, methodName, params);
 			analysisContext.getCurrentClass().addMemberFunction(mf);
-		}
+		}*/
 	}
 
 
