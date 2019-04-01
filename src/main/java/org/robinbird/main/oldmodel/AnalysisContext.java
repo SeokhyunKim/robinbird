@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.robinbird.main.oldoldrepository.Repository;
 import org.robinbird.exception.ExistingTypeNameException;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.NULL_POINTER_ENCOUNTERED;
+import static org.robinbird.util.Msgs.Key.NULL_POINTER_ENCOUNTERED;
 
 /**
  * Created by seokhyun on 6/4/17.

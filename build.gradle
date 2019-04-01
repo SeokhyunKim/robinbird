@@ -130,6 +130,8 @@ dependencies {
 	testCompile "junit:junit:4.12"
 	testCompile "org.mockito:mockito-core:2.8.47"
 	testCompile "com.google.guava:guava-testlib:20.0"
+	testCompile "org.springframework:spring-test:5.1.5.RELEASE"
+	testCompile "javax.inject:javax.inject:1"
 }
 
 

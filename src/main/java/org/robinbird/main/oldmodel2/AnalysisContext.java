@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.Validate;
 import org.robinbird.main.oldrepository.TypeRepository;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import static org.robinbird.main.util.Msgs.Key.INVALID_TYPE_CATEGORY;
+import static org.robinbird.util.Msgs.Key.INVALID_TYPE_CATEGORY;
 
 @Slf4j
 @RequiredArgsConstructor

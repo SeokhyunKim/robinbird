@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.robinbird.main.oldrepository.TypeRepository;
 import org.robinbird.parser.java8.Java8Lexer;
 import org.robinbird.parser.java8.Java8Parser;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.robinbird.main.oldmodel2.AnalysisUnit.Language.JAVA8;
-import static org.robinbird.main.util.Msgs.Key.IOEXCEPTION_WHILE_READING_SOURCE_CODES;
+import static org.robinbird.util.Msgs.Key.IOEXCEPTION_WHILE_READING_SOURCE_CODES;
 
 /**
  * Created by seokhyun on 6/3/17.

@@ -1,4 +1,4 @@
-package org.robinbird.main.util;
+package org.robinbird.util;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;

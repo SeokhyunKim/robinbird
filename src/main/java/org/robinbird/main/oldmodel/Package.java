@@ -1,12 +1,12 @@
 package org.robinbird.main.oldmodel;
 
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY;
+import static org.robinbird.util.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY;
 
 /**
  * Created by seokhyun on 7/23/17.

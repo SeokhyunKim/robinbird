@@ -6,7 +6,7 @@ import org.robinbird.main.oldmodel.Collection;
 import org.robinbird.main.oldmodel.Member;
 import org.robinbird.main.oldmodel.Type;
 import org.robinbird.main.oldoldrepository.Repository;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.util.List;
 

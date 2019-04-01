@@ -1,4 +1,4 @@
-package org.robinbird.main.model;
+package org.robinbird.model;
 
 public class AnalysisContext {
 }

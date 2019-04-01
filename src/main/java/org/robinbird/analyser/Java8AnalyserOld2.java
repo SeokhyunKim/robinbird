@@ -1,8 +1,8 @@
-package org.robinbird.main.analyser;
+package org.robinbird.analyser;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE;
-import static org.robinbird.main.util.Msgs.Key.FAILED_TO_FIND_MEMBER_TYPE;
+import static org.robinbird.util.Msgs.Key.CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE;
+import static org.robinbird.util.Msgs.Key.FAILED_TO_FIND_MEMBER_TYPE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.robinbird.main.oldmodel2.Relation;
 import org.robinbird.main.oldmodel2.RelationCategory;
 import org.robinbird.main.oldmodel2.Type;
 import org.robinbird.main.oldmodel2.TypeCategory;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 import org.robinbird.parser.java8.Java8BaseListener;
 import org.robinbird.parser.java8.Java8Parser;
 

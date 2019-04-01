@@ -1,4 +1,4 @@
-package org.robinbird.main.util;
+package org.robinbird.util;
 
 import org.robinbird.main.presentation.StringAppender;
 

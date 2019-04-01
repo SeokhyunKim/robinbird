@@ -1,12 +1,12 @@
 package org.robinbird.main.oldmodel;
 
 import lombok.Getter;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION;
+import static org.robinbird.util.Msgs.Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION;
 
 /**
  * Created by seokhyun on 6/2/17.

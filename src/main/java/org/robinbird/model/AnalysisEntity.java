@@ -1,4 +1,4 @@
-package org.robinbird.main.model;
+package org.robinbird.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package org.robinbird.main.analyser;
+package org.robinbird.analyser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -8,13 +8,13 @@ import org.robinbird.main.oldmodel.Class;
 import org.robinbird.main.oldmodel.Package;
 import org.robinbird.parser.java8.Java8BaseListener;
 import org.robinbird.parser.java8.Java8Parser;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.util.Msgs;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.*;
+import static org.robinbird.util.Msgs.Key.*;
 
 /**
  * Based on ANTLR generated Java8BaseListener, building AnalysisContext from java8 source codes

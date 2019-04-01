@@ -1,4 +1,4 @@
-package org.robinbird.main.analyser;
+package org.robinbird.analyser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;

@@ -1,4 +1,4 @@
-package org.robinbird.main.model;
+package org.robinbird.model;
 
 public enum RelationType {
     // RelationTypes for programming langue types

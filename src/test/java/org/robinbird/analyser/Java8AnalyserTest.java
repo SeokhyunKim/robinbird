@@ -1,4 +1,4 @@
-package org.robinbird.main.analyser;
+package org.robinbird.analyser;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robinbird.main.analyser.Java8AnalyserMockUtil.*;
+import static org.robinbird.analyser.Java8AnalyserMockUtil.*;
 
 /**
  * Created by seokhyun on 6/23/17.

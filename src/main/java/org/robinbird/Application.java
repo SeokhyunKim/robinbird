@@ -31,7 +31,7 @@ import org.robinbird.main.oldrepository.TypeRepository;
 import org.robinbird.main.oldrepository.TypeRepositoryImpl;
 import org.robinbird.main.oldrepository.dao.TypeDao;
 import org.robinbird.main.oldrepository.dao.TypeDaoFactory;
-import org.robinbird.main.util.Utils;
+import org.robinbird.util.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

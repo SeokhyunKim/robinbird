@@ -1,10 +1,10 @@
-package org.robinbird.main.util;
+package org.robinbird.util;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
-import static org.robinbird.main.util.Msgs.Key.ALREADY_EXISTING_TYPE_NAME;
-import static org.robinbird.main.util.Msgs.Key.ROOT_SOURCE_PATH_NOT_PROVIDED;
+import static org.robinbird.util.Msgs.Key.ALREADY_EXISTING_TYPE_NAME;
+import static org.robinbird.util.Msgs.Key.ROOT_SOURCE_PATH_NOT_PROVIDED;
 
 /**
  * Created by seokhyun on 9/8/17.
