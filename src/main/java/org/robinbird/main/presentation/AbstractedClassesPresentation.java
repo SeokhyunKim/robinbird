@@ -9,6 +9,7 @@ import org.robinbird.graph.cluster.ClusterNode;
 import org.robinbird.graph.cluster.ScoreMatchers;
 
 import java.util.List;
+import org.robinbird.util.StringAppender;
 
 /**
  * Created by seokhyun on 11/8/17.

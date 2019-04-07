@@ -1,7 +1,5 @@
 package org.robinbird.util;
 
-import org.robinbird.main.presentation.StringAppender;
-
 /**
  * Created by seokhyun on 12/15/17.
  */
