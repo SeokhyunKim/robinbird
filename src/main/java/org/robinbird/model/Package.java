@@ -32,7 +32,7 @@ public class Package extends Component {
                                           .name(component.getName())
                                           .relationCategory(RelationCategory.PACKAGE_MEMBER)
                                           .relatedComponent(component)
-                                          .cardinality(Cardinality.ONE.toString())
+                                          .cardinality(Cardinality.ONE)
                                           .parent(this)
                                           .build();
         addRelation(relation);

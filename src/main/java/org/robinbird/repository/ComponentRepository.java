@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
-import org.robinbird.exception.AlreadyExistingAnalysisEntityException;
 import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
@@ -68,7 +67,7 @@ public class ComponentRepository {
      * Register new {@link Component} with the given name and category.
      * If this is trying to register already existing {@link Component}, it will be just returned.
      * If this is trying to register a name of existing one with different category,
-     * {@link AlreadyExistingAnalysisEntityException} will be thrown.
+     * {@link org.robinbird.exception.RobinbirdException} will be thrown.
      * @param name
      * @param category
      * @return

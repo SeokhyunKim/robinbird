@@ -45,26 +45,26 @@ public class ComponentRepositoryTest {
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.ONE.toString())
+                               .cardinality(Cardinality.ONE)
                                .relatedComponent(r1)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.MULTIPLE.toString())
+                               .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r2)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.MULTIPLE.toString())
+                               .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r3)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         repository.updateComponent(au);
         final List<Relation> relations = repository.getRelations(au);
         final Set<String> cardinalities = relations.stream()
-                                                    .map(Relation::getCardinality)
+                                                    .map(r -> r.getCardinality().toString())
                                                     .collect(Collectors.toSet());
         final Set<String> names = relations.stream()
                                            .map(r -> r.getRelatedComponent().getName())
@@ -80,13 +80,13 @@ public class ComponentRepositoryTest {
         final Component r2 = repository.registerComponent("Relation2", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.ONE.toString())
+                               .cardinality(Cardinality.ONE)
                                .relatedComponent(r1)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.MULTIPLE.toString())
+                               .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r2)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
@@ -100,7 +100,7 @@ public class ComponentRepositoryTest {
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
                                .parent(au)
-                               .cardinality(Cardinality.MULTIPLE.toString())
+                               .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r3)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());

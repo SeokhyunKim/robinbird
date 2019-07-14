@@ -60,7 +60,7 @@ public class Converter {
         entity.setRelationCategory(relation.getRelationCategory().name());
         entity.setName(relation.getName());
         entity.setRelationId(relation.getRelatedComponent().getId());
-        entity.setCardinality(relation.getCardinality());
+        entity.setCardinality(relation.getCardinality().toString());
         entity.setId(relation.getId());
 
         try {

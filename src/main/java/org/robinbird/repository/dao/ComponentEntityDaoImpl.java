@@ -37,10 +37,9 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
 
         loadComponentEntityWithIdQuery = em.createQuery("select ce from ComponentEntity ce where ce.id = :id");
         loadComponentEntityWithNameQuery = em.createQuery("select ce from ComponentEntity ce where ce.name = :name");
-        loadComponentEntitiesWithComponentCategory = em.createQuery("select ce from ComponentEntity ce where  +"
-                                                                          + "ce.componentCategory = :componentCategory");
-        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r " +
-                                                                          "where r.parentId = :parentId and r.id = :id");
+        loadComponentEntitiesWithComponentCategory = em.createQuery("select ce from ComponentEntity ce where " +
+                                                                        "ce.componentCategory = :componentCategory");
+        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r where r.parentId = :parentId and r.id = :id");
         loadRelationEntitiesWithParentIdQuery = em.createQuery("select r from RelationEntity r " +
                                                                         "where r.parentId = :parentId");
         updateComponentEntityQuery = em.createQuery("update ComponentEntity " +

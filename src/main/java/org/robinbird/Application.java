@@ -56,6 +56,8 @@ public class Application {
 		}
 		log.info("\n" + Utils.printMemoryInfo());
 
+		return;
+/*
 		final AnalysisJob analysisJob = new AnalysisJob(JAVA8);
 		analysisJob.addPath(getRootPath(commandLine));
 
@@ -93,7 +95,7 @@ public class Application {
 
 
 								 // based on old model
-		/*AnalysisUnit au = new AnalysisUnit(JAVA8);
+		AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(getRootPath(commandLine));
 
 		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
@@ -186,66 +188,58 @@ public class Application {
 
 	private static Options buildOptions() {
 		final Option help = Option.builder("h")
-									.longOpt("help")
-									.desc("Print help messages.")
-									.build();
+								  .longOpt("help")
+								  .desc("Print help messages.")
+								  .build();
 		final Option root = Option.builder("r")
-									.longOpt("root")
-									.desc("specify root path of source codes")
-									.hasArg()
-									.build();
+								  .longOpt("root")
+								  .desc("specify root path of source codes")
+								  .hasArg()
+								  .build();
 		final Option presentation =
 				Option.builder("p")
-						.longOpt("presentation")
-						.desc("set presentation type. default is PLANTUML. " +
-									  "Currently, supported types are PLANTUML, SIMPLE, GML, ABSTRACTED_CLASSES")
-						.hasArg()
-						.build();
+					  .longOpt("presentation")
+					  .desc("set presentation type. default is PLANTUML. " +
+							"Currently, supported types are PLANTUML and GML (Graph Modeling Language).")
+					  .hasArg()
+					  .build();
 		final Option db =
 				Option.builder("db")
-						.longOpt("database-file")
-						.desc("Local h2 database file")
-						.hasArg()
-						.build();
+					  .longOpt("database-file")
+					  .desc("Local h2 database file")
+					  .hasArg()
+					  .build();
 		final Option terminalClass =
 				Option.builder("tc")
-						.longOpt("terminal-class")
-						.numberOfArgs(Option.UNLIMITED_VALUES)
-						.desc("Classes matched with this regular expression will be only shown their names in class diagram")
-						.build();
+					  .longOpt("terminal-class")
+					  .numberOfArgs(Option.UNLIMITED_VALUES)
+					  .desc("Classes matched with this regular expression will be only shown their names in class diagram")
+					  .build();
 		final Option excludedClass =
 				Option.builder("ec")
-						.longOpt("excluded-class")
-						.numberOfArgs(Option.UNLIMITED_VALUES)
-						.desc("Classes matched with this regular expression will not be shown in class diagram")
-						.build();
+					  .longOpt("excluded-class")
+					  .numberOfArgs(Option.UNLIMITED_VALUES)
+					  .desc("Classes matched with this regular expression will not be shown in class diagram")
+					  .build();
 		final Option clusteringType =
 				Option.builder("ct")
-						.longOpt("clustering-type")
-						.desc("experimental clustering type for ABSTRACTED_CLASSES")
-						.hasArg()
-						.build();
-		final Option score1 =
-				Option.builder("s1")
-						.longOpt("score1")
-						.desc("experimental things for ABSTRACTED_CLASSES")
-						.hasArg()
-						.build();
-		final Option score2 =
-				Option.builder("s2")
-						.longOpt("score2")
-						.desc("experimental things for ABSTRACTED_CLASSES")
-						.hasArg()
-						.build();
-		return new Options()
-					   .addOption(help)
-					   .addOption(root)
-					   .addOption(presentation)
-					   .addOption(db)
-					   .addOption(terminalClass)
-					   .addOption(excludedClass)
-					   .addOption(clusteringType)
-					   .addOption(score1)
-					   .addOption(score2);
+					  .longOpt("clustering-type")
+					  .desc("Robinbird provides abstrated components diagram. Currently, only has AGGLOMERATIVE clustering")
+					  .hasArg()
+					  .build();
+		final Option params =
+				Option.builder("cp")
+					  .longOpt("clustering-parameters")
+					  .desc("Parameters for clustering. Depends on clustering type.")
+					  .hasArgs()
+					  .build();
+		return new Options().addOption(help)
+							.addOption(root)
+							.addOption(presentation)
+							.addOption(db)
+							.addOption(terminalClass)
+							.addOption(excludedClass)
+							.addOption(clusteringType)
+							.addOption(params);
 	}
 }
