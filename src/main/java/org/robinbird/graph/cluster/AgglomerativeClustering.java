@@ -1,8 +1,8 @@
 package org.robinbird.graph.cluster;
 
 import lombok.Getter;
-import org.robinbird.main.repository.dao.Pair;
-import org.robinbird.main.util.Msgs;
+import org.robinbird.main.oldoldrepository.dao.Pair;
+import org.robinbird.util.Msgs;
 import org.robinbird.graph.FloydAlgorithm;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.Node;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkState;
-import static org.robinbird.main.util.Msgs.Key.FAILED_TO_FIND_AGGCLUSTER_NODE;
+import static org.robinbird.util.Msgs.Key.FAILED_TO_FIND_AGGCLUSTER_NODE;
 
 /**
  * Created by seokhyun on 11/11/17.

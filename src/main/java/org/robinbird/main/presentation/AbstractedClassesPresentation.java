@@ -1,7 +1,7 @@
 package org.robinbird.main.presentation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.oldmodel.AnalysisContext;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.cluster.AgglomerativeClustering;
 import org.robinbird.graph.cluster.Cluster;
@@ -9,6 +9,7 @@ import org.robinbird.graph.cluster.ClusterNode;
 import org.robinbird.graph.cluster.ScoreMatchers;
 
 import java.util.List;
+import org.robinbird.util.StringAppender;
 
 /**
  * Created by seokhyun on 11/8/17.

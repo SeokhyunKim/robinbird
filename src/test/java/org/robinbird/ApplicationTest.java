@@ -49,7 +49,7 @@ public class ApplicationTest {
 		assertTrue(output.contains("Classes"));
 		assertTrue(output.contains("a : int"));
 		assertTrue(output.contains("b : float"));
-		assertTrue(output.contains("TypeCategory"));
+		assertTrue(output.contains("ComponentCategory"));
 		assertTrue(output.contains("SimpleClass"));
 		assertTrue(output.contains(""));
 		assertTrue(output.contains(""));

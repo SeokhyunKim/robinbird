@@ -1,5 +1,8 @@
 package org.robinbird;
 
+import static org.robinbird.clustering.ClusteringMethodType.AGGLOMERATIVE_CLUSTERING;
+import static org.robinbird.model.AnalysisJob.Language.JAVA8;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -13,22 +16,27 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.robinbird.main.model.AnalysisContext;
-import org.robinbird.main.model.AnalysisUnit;
-import org.robinbird.main.presentation.AbstractedClassesPresentation;
-import org.robinbird.main.presentation.AnalysisContextPresentation;
-import org.robinbird.main.presentation.ClusteringMethod;
-import org.robinbird.main.presentation.GMLPresentation;
-import org.robinbird.main.presentation.PlantUMLPresentation;
-import org.robinbird.main.presentation.PresentationType;
-import org.robinbird.main.presentation.SimplePresentation;
-import org.robinbird.main.presentation.StringAppender;
-import org.robinbird.main.util.Utils;
+import org.robinbird.clustering.AgglomerativeClusteringNodeMatchers;
+import org.robinbird.clustering.ClusteringMethod;
+import org.robinbird.clustering.ClusteringMethodFactory;
+import org.robinbird.clustering.ClusteringNode;
+import org.robinbird.clustering.ClusteringNodeFactory;
+import org.robinbird.clustering.RelationSelectors;
+import org.robinbird.model.AnalysisContext;
+import org.robinbird.model.AnalysisJob;
+import org.robinbird.model.ComponentCategory;
+import org.robinbird.presentation.GMLPresentation;
+import org.robinbird.presentation.PlantUMLPresentation;
+import org.robinbird.presentation.Presentation;
+import org.robinbird.presentation.PresentationType;
+import org.robinbird.repository.ComponentRepository;
+import org.robinbird.repository.dao.ComponentEntityDao;
+import org.robinbird.repository.dao.ComponentEntityDaoH2Factory;
+import org.robinbird.util.StringAppender;
+import org.robinbird.util.Utils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.robinbird.main.model.AnalysisUnit.Language.JAVA8;
 
 @Slf4j
 public class Application {
@@ -48,15 +56,52 @@ public class Application {
 		}
 		log.info("\n" + Utils.printMemoryInfo());
 
-		AnalysisUnit au = new AnalysisUnit(JAVA8);
+		final AnalysisJob analysisJob = new AnalysisJob(JAVA8);
+		analysisJob.addPath(getRootPath(commandLine));
+
+		//AnalysisUnit au = new AnalysisUnit(JAVA8);
+		//au.addPath(getRootPath(commandLine));
+
+		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
+		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
+
+		final ComponentEntityDao componentEntityDao = ComponentEntityDaoH2Factory.createDao();
+		final ComponentRepository componentRepository = new ComponentRepository(componentEntityDao);
+		final AnalysisContext analysisContext = analysisJob.analysis(componentRepository, terminalPatterns, excludedPatterns);
+
+		// based on command line option, trying clustering.
+		final ClusteringNodeFactory clusteringNodeFactory = new ClusteringNodeFactory(componentRepository);
+		final ClusteringMethodFactory clusteringMethodFactory = new ClusteringMethodFactory(clusteringNodeFactory);
+
+		// get clustering method from command line.
+		final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(AGGLOMERATIVE_CLUSTERING, 1.0, 3.0);
+		final List<ClusteringNode> clusteringNodes = clusteringMethod.cluster(analysisContext.getComponents(ComponentCategory.CLASS),
+																			  RelationSelectors::getClassRelations,
+																			  AgglomerativeClusteringNodeMatchers::matchScoreRange);
+
+
+
+
+
+
+								 //final TypeDao typeDao = TypeDaoFactory.createDao(); // todo: add option to consider stored db file
+								 //final TypeRepository typeRepository = new TypeRepositoryImpl(typeDao);
+								 //AnalysisContext ac = au.analysis(typeRepository, terminalPatterns, excludedPatterns);
+								 //Presentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
+								 //System.out.println(acPresent.present(ac));
+
+
+
+								 // based on old model
+		/*AnalysisUnit au = new AnalysisUnit(JAVA8);
 		au.addPath(getRootPath(commandLine));
 
 		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
 		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
 
 		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
-		AnalysisContextPresentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
-		System.out.print(acPresent.present(ac));
+		Presentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
+		System.out.print(acPresent.present(ac));*/
 	}
 
 	private Path getRootPath(CommandLine commandLine) {
@@ -87,20 +132,11 @@ public class Application {
 		return PresentationType.valueOf(presentation);
 	}
 
-	private AnalysisContextPresentation createPresentation(PresentationType ptype, CommandLine commandLine) {
-		AnalysisContextPresentation presentation;
+	private Presentation createPresentation(PresentationType ptype, CommandLine commandLine) {
+		Presentation presentation;
 		switch (ptype) {
-			case ABSTRACTED_CLASSES:
-				ClusteringMethod cmethod = ClusteringMethod.getClusteringMethod(commandLine.getOptionValue("ct"));
-				presentation = new AbstractedClassesPresentation(cmethod,
-																 Float.parseFloat(commandLine.getOptionValue("s1")),
-																 Float.parseFloat(commandLine.getOptionValue("s2")));
-				break;
 			case GML:
 				presentation = new GMLPresentation();
-				break;
-			case SIMPLE:
-				presentation = new SimplePresentation();
 				break;
 			case PLANTUML:
 			default:

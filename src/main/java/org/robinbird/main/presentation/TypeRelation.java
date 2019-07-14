@@ -1,12 +1,10 @@
 package org.robinbird.main.presentation;
 
-import static com.google.common.base.Preconditions.checkState;
-
-import org.robinbird.main.model.Type;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
+import org.robinbird.main.oldmodel2.Type;
 
 @Getter
 @ToString
@@ -17,8 +15,8 @@ public class TypeRelation {
 		String first, second;
 	}
 
-	Type first, second;
-	@Setter String firstCardinality, secondCardinality;
+	private final Type first, second;
+	private String firstCardinality, secondCardinality;
 	
 	public Key getKey() {
 		return new Key(first.getName(), second.getName());
@@ -27,11 +25,17 @@ public class TypeRelation {
 	private TypeRelation(Type first, Type second) {
 		this.first = first;
 		this.second = second;
-	}	
+	}
 
-	public static TypeRelation create(Type first, Type second) {
-		checkState(first != null);
-		checkState(second != null);
+	public void updateCardinality(@NonNull final Type associated, @NonNull String cardinality) {
+		if (first.getName().equals(associated)) {
+			this.firstCardinality = cardinality;
+		} else if (second.getName().equals(associated.getName())) {
+			this.secondCardinality = cardinality;
+		}
+	}
+
+	public static TypeRelation create(@NonNull final Type first, @NonNull final Type second, @NonNull final String cardinality) {
 		if (first.compareTo(second) <= 0) {
 			return new TypeRelation(first, second);
 		} else {
@@ -39,9 +43,7 @@ public class TypeRelation {
 		}
 	}
 
-	public static Key createKey(Type first, Type second) {
-		checkState(first != null);
-		checkState(second != null);
+	public static Key createKey(@NonNull final Type first, @NonNull final Type second) {
 		if (first.compareTo(second) <= 0) {
 			return new Key(first.getName(), second.getName());
 		} else {
@@ -49,9 +51,7 @@ public class TypeRelation {
 		}
 	}
 
-	public static Key createKey(String first, String second) {
-		checkState(first != null);
-		checkState(second != null);
+	public static Key createKey(@NonNull final String first, @NonNull final String second) {
 		String former, later;
 		if (first.compareTo(second) <= 0) {
 			former = first;

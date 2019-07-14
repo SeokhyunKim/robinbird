@@ -2,7 +2,7 @@ package org.robinbird.main.presentation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.robinbird.main.model.AnalysisContext;
+import org.robinbird.main.oldmodel.AnalysisContext;
 
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +32,7 @@ public class SimplePresentationTest {
 		assertTrue(present.contains("m1 : ClassB"));
 		assertTrue(present.contains("m2 : ClassA"));
 		assertTrue(present.contains("m3 : ClassA"));
-		assertTrue(present.contains("// TypeCategory"));
+		assertTrue(present.contains("// ComponentCategory"));
 		System.out.println(present);
 	}
 }

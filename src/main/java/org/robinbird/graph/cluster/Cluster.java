@@ -2,7 +2,7 @@ package org.robinbird.graph.cluster;
 
 import lombok.Getter;
 import lombok.NonNull;
-import org.robinbird.main.presentation.StringAppender;
+import org.robinbird.util.StringAppender;
 import org.robinbird.graph.Graph;
 import org.robinbird.graph.Node;
 
