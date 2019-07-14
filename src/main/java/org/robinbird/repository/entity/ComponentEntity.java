@@ -11,8 +11,11 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(indexes = {@Index(columnList = "name")})
-public class AnalysisEntity {
+@Table(name = "component",
+       indexes = {
+        @Index(columnList = "name", unique = true),
+        @Index(columnList = "componentCategory")})
+public class ComponentEntity {
 
     @Id
     @GeneratedValue
@@ -20,6 +23,8 @@ public class AnalysisEntity {
 
     private String name;
 
-    private String category;
+    private String componentCategory;
+
+    private String metadata;
 
 }

@@ -30,7 +30,7 @@ class TypeRelationsBuilder {
 				if (!filterType(associated, ac)) {
 					continue;
 				}
-				// now make a type relation
+				// now make a type relatedComponent
 				TypeRelation.Key key = TypeRelation.createKey(classType, associated);
 				TypeRelation tr = typeRelationMap.get(key);
 				if (tr == null) {
@@ -59,16 +59,16 @@ class TypeRelationsBuilder {
 	}
 
 	private boolean filterType(@NonNull final Type type, @NonNull final AnalysisContext ac) {
-		// member function relation will be added later
+		// member function relatedComponent will be added later
 		if (type.getCategory() == TypeCategory.FUNCTION) {
 			return false;
 		}
-		// doesn't make relation for primitive types
+		// doesn't make relatedComponent for primitive types
 		if (type.getCategory() == TypeCategory.PRIMITIVE) {
 			return false;
 		}
 		if (ac.isExcluded(type.getName())) {
-			log.debug("type {} is excluded type and skip to create relation.", type.getName());
+			log.debug("type {} is excluded type and skip to create relatedComponent.", type.getName());
 			return false;
 		}
 		return true;

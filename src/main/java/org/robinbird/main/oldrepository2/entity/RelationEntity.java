@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "relation", indexes = {@Index(columnList = "typeId")})
+@Table(name = "relatedComponent", indexes = {@Index(columnList = "typeId")})
 public class RelationEntity {
 
     @Id

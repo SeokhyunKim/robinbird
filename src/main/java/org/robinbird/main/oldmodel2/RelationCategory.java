@@ -1,9 +1,9 @@
 package org.robinbird.main.oldmodel2;
 
 public enum RelationCategory {
-    // General relation type. Using this for testing and etc.
+    // General relatedComponent type. Using this for testing and etc.
     RELATION,
-    // class diagram relation types
+    // class diagram relatedComponent types
     ASSOCIATION,
     COMPOSITION,
     INHERITANCE,

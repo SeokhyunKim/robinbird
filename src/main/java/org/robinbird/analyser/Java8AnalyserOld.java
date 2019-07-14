@@ -170,8 +170,6 @@ public class Java8AnalyserOld extends Java8BaseListener implements Analyser {
 		}
 	}
 
-
-
 	private List<ParameterType> getMethodParameterList(Java8Parser.MethodDeclaratorContext ctx) {
 		if (ctx.formalParameterList() != null) {
 			List<ParameterType> paramList = new ArrayList<>();

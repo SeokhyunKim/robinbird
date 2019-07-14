@@ -42,7 +42,7 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 			}
 		}
 		// relations
-		for (Relation r : analysisContext.getRelations()) {
+		for (RelationEntity r : analysisContext.getRelations()) {
 			String firstName = removeGenerics(r.getFirst().getName());
 			String secondName = removeGenerics(r.getSecond().getName());
 			if (r.getFirstCardinality() == null) {
@@ -92,7 +92,7 @@ public class PlantUMLPresentation implements AnalysisContextPresentation {
 		return sa.toString();
 	}
 
-	private String convertAccessModifier(AccessModifier accessModifier) {
+	private String convertAccessModifier(AccessLevel accessModifier) {
 		switch (accessModifier) {
 			case PUBLIC: return "+";
 			case PRIVATE: return "-";

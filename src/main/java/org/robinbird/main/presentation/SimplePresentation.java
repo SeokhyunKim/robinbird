@@ -40,7 +40,7 @@ public class SimplePresentation implements AnalysisContextPresentation {
 			}
 		}
 		sa.appendLine("//----------------------------------------------------");
-		sa.appendLine("// AnalysisEntityCategory");
+		sa.appendLine("// ComponentCategory");
 		for (Type type : analysisContext.getTypes()) {
 			sa.appendLine(type.getName());
 		}

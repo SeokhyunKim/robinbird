@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Entity
 @EqualsAndHashCode
-@Table(name = "relation", indexes = {@Index(columnList = "parentTypeId")})
+@Table(name = "relatedComponent", indexes = {@Index(columnList = "parentTypeId")})
 public class RelationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;

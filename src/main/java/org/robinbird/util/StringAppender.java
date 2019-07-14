@@ -1,8 +1,5 @@
 package org.robinbird.util;
 
-/**
- * Created by seokhyun on 6/23/17.
- */
 public class StringAppender {
 	private StringBuffer stringBuffer = new StringBuffer();
 

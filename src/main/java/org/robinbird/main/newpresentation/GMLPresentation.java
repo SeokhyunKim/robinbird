@@ -39,7 +39,7 @@ public class GMLPresentation implements AnalysisContextPresentation {
 			}
 		}
 		// relations
-		for (Relation r : analysisContext.getRelations()) {
+		for (RelationEntity r : analysisContext.getRelations()) {
 			if (!(r.getFirst() instanceof Class) || !(r.getSecond() instanceof Class)) {
 				continue;
 			}

@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import static org.robinbird.util.Msgs.Key.INVALID_TYPE_CATEGORY;
+import static org.robinbird.util.Msgs.Key.INVALID_COMPONENT_CATEGORY;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class AnalysisContext {
 	private boolean isParsingEnum;
 	
 	public void pushCurrentClass(final @NonNull Type c) {
-		Validate.isTrue(c.getCategory() == TypeCategory.CLASS, Msgs.get(INVALID_TYPE_CATEGORY, c.getCategory().name()));
+		Validate.isTrue(c.getCategory() == TypeCategory.CLASS, Msgs.get(INVALID_COMPONENT_CATEGORY, c.getCategory().name()));
 		if (currentPackage != null) {
 			currentPackage.addRelation(Relation.create(RelationCategory.PACKAGE_MEMBER, c));
 		}
@@ -81,7 +81,7 @@ public class AnalysisContext {
 		    // One possible case is registered as CLASS and updated as INTERFACE later.
             // For now, don't check this case and just update category.
 //		    if (alreadyRegistered.getCategory() != tc) {
-//		        types.updateType(alreadyRegistered.updateTypeCategory(AnalysisEntityCategory.INTERFACE);
+//		        types.updateType(alreadyRegistered.updateTypeCategory(ComponentCategory.INTERFACE);
 //            }
 			return alreadyRegistered;
 		}
@@ -94,7 +94,7 @@ public class AnalysisContext {
 							   @NonNull String methodName, @NonNull final List<Type> params) {
 		log.debug("register method: {}, {}, {}, {}", parentType.getName(), accessModifier, methodName, params);
 //		Type curParentType = types.populateType(parentType);
-//		curParentType.addRelation(Relation.builder().category(RelationCategory.MEMBER_FUNCTION)..build());
+//		curParentType.addRelation(RelationEntity.builder().category(RelationCategory.MEMBER_FUNCTION)..build());
 
 		return null;
 

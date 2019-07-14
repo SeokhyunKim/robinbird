@@ -28,7 +28,13 @@ public class Msgs {
 		FAILED_TO_FIND_AGGCLUSTER_NODE,
 		SCORE_FOR_CLUSTERING_IS_NOT_GIVEN,
 		CLUSTERING_TYPE_IS_NOT_GIVEN,
-		INVALID_TYPE_CATEGORY
+		INVALID_COMPONENT_CATEGORY,
+		JSON_PROCESSING_ISSUE,
+		CURRENT_COMPONENT_IS_NOT_CLASS,
+		FOUND_COMPONENT_OF_DIFFERENT_TYPE,
+		WRONG_COMPONENT_CATEGORY,
+		TRIED_TO_ADD_WRONG_COMPONENT,
+		INTERNAL_ERROR
 	}
 
 	private static final Map<Key, String> msgMap;
@@ -51,7 +57,14 @@ public class Msgs {
 			.put(Key.FAILED_TO_FIND_AGGCLUSTER_NODE, "Failed to find agglomerative clustering node %s.")
 			.put(Key.SCORE_FOR_CLUSTERING_IS_NOT_GIVEN, "Score for controling clustering method was not given.")
 			.put(Key.CLUSTERING_TYPE_IS_NOT_GIVEN, "Clustering type was not given.")
-			.put(Key.INVALID_TYPE_CATEGORY, "Invalid AnalysisEntityCategory %s is used.")
+			.put(Key.INVALID_COMPONENT_CATEGORY, "Invalid ComponentCategory %s is used.")
+			.put(Key.JSON_PROCESSING_ISSUE, "Exception caught while processing json serialization/deserialization for %s.")
+			.put(Key.INTERNAL_ERROR, "Unexpected internal error occurred.")
+			.put(Key.CURRENT_COMPONENT_IS_NOT_CLASS, "In AnalysisContext, current component is not Class. Check this: %s.")
+			.put(Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE, "While trying to register a component, found another component " +
+														"with different type. Name: %s, Category: %s.")
+			.put(Key.WRONG_COMPONENT_CATEGORY, "Wrong ComponentCategory is used. componentCategory: %s.")
+			.put(Key.TRIED_TO_ADD_WRONG_COMPONENT, "Tried to add wrong component. Component: %s.")
 			.build();
 	}
 
@@ -59,7 +72,13 @@ public class Msgs {
 		return msgMap.get(k);
 	}
 
-	public static String get(Key k, String msg) { return String.format(msgMap.get(k), msg); }
+	public static String get(Key k, String msg) {
+		return String.format(msgMap.get(k), msg);
+	}
+
+	public static String get(Key k, String msg1, String msg2) {
+		return String.format(msgMap.get(k), msg1, msg2);
+	}
 
 	public static String get(Key k, Exception e) {
 		return msgMap.get(k) + getNewLineStackTrace(e);
@@ -69,7 +88,7 @@ public class Msgs {
 		return get(k, msg) + getNewLineStackTrace(e);
 	}
 
-	private static String getNewLineStackTrace(Exception e) { return "\n" + Throwables.getStackTraceAsString(e); }
-
-
+	private static String getNewLineStackTrace(Exception e) {
+		return "\n" + Throwables.getStackTraceAsString(e);
+	}
 }

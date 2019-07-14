@@ -33,13 +33,13 @@ public class SimplePresentation implements AnalysisContextPresentation {
 			}
 		}
 		sa.appendLine("//----------------------------------------------------");
-		sa.appendLine("// AnalysisEntityCategory");
+		sa.appendLine("// ComponentCategory");
 		for (Type type : analysisContext.getTypes()) {
 			sa.appendLine(type.getName());
 		}
 		sa.appendLine("//----------------------------------------------------");
 		sa.appendLine("// Relations");
-		for (Relation r : analysisContext.getRelations()) {
+		for (RelationEntity r : analysisContext.getRelations()) {
 			sa.appendLine(String.format("%s (%s) --- (%s) %s", r.getFirst().getName(), (r.getFirstCardinality() != null ? r.getFirstCardinality() : "null"),
 				(r.getSecondCardinality() != null ? r.getSecondCardinality() : "null"), r.getSecond().getName()));
 		}

@@ -187,11 +187,11 @@ public class AnalysisContext {
 					cardinality = "*";
 				}
 				if (associated.isPrimitiveType()) {
-					log.debug("associated type {} is primitive and skip to create relation.", associated.getName());
+					log.debug("associated type {} is primitive and skip to create relatedComponent.", associated.getName());
 					continue;
 				}
 				if (isExcluded(associated.getName())) {
-					log.debug("associated type {} is excluded type and skip to create relation.", associated.getName());
+					log.debug("associated type {} is excluded type and skip to create relatedComponent.", associated.getName());
 					continue;
 				}
 				Relation.Key k = Relation.createKey(classObj, associated);

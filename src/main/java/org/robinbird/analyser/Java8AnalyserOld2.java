@@ -152,13 +152,13 @@ public class Java8AnalyserOld2 extends Java8BaseListener implements Analyser {
 		String signature = MemberFunction.createMethodSignature(methodName, params);
 		MemberFunction mf = analysisContext.getCurrentClass().getMemberFunction(signature);
 		if (mf == null) {
-			AccessModifier accessModifier = getMethodAccessModifier(ctx.methodModifier());
+			AccessLevel accessModifier = getMethodAccessModifier(ctx.methodModifier());
 			Type returnType;
 			if (ctx.methodHeader().result().unannType() != null) {
 				returnType = getType(ctx.methodHeader().result().unannType());
 			} else {
 				checkState(ctx.methodHeader().result().getText().equals("void"), Msgs.get(CURRENT_CLASS_IS_NULL_WHILE_WALKING_THROUGH_PARSE_TREE));
-				returnType = new Type("void", Type.Kind.PRIMITIVE);
+				returnType = new Type("void", Type.Kind.PRIMITIVE_TYPE);
 			}
 			mf = new MemberFunction(accessModifier, returnType, methodName, params);
 			analysisContext.getCurrentClass().addMemberFunction(mf);
