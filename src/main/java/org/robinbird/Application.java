@@ -1,7 +1,7 @@
 package org.robinbird;
 
-import static org.robinbird.clustering.ClusteringMethodType.AGGLOMERATIVE_CLUSTERING;
 import static org.robinbird.model.AnalysisJob.Language.JAVA8;
+import static org.robinbird.model.ComponentCategory.CLASS;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,18 +16,18 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.robinbird.clustering.AgglomerativeClusteringNodeMatchers;
 import org.robinbird.clustering.ClusteringMethod;
 import org.robinbird.clustering.ClusteringMethodFactory;
+import org.robinbird.clustering.ClusteringMethodType;
 import org.robinbird.clustering.ClusteringNode;
 import org.robinbird.clustering.ClusteringNodeFactory;
 import org.robinbird.clustering.RelationSelectors;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisJob;
-import org.robinbird.model.ComponentCategory;
 import org.robinbird.presentation.GMLPresentation;
 import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.Presentation;
+import org.robinbird.presentation.PresentationFactory;
 import org.robinbird.presentation.PresentationType;
 import org.robinbird.repository.ComponentRepository;
 import org.robinbird.repository.dao.ComponentEntityDao;
@@ -56,59 +56,56 @@ public class Application {
 		}
 		log.info("\n" + Utils.printMemoryInfo());
 
-		return;
-/*
+		// create analysis job for the given root path
 		final AnalysisJob analysisJob = new AnalysisJob(JAVA8);
 		analysisJob.addPath(getRootPath(commandLine));
 
-		//AnalysisUnit au = new AnalysisUnit(JAVA8);
-		//au.addPath(getRootPath(commandLine));
-
+		// read terminal classes and excludes classes
 		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
 		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
 
+		// create dao, repository
 		final ComponentEntityDao componentEntityDao = ComponentEntityDaoH2Factory.createDao();
 		final ComponentRepository componentRepository = new ComponentRepository(componentEntityDao);
+
+		// real analysis job
 		final AnalysisContext analysisContext = analysisJob.analysis(componentRepository, terminalPatterns, excludedPatterns);
 
-		// based on command line option, trying clustering.
-		final ClusteringNodeFactory clusteringNodeFactory = new ClusteringNodeFactory(componentRepository);
-		final ClusteringMethodFactory clusteringMethodFactory = new ClusteringMethodFactory(clusteringNodeFactory);
+		// presentation type
+		final PresentationType presentationType = getPresentationType(commandLine);
 
-		// get clustering method from command line.
-		final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(AGGLOMERATIVE_CLUSTERING, 1.0, 3.0);
-		final List<ClusteringNode> clusteringNodes = clusteringMethod.cluster(analysisContext.getComponents(ComponentCategory.CLASS),
-																			  RelationSelectors::getClassRelations,
-																			  AgglomerativeClusteringNodeMatchers::matchScoreRange);
+		// get clustering method
+		final Optional<ClusteringMethodType> clusteringMethodTypeOpt = getClusteringMethodType(commandLine);
 
+		// get final presentation string
+		final String presentationText;
+		if (clusteringMethodTypeOpt.isPresent()) {
+			final ClusteringMethodType clusteringMethodType = clusteringMethodTypeOpt.get();
+			final String[] params = getClusteringParameters(commandLine);
+			final ClusteringMethodFactory clusteringMethodFactory =
+					new ClusteringMethodFactory(new ClusteringNodeFactory(componentRepository));
+			final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(clusteringMethodType, params);
+			final List<ClusteringNode> clusteringNodes =
+					clusteringMethod.cluster(analysisContext.getComponents(CLASS),
+											 RelationSelectors::getClassRelations,
+											 clusteringMethodFactory.getNodeMatcher(clusteringMethodType));
+			final PresentationFactory presentationFactory = new PresentationFactory();
+			final Presentation presentation = presentationFactory.create(presentationType);
+			presentationText = presentation.presentClusteringNodes(clusteringNodes);
+		} else {
+			final PresentationFactory presentationFactory = new PresentationFactory();
+			final Presentation presentation = presentationFactory.create(presentationType);
+			presentationText = presentation.presentClasses(analysisContext);
+		}
 
-
-
-
-
-								 //final TypeDao typeDao = TypeDaoFactory.createDao(); // todo: add option to consider stored db file
-								 //final TypeRepository typeRepository = new TypeRepositoryImpl(typeDao);
-								 //AnalysisContext ac = au.analysis(typeRepository, terminalPatterns, excludedPatterns);
-								 //Presentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
-								 //System.out.println(acPresent.present(ac));
-
-
-
-								 // based on old model
-		AnalysisUnit au = new AnalysisUnit(JAVA8);
-		au.addPath(getRootPath(commandLine));
-
-		List<Pattern> terminalPatterns = convertStringsToPatterns(commandLine.getOptionValues("tc"));
-		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
-
-		AnalysisContext ac = au.analysis(terminalPatterns, excludedPatterns);
-		Presentation acPresent = createPresentation(getPresentationType(commandLine), commandLine);
-		System.out.print(acPresent.present(ac));*/
+		System.out.println(presentationText);
 	}
 
 	private Path getRootPath(CommandLine commandLine) {
-		String rootPathStr = commandLine.getOptionValue("r");
-		if (rootPathStr == null) {
+		final String rootPathStr;
+		if (commandLine.hasOption("r")) {
+			rootPathStr = commandLine.getOptionValue("r");
+		} else {
 			rootPathStr = "./";
 		}
 		Path rootPath = Paths.get(rootPathStr);
@@ -121,8 +118,25 @@ public class Application {
 
 	private List<Pattern> convertStringsToPatterns(String[] strings) {
 		return Optional.ofNullable(strings)
-				.map(strs -> Arrays.stream(strs).map(Pattern::compile).collect(Collectors.toList()))
-				.orElse(null);
+					   .map(strs -> Arrays.stream(strs)
+										  .map(Pattern::compile)
+										  .collect(Collectors.toList()))
+					   .orElse(null);
+	}
+
+	private Optional<ClusteringMethodType> getClusteringMethodType(CommandLine commandLine) {
+		if (!commandLine.hasOption("ct")) {
+			return Optional.empty();
+		}
+		return Optional.of(commandLine.getOptionValue("ct"))
+					   .map(ClusteringMethodType::valueOf);
+	}
+
+	private String[] getClusteringParameters(CommandLine commandLine) {
+		if (!commandLine.hasOption("cp")) {
+			return new String[0];
+		}
+		return commandLine.getOptionValues("cp");
 	}
 
 	private PresentationType getPresentationType(CommandLine commandLine) {

@@ -11,16 +11,16 @@ public class ClusteringMethodFactory {
     @NonNull
     private final ClusteringNodeFactory clusteringNodeFactory;
 
-    public ClusteringMethod create(@NonNull final ClusteringMethodType type, @NonNull final Object... params) {
+    public ClusteringMethod create(@NonNull final ClusteringMethodType type, @NonNull final String[] paramStrings) {
         final ClusteringMethod clusteringMethod;
         switch (type) {
             default:
             case AGGLOMERATIVE_CLUSTERING: {
-                Validate.isTrue(params.length >= 2, Msgs.get(Msgs.Key.INTERNAL_ERROR));
+                Validate.isTrue(paramStrings.length >= 2, Msgs.get(Msgs.Key.INTERNAL_ERROR));
                 final double[] minMax = new double[2];
                 int i = 0;
-                for (Object param : params) {
-                    minMax[i] = (double) param;
+                for (String paramStr : paramStrings) {
+                    minMax[i] = Double.parseDouble(paramStr);
                     if (++i >= 2) {
                         break;
                     }
@@ -30,5 +30,15 @@ public class ClusteringMethodFactory {
             break;
         }
         return clusteringMethod;
+    }
+
+    public ClusteringNodeMatcher getNodeMatcher(@NonNull final ClusteringMethodType type) {
+        final ClusteringNodeMatcher nodeMatcher;
+        switch (type) {
+            default:
+            case AGGLOMERATIVE_CLUSTERING:
+                nodeMatcher = AgglomerativeClusteringNodeMatchers::matchScoreRange;
+        }
+        return nodeMatcher;
     }
 }

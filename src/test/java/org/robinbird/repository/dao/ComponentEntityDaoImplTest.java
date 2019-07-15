@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.robinbird.model.Cardinality;
@@ -24,20 +25,26 @@ public class ComponentEntityDaoImplTest {
 
     private static ComponentEntityDao componentEntityDao;
 
+    private String name;
+
     @BeforeClass
     public static void dbSetup() {
         ComponentEntityDaoImplTest.componentEntityDao = ComponentEntityDaoH2Factory.createDao();
     }
 
+    @Before
+    public void setUp() {
+        name = UUID.randomUUID().toString();
+    }
 
     @Test
     public void test_save() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
 
-        Assert.assertThat(savedComponentEntity.getName(), is("test"));
+        Assert.assertThat(savedComponentEntity.getName(), is(name));
         Assert.assertThat(savedComponentEntity.getComponentCategory(), is("CLASS"));
 
         final RelationEntity relationEntity = new RelationEntity();
@@ -63,7 +70,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_loadAnalysisEntity_withId() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
         final ComponentEntity loadedComponentEntity = componentEntityDao.loadComponentEntity(savedComponentEntity.getId()).get();
@@ -74,7 +81,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_loadAnalysisEntity_withName() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test-name");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
         final ComponentEntity loadedComponentEntity = componentEntityDao.loadComponentEntity(savedComponentEntity.getName()).get();
@@ -85,7 +92,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_loadRelation_withId() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
 
@@ -106,7 +113,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_loadRelations_withParentId() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
 
@@ -128,7 +135,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_update() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
 
@@ -161,7 +168,7 @@ public class ComponentEntityDaoImplTest {
     @Test
     public void test_delete() {
         final ComponentEntity componentEntity = new ComponentEntity();
-        componentEntity.setName("test");
+        componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
         final ComponentEntity savedComponentEntity = componentEntityDao.save(componentEntity);
 

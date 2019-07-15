@@ -14,7 +14,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.robinbird.exception.ParsingException;
+import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.AccessLevel;
 import org.robinbird.model.Analyser;
 import org.robinbird.model.AnalysisContext;
@@ -162,7 +162,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         if (collectionOrArrayOpt.isPresent()) {
             return collectionOrArrayOpt.get();
         }
-        throw new ParsingException(Msgs.get(INTERNAL_ERROR));
+        throw new RobinbirdException(Msgs.get(INTERNAL_ERROR));
     }
 
     private Optional<Component> getPrimitiveType(Java8Parser.UnannTypeContext ctx) {
