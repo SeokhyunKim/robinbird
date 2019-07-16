@@ -1,8 +1,7 @@
 Robinbird
 ==========
 
-## Currently, major refactoring is ongoing. Just using master branch because this is not popular at all. ;D Nevertheless, if you want to run this, please contact me. During the refactoring, I don't guarantee this is working.
-
+## Refactoring is done. Debugging to make this work again.
 
 ## Goal: making a versatile source architecture analysis tool
 Currently, it's just in very early stage.

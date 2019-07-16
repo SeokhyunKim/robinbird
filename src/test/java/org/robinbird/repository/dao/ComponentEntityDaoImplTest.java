@@ -4,12 +4,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.SetUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,6 +37,11 @@ public class ComponentEntityDaoImplTest {
     @Before
     public void setUp() {
         name = UUID.randomUUID().toString();
+    }
+
+    @After
+    public void tearDown() {
+        componentEntityDao.deleteAll();
     }
 
     @Test
@@ -68,7 +75,7 @@ public class ComponentEntityDaoImplTest {
     }
 
     @Test
-    public void test_loadAnalysisEntity_withId() {
+    public void test_loadComponentEntity_withId() {
         final ComponentEntity componentEntity = new ComponentEntity();
         componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
@@ -79,7 +86,7 @@ public class ComponentEntityDaoImplTest {
     }
 
     @Test
-    public void test_loadAnalysisEntity_withName() {
+    public void test_loadComponentEntities_withName() {
         final ComponentEntity componentEntity = new ComponentEntity();
         componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
@@ -90,7 +97,22 @@ public class ComponentEntityDaoImplTest {
     }
 
     @Test
-    public void test_loadRelation_withId() {
+    public void test_loadComponentEntities_withComponentCategory() {
+        final ComponentEntity entity1 = new ComponentEntity();
+        final ComponentEntity entity2 = new ComponentEntity();
+        entity1.setName(name);
+        entity1.setComponentCategory(ComponentCategory.CLASS.name());
+        entity2.setName(name + "-test");
+        entity2.setComponentCategory(ComponentCategory.CLASS.name());
+        final ComponentEntity saved1 = componentEntityDao.save(entity1);
+        final ComponentEntity saved2 = componentEntityDao.save(entity2);
+
+        Set<ComponentEntity> entities = new HashSet<>(componentEntityDao.loadComponentEntities(ComponentCategory.CLASS.name()));
+        Assert.assertThat(entities, is(ImmutableSet.of(saved1, saved2)));
+    }
+
+    @Test
+    public void test_loadRelationEntity_withId() {
         final ComponentEntity componentEntity = new ComponentEntity();
         componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());
@@ -111,7 +133,7 @@ public class ComponentEntityDaoImplTest {
     }
 
     @Test
-    public void test_loadRelations_withParentId() {
+    public void test_loadRelationEntities_withParentId() {
         final ComponentEntity componentEntity = new ComponentEntity();
         componentEntity.setName(name);
         componentEntity.setComponentCategory(ComponentCategory.CLASS.name());

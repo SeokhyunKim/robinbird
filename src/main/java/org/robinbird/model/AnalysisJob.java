@@ -65,7 +65,7 @@ public class AnalysisJob {
                         return false;
                     }
                     // todo: change to check proper things according to languages
-                    if (!p.getFileName().toString().contains("java")) {
+                    if (!p.getFileName().toString().endsWith(".java")) {
                         return false;
                     }
                     return true;

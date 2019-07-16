@@ -57,6 +57,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
         deleteComponentEntityQuery = em.createQuery("delete from ComponentEntity where id = :id");
         deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where parentId = :parentId and id = :id");
 
+
         log.info("DaoImpl created.");
     }
 
@@ -185,6 +186,27 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
             final RelationEntity r = (RelationEntity)entity;
             transactional(deleteRelationEntityQuery.setParameter("parentId", r.getParentId())
                                                    .setParameter("id", r.getId()), Query::executeUpdate);
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        final Query deleteAllComponentEntities = em.createQuery("delete from ComponentEntity");
+        final Query deleteAllRelationEntities = em.createQuery("delete from RelationEntity");
+
+        EntityTransaction tx = null;
+        try {
+            tx = em.getTransaction();
+            tx.begin();
+            deleteAllComponentEntities.executeUpdate();
+            deleteAllRelationEntities.executeUpdate();
+            em.flush();
+            tx.commit();
+        } catch (RuntimeException e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
         }
     }
 }

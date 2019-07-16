@@ -54,6 +54,7 @@ public class Application {
 			System.out.println(msg);
 			log.info(msg);
 		}
+		log.info("Working directory: " + shellDir);
 		log.info("\n" + Utils.printMemoryInfo());
 
 		// create analysis job for the given root path
@@ -105,6 +106,7 @@ public class Application {
 		final String rootPathStr;
 		if (commandLine.hasOption("r")) {
 			rootPathStr = commandLine.getOptionValue("r");
+			log.debug("Given root path: " + rootPathStr);
 		} else {
 			rootPathStr = "./";
 		}
@@ -187,7 +189,7 @@ public class Application {
 
 	private static void printHelpMessages(@NonNull final Options options) {
 		StringAppender sa = new StringAppender();
-		sa.appendLine("Usage: robinbird option-type option-value ...\n");
+		sa.appendLine("robinbird option-type option-value ...\n");
 		sa.appendLine("Examples:");
 		sa.appendLine("robinbird -root your_root_path_for_source_codes");
 		sa.appendLine("  . This will generate PlantUML class diagram script for the given root");

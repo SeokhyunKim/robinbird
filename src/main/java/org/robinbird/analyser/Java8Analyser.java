@@ -269,7 +269,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
                 }
                 // varargs case
                 else {
-                    final Component baseType = getType(lfpc.formalParameter().unannType());
+                    final Component baseType = getType(lfpc.unannType());
                     final Varargs varargs = analysisContext.registerVarargs(baseType);
                     paramList.add(varargs);
                 }

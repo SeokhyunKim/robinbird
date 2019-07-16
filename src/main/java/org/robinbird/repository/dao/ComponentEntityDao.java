@@ -23,4 +23,6 @@ public interface ComponentEntityDao {
 
     <T> void delete(T entry);
 
+    void deleteAll(); // main for unit tests
+
 }
