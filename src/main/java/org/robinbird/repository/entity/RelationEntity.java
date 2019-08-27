@@ -25,7 +25,7 @@ public class RelationEntity {
 
     private String name;
 
-    private long relationId;
+    private long relatedComponentId;
 
     private String cardinality;
 

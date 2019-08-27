@@ -10,15 +10,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.robinbird.exception.RobinbirdException;
+import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Relation;
+import org.robinbird.model.RelationCategory;
 import org.robinbird.repository.entity.ComponentEntity;
 import org.robinbird.repository.entity.RelationEntity;
 import org.robinbird.util.Msgs;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Converter {
 
     public static Component convert(@NonNull final ComponentEntity entity) {
@@ -59,8 +65,8 @@ public class Converter {
         entity.setParentId(relation.getParent().getId());
         entity.setRelationCategory(relation.getRelationCategory().name());
         entity.setName(relation.getName());
-        entity.setRelationId(relation.getRelatedComponent().getId());
-        entity.setCardinality(relation.getCardinality().toString());
+        entity.setRelatedComponentId(relation.getRelatedComponent().getId());
+        entity.setCardinality(relation.getCardinality().name());
         entity.setId(relation.getId());
 
         try {
@@ -70,5 +76,24 @@ public class Converter {
         }
 
         return entity;
+    }
+
+    public static Relation convert(@NonNull final RelationEntity entity,
+                                   @NonNull final Component relatedComponent, @NonNull final Component parent) {
+        final Map<String, String> metadata;
+        try {
+            metadata = OBJECT_MAPPER.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
+        } catch (final IOException e) {
+            throw new RobinbirdException(Msgs.get(JSON_PROCESSING_ISSUE, entity.toString()), e);
+        }
+        return Relation.builder()
+                       .name(Optional.ofNullable(entity.getName()).orElse(""))
+                       .relationCategory(RelationCategory.valueOf(entity.getRelationCategory()))
+                       .relatedComponent(relatedComponent)
+                       .cardinality(Cardinality.valueOf(entity.getCardinality()))
+                       .parent(parent)
+                       .id(entity.getId())
+                       .metadata(metadata)
+                       .build();
     }
 }

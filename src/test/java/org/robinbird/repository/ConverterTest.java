@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.testing.NullPointerTester;
 import org.junit.Assert;
 import org.junit.Test;
 import org.robinbird.exception.RobinbirdException;
@@ -90,8 +91,16 @@ public class ConverterTest {
         Assert.assertThat(entity.getParentId(), is(1L));
         Assert.assertThat(entity.getId(), is("test-id"));
         Assert.assertThat(entity.getRelationCategory(), is(RelationCategory.MEMBER_VARIABLE.name()));
-        Assert.assertThat(entity.getRelationId(), is(2L));
+        Assert.assertThat(entity.getRelatedComponentId(), is(2L));
         Assert.assertThat(entity.getName(), is("test"));
+    }
+
+    @Test
+    public void test_nulls() {
+        NullPointerTester tester = new NullPointerTester();
+        Component component = mock(Component.class);
+        tester.setDefault(Component.class, component);
+        tester.testAllPublicStaticMethods(Converter.class);
     }
 
 }

@@ -34,6 +34,7 @@ public class Msgs {
 		FOUND_COMPONENT_OF_DIFFERENT_TYPE,
 		WRONG_COMPONENT_CATEGORY,
 		TRIED_TO_ADD_WRONG_COMPONENT,
+		TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED,
 		INTERNAL_ERROR
 	}
 
@@ -65,6 +66,8 @@ public class Msgs {
 														"with different type. Name: %s, Category: %s.")
 			.put(Key.WRONG_COMPONENT_CATEGORY, "Wrong ComponentCategory is used. componentCategory: %s.")
 			.put(Key.TRIED_TO_ADD_WRONG_COMPONENT, "Tried to add wrong component. Component: %s.")
+			.put(Key.TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED,
+				 "Tried to create a new relation with already persisted one. Relation: %s.")
 			.build();
 	}
 

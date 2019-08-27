@@ -91,9 +91,13 @@ public class Component {
      */
     public void deleteRelation(@NonNull final Relation relation) {
         lazyLoadingRelations();
-        this.relations.removeIf(r -> (r.getName().equals(relation.getName())) &&
+        this.relations.removeIf(r -> r.equals(relation) &&
                                      (r.getParent().getId() == relation.getParent().getId()));
+    }
 
+    public void deleteRelationObject(@NonNull final Relation relation) {
+        lazyLoadingRelations();
+        this.relations.removeIf(r -> r == relation);
     }
 
     /**

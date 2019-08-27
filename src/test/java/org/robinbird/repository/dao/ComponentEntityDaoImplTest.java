@@ -59,7 +59,7 @@ public class ComponentEntityDaoImplTest {
         relationEntity.setId(UUID.randomUUID().toString());
         relationEntity.setRelationCategory(RelationCategory.MEMBER_VARIABLE.name());
         relationEntity.setName("test");
-        relationEntity.setRelationId(3L);
+        relationEntity.setRelatedComponentId(3L);
         relationEntity.setCardinality(Cardinality.ONE.toString());
         relationEntity.setMetadata("{}");
 
@@ -69,8 +69,8 @@ public class ComponentEntityDaoImplTest {
         Assert.assertThat(savedRelationEntity.getId(), is(relationEntity.getId()));
         Assert.assertThat(savedRelationEntity.getRelationCategory(), is("MEMBER_VARIABLE"));
         Assert.assertThat(savedRelationEntity.getName(), is("test"));
-        Assert.assertThat(savedRelationEntity.getRelationId(), is(3L));
-        Assert.assertThat(savedRelationEntity.getCardinality(), is("1"));
+        Assert.assertThat(savedRelationEntity.getRelatedComponentId(), is(3L));
+        Assert.assertThat(savedRelationEntity.getCardinality(), is(Cardinality.ONE.name()));
         Assert.assertThat(savedRelationEntity.getMetadata(), is("{}"));
     }
 
@@ -122,7 +122,7 @@ public class ComponentEntityDaoImplTest {
         relationEntity.setCardinality(Cardinality.ONE.toString());
         relationEntity.setRelationCategory(RelationCategory.MEMBER_VARIABLE.name());
         relationEntity.setParentId(savedComponentEntity.getId());
-        relationEntity.setRelationId(3L);
+        relationEntity.setRelatedComponentId(3L);
         final RelationEntity savedRelationEntity = componentEntityDao.save(relationEntity);
 
         final RelationEntity loadedRelationEntity =
@@ -143,13 +143,13 @@ public class ComponentEntityDaoImplTest {
             final RelationEntity relationEntity = new RelationEntity();
             relationEntity.setCardinality(Cardinality.MULTIPLE.toString());
             relationEntity.setRelationCategory(RelationCategory.MEMBER_VARIABLE.name());
-            relationEntity.setRelationId(i + 1L);
+            relationEntity.setRelatedComponentId(i + 1L);
             relationEntity.setParentId(savedComponentEntity.getId());
             componentEntityDao.save(relationEntity);
         }
 
         final List<RelationEntity> relationEntities = componentEntityDao.loadRelationEntities(savedComponentEntity.getId());
-        final Set<Long> relationIds = relationEntities.stream().map(RelationEntity::getRelationId).collect(Collectors.toSet());
+        final Set<Long> relationIds = relationEntities.stream().map(RelationEntity::getRelatedComponentId).collect(Collectors.toSet());
 
         Assert.assertTrue(SetUtils.isEqualSet(relationIds, ImmutableSet.of(1L, 2L, 3L)));
     }
@@ -173,7 +173,7 @@ public class ComponentEntityDaoImplTest {
         relationEntity.setCardinality(Cardinality.ONE.toString());
         relationEntity.setRelationCategory(RelationCategory.MEMBER_VARIABLE.name());
         relationEntity.setParentId(savedComponentEntity.getId());
-        relationEntity.setRelationId(3L);
+        relationEntity.setRelatedComponentId(3L);
         final RelationEntity savedRelationEntity = componentEntityDao.save(relationEntity);
 
         savedRelationEntity.setRelationCategory(RelationCategory.MEMBER_FUNCTION.name());
@@ -184,7 +184,7 @@ public class ComponentEntityDaoImplTest {
         Assert.assertThat(updatedRelationEntity.getParentId(), equalTo(savedComponentEntity.getId()));
         Assert.assertThat(updatedRelationEntity.getCardinality(), is(Cardinality.MULTIPLE.toString()));
         Assert.assertThat(updatedRelationEntity.getRelationCategory(), equalTo(RelationCategory.MEMBER_FUNCTION.name()));
-        Assert.assertThat(updatedRelationEntity.getRelationId(), is(3L));
+        Assert.assertThat(updatedRelationEntity.getRelatedComponentId(), is(3L));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class ComponentEntityDaoImplTest {
         relationEntity.setCardinality(Cardinality.ONE.toString());
         relationEntity.setRelationCategory(RelationCategory.MEMBER_VARIABLE.name());
         relationEntity.setParentId(savedComponentEntity.getId());
-        relationEntity.setRelationId(3L);
+        relationEntity.setRelatedComponentId(3L);
         final RelationEntity savedRelationEntity = componentEntityDao.save(relationEntity);
 
         componentEntityDao.delete(savedComponentEntity);

@@ -4,10 +4,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.testing.NullPointerTester;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,12 +32,38 @@ public class ComponentRepositoryTest {
         ComponentRepositoryTest.componentEntityDao = ComponentEntityDaoH2Factory.createDao();
     }
 
+    @After
+    public void tearDown() {
+        componentEntityDao.deleteAll();
+    }
+
     @Test
     public void test_registerComponent_and_getComponent() {
         final Component au = repository.registerComponent("Test", ComponentCategory.CLASS);
         final Optional<Component> compOpt = repository.getComponent("Test");
         Assert.assertTrue(compOpt.isPresent());
         Assert.assertThat(au, equalTo(compOpt.get()));
+    }
+
+    @Test
+    public void test_registerComponents_and_getComponents() {
+        final Component comp1 = repository.registerComponent("Test1", ComponentCategory.CLASS);
+        final Component comp2 = repository.registerComponent("Test2", ComponentCategory.CLASS);
+        final Set<Component> savedComps = new HashSet<>(repository.getComponents(ComponentCategory.CLASS));
+        Assert.assertThat(savedComps, is(ImmutableSet.of(comp1, comp2)));
+    }
+
+    @Test
+    public void test_registerComponent_returnsExistingComponent_whenRegisterWithSameNameAndCategory() {
+        final Component comp1 = repository.registerComponent("Test1", ComponentCategory.CLASS);
+        final Component existing = repository.registerComponent("Test1", ComponentCategory.CLASS);
+        Assert.assertThat(comp1, is(existing));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_registerComponent_throwsException_whenRegisterWithSameNameButDifferentCategory() {
+        repository.registerComponent("Test1", ComponentCategory.CLASS);
+        repository.registerComponent("Test1", ComponentCategory.INTERFACE);
     }
 
     @Test
@@ -63,18 +92,18 @@ public class ComponentRepositoryTest {
                                .build());
         repository.updateComponent(au);
         final List<Relation> relations = repository.getRelations(au);
-        final Set<String> cardinalities = relations.stream()
-                                                    .map(r -> r.getCardinality().toString())
-                                                    .collect(Collectors.toSet());
+        final Set<Cardinality> cardinalities = relations.stream()
+                                                        .map(Relation::getCardinality)
+                                                        .collect(Collectors.toSet());
         final Set<String> names = relations.stream()
                                            .map(r -> r.getRelatedComponent().getName())
                                            .collect(Collectors.toSet());
-        Assert.assertThat(cardinalities, is(ImmutableSet.of("1", "n")));
+        Assert.assertThat(cardinalities, is(ImmutableSet.of(Cardinality.ONE, Cardinality.MULTIPLE)));
         Assert.assertThat(names, is(ImmutableSet.of("Relation1", "Relation2", "Relation3")));
     }
 
     @Test
-    public void test_updateAnalysisUnit() {
+    public void test_updateComponent() {
         final Component au = repository.registerComponent("Test3", ComponentCategory.CLASS);
         final Component r1 = repository.registerComponent("Relation1", ComponentCategory.CLASS);
         final Component r2 = repository.registerComponent("Relation2", ComponentCategory.CLASS);
@@ -96,7 +125,13 @@ public class ComponentRepositoryTest {
                                     .collect(Collectors.toSet());
         Assert.assertThat(names, is(ImmutableSet.of("Relation1", "Relation2")));
 
-        au.getRelations().forEach(au::deleteRelation);
+        au.deleteRelation(Relation.builder()
+                                  .parent(au)
+                                  .cardinality(Cardinality.ONE)
+                                  .relatedComponent(r1)
+                                  .relationCategory(RelationCategory.MEMBER_VARIABLE)
+                                  .build());
+
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
                                .parent(au)
@@ -108,7 +143,29 @@ public class ComponentRepositoryTest {
         final Set<String> names2 = au.getRelations().stream()
                                      .map(r -> r.getRelatedComponent().getName())
                                      .collect(Collectors.toSet());
-        Assert.assertThat(names2, is(ImmutableSet.of("Relation3")));
+        Assert.assertThat(names2, is(ImmutableSet.of("Relation2", "Relation3")));
+    }
+
+    @Test
+    public void test_updateComponentWithoutChangingRelations() {
+        final Component au = repository.registerComponent("Test3", ComponentCategory.CLASS);
+        final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
+        au.addRelation(Relation.builder()
+                               .parent(au)
+                               .cardinality(Cardinality.MULTIPLE)
+                               .relatedComponent(r3)
+                               .relationCategory(RelationCategory.MEMBER_VARIABLE)
+                               .build());
+        repository.updateComponentWithoutChangingRelations(au);
+        List<Relation> relationsInDb = repository.getRelations(au);
+        Assert.assertTrue(relationsInDb.isEmpty());
+    }
+
+    @Test
+    public void test_nulls() {
+        NullPointerTester tester = new NullPointerTester();
+        tester.testAllPublicConstructors(ComponentRepository.class);
+        tester.testAllPublicInstanceMethods(repository);
     }
 
 }

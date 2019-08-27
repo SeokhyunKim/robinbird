@@ -50,7 +50,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
         updateRelationEntityQuery = em.createQuery("update RelationEntity " +
                                                            "set relationCategory = :relationCategory," +
                                                            "name = :name," +
-                                                           "relationId = :relationId," +
+                                                           "relatedComponentId = :relationId," +
                                                            "cardinality = :cardinality," +
                                                            "metadata = :metadata" +
                                                            " where parentId = :parentId and id = :id");
@@ -169,7 +169,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
                                                    .setParameter("id", r.getId())
                                                    .setParameter("relationCategory", r.getRelationCategory())
                                                    .setParameter("name", r.getName())
-                                                   .setParameter("relationId", r.getRelationId())
+                                                   .setParameter("relationId", r.getRelatedComponentId())
                                                    .setParameter("cardinality", r.getCardinality())
                                                    .setParameter("metadata", r.getMetadata()), Query::executeUpdate);
             return entity;

@@ -2,13 +2,14 @@ package org.robinbird.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"id"})
 @Builder
 public class Relation {
 
