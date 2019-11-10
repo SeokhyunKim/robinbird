@@ -20,10 +20,13 @@ public class Function extends Component {
 
     @Builder
     public Function(final long id, @NonNull final String name, @Nullable final List<Relation> relations) {
-        super(id, name, ComponentCategory.COLLECTION, relations, null);
+        super(id, name, ComponentCategory.FUNCTION, relations, null);
     }
 
-    public void addParameters(@NonNull final List<Component> parameters) {
+    public void addParameters(@Nullable final List<Component> parameters) {
+        if (parameters == null) {
+            return;
+        }
         int order = 0;
         for (final Component param : parameters) {
             final Map<String, String> metadata = Maps.newHashMap();

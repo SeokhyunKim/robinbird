@@ -29,7 +29,11 @@ public class PlantUMLPresentation implements Presentation {
         sa.appendLine("@startuml");
         sa.appendLine("left to right direction");
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = (Package) component;
+            Package classPackage = Package.builder()
+                                          .id(component.getId())
+                                          .name(component.getName())
+                                          .relations(component.getRelations())
+                                          .build();
             sa.appendLine("package " + classPackage.getName() + " {");
             for (Class classObj : classPackage.getClasses()) {
                 // class name, member variables, and member functions
@@ -42,7 +46,11 @@ public class PlantUMLPresentation implements Presentation {
         }
         // inheritance
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = (Package) component;
+            Package classPackage = Package.builder()
+                                          .id(component.getId())
+                                          .name(component.getName())
+                                          .relations(component.getRelations())
+                                          .build();
             for (Class classObj : classPackage.getClasses()) {
                 final Optional<Class> parentOpt = classObj.getParent();
                 if (parentOpt.isPresent()) {
@@ -53,7 +61,11 @@ public class PlantUMLPresentation implements Presentation {
         }
         // interfaces
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = (Package) component;
+            Package classPackage = Package.builder()
+                                          .id(component.getId())
+                                          .name(component.getName())
+                                          .relations(component.getRelations())
+                                          .build();
             for (Class classObj : classPackage.getClasses()) {
                 if (classObj.getInterfaces().size() > 0) {
                     for (Class interfaceOfClassObj : classObj.getInterfaces()) {
@@ -65,7 +77,13 @@ public class PlantUMLPresentation implements Presentation {
         // generate relationships for UML
         final Map<UMLRelation.Key, UMLRelation> umlRelations = new HashMap<>();
         for (Component component : analysisContext.getComponents(ComponentCategory.CLASS)) {
-            final Class classObj = (Class) component;
+            final Class classObj = Class.builder()
+                                        .id(component.getId())
+                                        .name(component.getName())
+                                        .category(component.getComponentCategory())
+                                        .relations(component.getRelations())
+                                        .metadata(component.getMetadata())
+                                        .build();
             final List<Relation> relations = classObj.getRelations(RelationCategory.MEMBER_VARIABLE);
             for (final Relation relation : relations) {
                 final UMLRelation.Key key = UMLRelation.createKey(component, relation.getRelatedComponent());
@@ -124,7 +142,12 @@ public class PlantUMLPresentation implements Presentation {
                             Msgs.get(Msgs.Key.INTERNAL_ERROR));
             sa.append("\t").append(convertAccessLevel(funcRelation.getAccessLevel())).append(" ");
             sa.append(funcRelation.getName()).append("(");
-            final Function func = (Function) funcRelation.getRelatedComponent();
+            final Component relatedComp = funcRelation.getRelatedComponent();
+            final Function func = Function.builder()
+                                          .id(relatedComp.getId())
+                                          .name(relatedComp.getName())
+                                          .relations(relatedComp.getRelations())
+                                          .build();
             final Iterator<Component> itor = func.getParameters().iterator();
             while (itor.hasNext()) {
                 final Component param = itor.next();

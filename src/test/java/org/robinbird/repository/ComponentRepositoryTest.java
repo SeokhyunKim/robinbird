@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Assert;
@@ -35,6 +36,12 @@ public class ComponentRepositoryTest {
     @After
     public void tearDown() {
         componentEntityDao.deleteAll();
+    }
+
+    @Test
+    public void test_getComponent_returnEmpty_whenNotExistingComponent() {
+        final Optional<Component> compOpt = repository.getComponent(UUID.randomUUID().toString());
+        Assert.assertTrue(!compOpt.isPresent());
     }
 
     @Test

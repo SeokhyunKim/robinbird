@@ -15,8 +15,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,8 +36,9 @@ public class Class extends Component {
     private static final String TEMPLATE_VARIABLES_KEY = "templateVariables";
 
     @Builder
-    public Class(final long id, @NonNull final String name, @NonNull ComponentCategory category) {
-        super(id, name, category, null, null);
+    private Class(final long id, @NonNull final String name, @NonNull final ComponentCategory category,
+                  @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
+        super(id, name, category, relations, metadata);
         Validate.isTrue(category == ComponentCategory.CLASS ||
                         category == ComponentCategory.TEMPLATE_CLASS ||
                         category == ComponentCategory.INTERFACE,
@@ -87,12 +90,20 @@ public class Class extends Component {
         if (relations.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of((Class) relations.iterator().next().getRelatedComponent());
+        final Component relatedComp = relations.iterator().next().getRelatedComponent();
+        return Optional.of(Class.builder()
+                                .id(relatedComp.getId())
+                                .name(relatedComp.getName())
+                                .category(relatedComp.getComponentCategory())
+                                .relations(relatedComp.getRelations())
+                                .metadata(relatedComp.getMetadata())
+                                .build());
     }
 
     public void addInterface(@NonNull final Class newInterface) {
-        Validate.isTrue(newInterface.getComponentCategory() == ComponentCategory.INTERFACE,
-                        Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, newInterface.getComponentCategory().name()));
+        // todo: check whether this is safe
+        //Validate.isTrue(newInterface.getComponentCategory() == ComponentCategory.INTERFACE,
+        //                Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, newInterface.getComponentCategory().name()));
         final Relation interfaceRelation = Relation.builder()
                                                 .relationCategory(RelationCategory.IMPLEMENTING_INTERFACE)
                                                 .relatedComponent(newInterface)

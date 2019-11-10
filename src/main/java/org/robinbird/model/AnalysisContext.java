@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -149,20 +150,24 @@ public class AnalysisContext {
     }
 
     public Collection registerCollection(@NonNull final String typeName, @NonNull final List<Component> types) {
+        log.debug("typeName={}, types={}", typeName, types);
         final Optional<Component> compOpt = repository.getComponent(typeName);
         if (compOpt.isPresent()) {
             final Component comp = compOpt.get();
             Validate.isTrue(comp.getComponentCategory() == ComponentCategory.COLLECTION,
                             Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, typeName, comp.getComponentCategory().name()));
-            return Collection.builder()
-                             .id(comp.getId())
-                             .name(comp.getName())
-                             .relatedTypes(comp.getRelations())
-                             .build();
+            final Collection collection = Collection.builder()
+                                                    .id(comp.getId())
+                                                    .name(comp.getName())
+                                                    .relatedTypes(comp.getRelations())
+                                                    .build();
+            log.debug("Existing component. Returning {}", collection);
+            return collection;
         }
         final Component newCollectionComponent = repository.registerComponent(typeName, ComponentCategory.COLLECTION);
         final Collection newCollection = Collection.create(newCollectionComponent);
         newCollection.addRelatedTypes(types);
+        log.debug("Trying to persist a new collection: {}", newCollection);
         newCollection.persist();
         return newCollection;
     }
@@ -209,7 +214,7 @@ public class AnalysisContext {
         return varargs;
     }
 
-    public Function registerFunction(@NonNull final String functionName, @NonNull final List<Component> params,
+    public Function registerFunction(@NonNull final String functionName, @Nullable final List<Component> params,
                                      @NonNull final Component returnType) {
         final Optional<Component> componentOpt = repository.getComponent(functionName);
         if (componentOpt.isPresent()) {

@@ -3,6 +3,7 @@ package org.robinbird.repository;
 import static org.robinbird.util.Msgs.Key.TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class ComponentRepository {
      * @return Optional of found AnalysisUnit. If this doesn't find anything, returns empty optional.
      */
     public Optional<Component> getComponent(@NonNull final String name) {
-        final Optional<ComponentEntity> aueOpt = componentEntityDao.loadComponentEntity(name);
-        return aueOpt.map(Converter::convert);
+        final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntity(name);
+        return ceOpt.map(Converter::convert);
     }
 
     public List<Component> getComponents(@NonNull final ComponentCategory componentCategory) {
@@ -109,28 +110,44 @@ public class ComponentRepository {
 
         // Relation loaded from db
         final List<Relation> dbRelations = getRelations(component);
-        final Map<Relation, Relation> dbRelationMap = dbRelations.stream()
-                                                                 .collect(Collectors.toMap(Function.identity(), Function.identity()));
+        final Map<Integer, List<Relation>> dbRelationsMap = new HashMap<>();
+        dbRelations.forEach(r -> dbRelationsMap.computeIfAbsent(r.hashCode(), k -> new ArrayList<>()).add(r));
 
         // Relations wanted to be updated.
-        final List<Relation> compRelations = component.getRelations();
-        final Map<Relation, Relation> compRelationMap = component.getRelations() // this can return current not persisted relations.
-                                                                 .stream()
-                                                                 .collect(Collectors.toMap(Function.identity(), Function.identity()));
+        final Map<Integer, List<Relation>> compRelationsMap = new HashMap<>();
+        // component.getRelations() can return current not persisted relations.
+        component.getRelations().forEach(r -> compRelationsMap.computeIfAbsent(r.hashCode(), k -> new ArrayList<>()).add(r));
 
         // 1. delete relatedComponent entities not existing in component
-        dbRelations.forEach(r -> {
-            if (compRelationMap.get(r) == null) {
+        for (Map.Entry<Integer, List<Relation>> entry : dbRelationsMap.entrySet()) {
+            final Integer relationHashCode = entry.getKey();
+            final List<Relation> relationsInDb = entry.getValue();
+            Iterator<Relation> itor = relationsInDb.iterator();
+            int numDeleted;
+            if (compRelationsMap.get(relationHashCode) == null) {
+                numDeleted = relationsInDb.size();
+            } else {
+                numDeleted = relationsInDb.size() - compRelationsMap.get(relationHashCode).size();
+            }
+            while (itor.hasNext()) {
+                if (numDeleted-- <= 0) {
+                    break;
+                }
+                final Relation r = itor.next();
                 componentEntityDao.delete(Converter.convert(r));
+                itor.remove();
             }
-        });
+        }
+
         // 2. add new relatedComponent entity not existing in db.
-        compRelations.forEach(r -> {
-            if (dbRelationMap.get(r) == null) {
-                component.deleteRelationObject(r); // this is deleting based on memory reference, not equals
-                component.addRelation(persistNewRelation(r, component));
-            }
-        });
+        for (final List<Relation> relationsInComp : compRelationsMap.values()) {
+            relationsInComp.forEach(r -> {
+                if (!r.isPersisted()) {
+                    component.deleteRelationObject(r); // this is deleting based on memory reference, not equals
+                    component.addRelation(persistNewRelation(r, component));
+                }
+            });
+        }
     }
 
     /**

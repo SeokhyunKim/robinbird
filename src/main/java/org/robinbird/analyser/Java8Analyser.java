@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -58,6 +59,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         }
         final Package p = analysisContext.registerPackage(packageNameList);
         analysisContext.setCurrentPackage(p);
+    }
+
+    @Override
+    public void exitPackageDeclaration(Java8Parser.PackageDeclarationContext ctx) {
+        analysisContext.getCurrentPackage().persist();
     }
 
     @Override
@@ -110,6 +116,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
     @Override
     public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
+        analysisContext.getCurrent().persist();
         analysisContext.popCurrent();
         analysisContext.setCurrentPackage(null);
     }
@@ -134,6 +141,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
     @Override
     public void exitNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
+        analysisContext.getCurrent().persist();
         analysisContext.popCurrent();
         analysisContext.setCurrentPackage(null);
     }
@@ -205,7 +213,8 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
             if (getCollectionTypeName(typeName) != null) {
                 final List<Java8Parser.ReferenceTypeContext> java8RefTypes = findJava8ParserReferenceTypes(referenceTypeContext);
                 final List<Component> types = getReferenceComponents(java8RefTypes);
-                final Collection collection = analysisContext.registerCollection(typeName, types);
+                final String collectionTypeName = getCollectionTypeName(typeName);
+                final Collection collection = analysisContext.registerCollection(collectionTypeName, types);
                 return Optional.of(collection);
             }
             return Optional.empty();
@@ -239,6 +248,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         }
         final List<Component> params = getMethodParameterList(ctx.methodHeader().methodDeclarator());
         final String methodName = ctx.methodHeader().methodDeclarator().Identifier().getText();
+        log.debug("methodName={}, params={}", methodName, params);
         final String signature = createMethodSignature(methodName, params);
         AccessLevel accessLevel = getMethodAccessLevel(ctx.methodModifier());
         final Component returnType;
@@ -398,7 +408,8 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         return null;
     }
 
-    private String createMethodSignature(@NonNull final String methodName, @NonNull final List<Component> params) {
+    private String createMethodSignature(@NonNull final String methodName, @Nullable final List<Component> params) {
+        log.debug("methodName={}, params={}", methodName, params);
         StringBuilder stringBuilder = new StringBuilder(methodName);
         if (params != null) {
             for (Component t : params) {

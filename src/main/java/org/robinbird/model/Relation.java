@@ -31,6 +31,10 @@ public class Relation {
     @Builder.Default
     private final Map<String, String> metadata = new HashMap<>();
 
+    public boolean isPersisted() {
+        return id != null;
+    }
+
     @Override
     public String toString() {
         return "Relation(name=" + name +
@@ -64,7 +68,5 @@ public class Relation {
     public boolean isCollection() {
         return metadata.get(COLLECTION_TYPE_KEY) != null;
     }
-
-
 
 }

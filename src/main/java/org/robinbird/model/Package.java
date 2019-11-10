@@ -3,6 +3,7 @@ package org.robinbird.model;
 import static com.google.common.base.Preconditions.checkState;
 import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY;
+import static org.robinbird.util.Msgs.Key.WRONG_COMPONENT_CATEGORY;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class Package extends Component {
     private static String DELIMITER = ".";
 
     @Builder
-    public Package(final long id, @NonNull final String name, @Nullable final List<Relation> relations) {
+    private Package(final long id, @NonNull final String name, @Nullable final List<Relation> relations) {
         super(id, name, ComponentCategory.PACKAGE, relations, null);
     }
 
@@ -43,7 +44,16 @@ public class Package extends Component {
     public List<Class> getClasses() {
         return getRelations(RelationCategory.PACKAGE_MEMBER)
                        .stream()
-                       .map(r -> (Class) r.getRelatedComponent())
+                       .map(r -> {
+                           final Component component = r.getRelatedComponent();
+                           return Class.builder()
+                                       .id(component.getId())
+                                       .name(component.getName())
+                                       .category(component.getComponentCategory())
+                                       .relations(component.getRelations())
+                                       .metadata(component.getMetadata())
+                                       .build();
+                       })
                        .collect(Collectors.toList());
     }
 

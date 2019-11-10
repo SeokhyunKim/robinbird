@@ -50,6 +50,10 @@ public class Component {
         this.componentCategory = componentCategory;
     }
 
+    public boolean hasPersisted() {
+        return id > 0L;
+    }
+
     /**
      * Save current {@link Component} information in database. Current relations will overwrite database relations.
      */

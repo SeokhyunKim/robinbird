@@ -7,9 +7,11 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.NullPointerTester;
+import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 import org.robinbird.exception.RobinbirdException;
+import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Relation;
@@ -62,6 +64,28 @@ public class ConverterTest {
         entity.setId(1L);
         entity.setName("test");
         Converter.convert(entity);
+    }
+
+    @Test
+    public void test_convert_forRelation_whenValidRelation() {
+        Component related = mock(Component.class);
+        when(related.getId()).thenReturn(2L);
+        Component parent = mock(Component.class);
+        when(parent.getId()).thenReturn(1L);
+        Relation r = Relation.builder()
+                             .name("test")
+                             .relationCategory(RelationCategory.MEMBER_VARIABLE)
+                             .relatedComponent(related)
+                             .parent(parent)
+                             .id(UUID.randomUUID().toString())
+                             .build();
+        RelationEntity e = Converter.convert(r);
+        Assert.assertThat(e.getParentId(), is(1L));
+        Assert.assertNotNull(e.getId());
+        Assert.assertThat(e.getCardinality(), is(Cardinality.ONE.name()));
+        Assert.assertThat(e.getRelatedComponentId(), is(2L));
+        Assert.assertThat(e.getRelationCategory(), is(RelationCategory.MEMBER_VARIABLE.name()));
+        Assert.assertThat(e.getName(), is("test"));
     }
 
     @Test

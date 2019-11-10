@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Validate;
 import org.robinbird.util.Msgs;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Collection extends Component {
 
@@ -28,6 +28,7 @@ public class Collection extends Component {
                                                      .map(c -> Relation.builder()
                                                                        .parent(this)
                                                                        .relationCategory(RelationCategory.COLLECTION_ELEMENT_TYPE)
+                                                                       .relatedComponent(c)
                                                                        .build())
                                                      .collect(Collectors.toList());
         relations.forEach(this::addRelation);
