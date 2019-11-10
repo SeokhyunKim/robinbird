@@ -1,8 +1,6 @@
 Robinbird
 ==========
 
-## Refactoring is done. Debugging to make this work again.
-
 ## Goal: making a versatile source architecture analysis tool
 Currently, it's just in very early stage.
 But, now it can generate class diagram scripts automatically for PlantUML (plantuml.com).
