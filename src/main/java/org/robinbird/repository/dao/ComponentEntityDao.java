@@ -17,12 +17,16 @@ public interface ComponentEntityDao {
 
     List<RelationEntity> loadRelationEntities(long parentId);
 
+    int getNumComponentEntities();
+
     <T> T save(T entity);
 
     <T> T update(T entity);
 
     <T> void delete(T entry);
 
-    void deleteAll(); // main for unit tests
+    void deleteAll(); // mainly for unit tests
+
+    void close();
 
 }

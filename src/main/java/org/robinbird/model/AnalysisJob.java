@@ -45,6 +45,7 @@ public class AnalysisJob {
     }
 
     public AnalysisContext analysis(@NonNull final ComponentRepository componentRepository,
+                                    final boolean analysisFiles,
                                     @Nullable List<Pattern> terminalPatterns, @Nullable List<Pattern> excludePatterns) {
         AnalysisContext analysisContext = new AnalysisContext(componentRepository);
         if (terminalPatterns != null && terminalPatterns.size()>0) {
@@ -52,6 +53,9 @@ public class AnalysisJob {
         }
         if (excludePatterns != null && excludePatterns.size()>0) {
             analysisContext.setExcludedClassPatterns(excludePatterns);
+        }
+        if (!analysisFiles) {
+            return analysisContext;
         }
         for (Path path : paths) {
             log.info("Start analysis for " + path);

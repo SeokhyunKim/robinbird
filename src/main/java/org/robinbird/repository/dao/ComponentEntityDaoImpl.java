@@ -30,6 +30,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     private final Query updateRelationEntityQuery;
     private final Query deleteComponentEntityQuery;
     private final Query deleteRelationEntityQuery;
+    private final Query countComponentEntities;
 
     public ComponentEntityDaoImpl(@NonNull final EntityManagerFactory emf) {
         this.emf = emf;
@@ -56,7 +57,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
                                                            " where parentId = :parentId and id = :id");
         deleteComponentEntityQuery = em.createQuery("delete from ComponentEntity where id = :id");
         deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where parentId = :parentId and id = :id");
-
+        countComponentEntities = em.createQuery("select count(ce) from ComponentEntity ce");
 
         log.info("DaoImpl created.");
     }
@@ -135,6 +136,15 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     }
 
     @Override
+    public int getNumComponentEntities() {
+        final List resultList = countComponentEntities.getResultList();
+        if (resultList.isEmpty()) {
+            return 0;
+        }
+        return ((Long)resultList.iterator().next()).intValue();
+    }
+
+    @Override
     public <T> T save(@NonNull final T entity) {
         if (entity instanceof RelationEntity) {
             final RelationEntity relationEntity = (RelationEntity) entity;
@@ -208,5 +218,11 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
             }
             throw e;
         }
+    }
+
+    @Override
+    public void close() {
+        em.close();
+        emf.close();
     }
 }

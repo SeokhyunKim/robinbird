@@ -45,6 +45,12 @@ public class Application {
 
 	private String shellDir;
 
+	private static enum DB_OPTION {
+		GENERATE_DB_FILE,
+		NOT_PARSING_AND_READ_DB_FILE,
+		NO_DB_FILE
+	}
+
 	public void run(CommandLine commandLine) {
 		shellDir = System.getProperty(SHELL_DIR);
 		if (shellDir == null) {
@@ -66,11 +72,36 @@ public class Application {
 		List<Pattern> excludedPatterns = convertStringsToPatterns(commandLine.getOptionValues("ec"));
 
 		// create dao, repository
-		final ComponentEntityDao componentEntityDao = ComponentEntityDaoH2Factory.createDao();
+		final DB_OPTION dbOption;
+		final String dbFileName;
+		if (commandLine.hasOption("gdb")) {
+			// generate database file with given file name
+			dbOption = DB_OPTION.GENERATE_DB_FILE;
+			dbFileName = commandLine.getOptionValue("gdb");
+		} else if (commandLine.hasOption("db")) {
+			// not parsing source co
+			dbOption = DB_OPTION.NOT_PARSING_AND_READ_DB_FILE;
+			dbFileName = commandLine.getOptionValue("db");
+		} else {
+			dbOption = DB_OPTION.NO_DB_FILE;
+			dbFileName = "";
+		}
+
+		final ComponentEntityDao componentEntityDao;
+		if (dbOption == DB_OPTION.GENERATE_DB_FILE) {
+			componentEntityDao = ComponentEntityDaoH2Factory.createDao(dbFileName, true);
+		} else if (dbOption == DB_OPTION.NOT_PARSING_AND_READ_DB_FILE) {
+			componentEntityDao = ComponentEntityDaoH2Factory.createDao(dbFileName, false);
+		} else {
+			componentEntityDao = ComponentEntityDaoH2Factory.createDao();
+		}
 		final ComponentRepository componentRepository = new ComponentRepository(componentEntityDao);
 
 		// real analysis job
-		final AnalysisContext analysisContext = analysisJob.analysis(componentRepository, terminalPatterns, excludedPatterns);
+		final AnalysisContext analysisContext = analysisJob.analysis(componentRepository,
+																	 dbOption != DB_OPTION.NOT_PARSING_AND_READ_DB_FILE,
+																	 terminalPatterns, excludedPatterns);
+		log.info("Recognized {} components.", componentEntityDao.getNumComponentEntities());
 
 		// presentation type
 		final PresentationType presentationType = getPresentationType(commandLine);
@@ -100,6 +131,8 @@ public class Application {
 		}
 
 		System.out.println(presentationText);
+		componentEntityDao.close();
+		log.info("Database closed.");
 	}
 
 	private Path getRootPath(CommandLine commandLine) {
@@ -195,7 +228,12 @@ public class Application {
 		sa.appendLine("  . This will generate PlantUML class diagram script for the given root");
 		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
 		sa.appendLine("  . This will generate PlantUML class diagrams from root_path excluding classes matched with Java regular " +
-							  "expression 'EscludedClass.*'\n");
+							  "expression 'EscludedClass.*'");
+		sa.appendLine("robinbird -gdb mydb");
+		sa.appendLine("  . Generate a database file which can be used for generating diagrams later. Db file name will be \'mydb.h2.db\'");
+		sa.appendLine("robinbird -db mydb");
+		sa.appendLine("  . Not parsing source codes and generating PlantUML class diagram using mydb.h2.db file\n");
+		sa.appendLine("robinbird -r root_path ");
 		sa.appendLine("Options:");
 
 		final HelpFormatter formatter = new HelpFormatter();
@@ -222,8 +260,14 @@ public class Application {
 		final Option db =
 				Option.builder("db")
 					  .longOpt("database-file")
-					  .desc("Local h2 database file")
+					  .desc("Not parsing source codes, but readling given h2 database file to generate diagrams.")
 					  .hasArg()
+					  .build();
+		final Option gdb =
+				Option.builder("gdb")
+					  .longOpt("generate-database-file")
+					  .desc("Generate database file by parsing source codes")
+					  .hasArgs()
 					  .build();
 		final Option terminalClass =
 				Option.builder("tc")
@@ -253,6 +297,7 @@ public class Application {
 							.addOption(root)
 							.addOption(presentation)
 							.addOption(db)
+							.addOption(gdb)
 							.addOption(terminalClass)
 							.addOption(excludedClass)
 							.addOption(clusteringType)
