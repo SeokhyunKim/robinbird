@@ -1,6 +1,7 @@
 package org.robinbird.model;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.robinbird.model.ComponentCasts.toClass;
 import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY;
 import static org.robinbird.util.Msgs.Key.WRONG_COMPONENT_CATEGORY;
@@ -44,16 +45,7 @@ public class Package extends Component {
     public List<Class> getClasses() {
         return getRelations(RelationCategory.PACKAGE_MEMBER)
                        .stream()
-                       .map(r -> {
-                           final Component component = r.getRelatedComponent();
-                           return Class.builder()
-                                       .id(component.getId())
-                                       .name(component.getName())
-                                       .category(component.getComponentCategory())
-                                       .relations(component.getRelations())
-                                       .metadata(component.getMetadata())
-                                       .build();
-                       })
+                       .map(r -> toClass(r.getRelatedComponent()))
                        .collect(Collectors.toList());
     }
 

@@ -2,6 +2,7 @@ package org.robinbird.model;
 
 import static org.robinbird.model.Cardinality.MULTIPLE;
 import static org.robinbird.model.Cardinality.ONE;
+import static org.robinbird.model.ComponentCasts.toClass;
 import static org.robinbird.model.ComponentCategory.ARRAY;
 import static org.robinbird.model.ComponentCategory.COLLECTION;
 import static org.robinbird.model.ComponentCategory.PACKAGE;
@@ -117,7 +118,7 @@ public class Class extends Component {
         if (relations.isEmpty()) {
             return Lists.newArrayList();
         }
-        return relations.stream().map(r -> (Class) r.getRelatedComponent()).collect(Collectors.toList());
+        return relations.stream().map(r -> toClass(r.getRelatedComponent())).collect(Collectors.toList());
     }
 
     public void addMemberVariable(@NonNull final Component memberVariableType, @NonNull final String name,
