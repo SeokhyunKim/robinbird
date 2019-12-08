@@ -11,9 +11,9 @@ import org.robinbird.model.Relation;
 
 public class FloydAlgorithm {
 
-    public static Map<Long, Map<Long, Double>> calculateDistances(@NonNull final List<Component> nodes,
-                                                                  @NonNull final RelationsSelector relationsSelector) {
-        final Map<Long, Map<Long, Double>> dist = new HashMap<>();
+    public static Map<Long, Map<Long, NodeDistance>> calculateDistances(@NonNull final List<Component> nodes,
+                                                                        @NonNull final RelationsSelector relationsSelector) {
+        final Map<Long, Map<Long, NodeDistance>> dist = new HashMap<>();
         final List<Long> allIds = new ArrayList<>(nodes.size());
         double scoreSum = 0.0;
         for (final Component node1 : nodes) {
@@ -24,7 +24,7 @@ public class FloydAlgorithm {
         for (final Component node1 : nodes) {
             for (final Component node2 : nodes) {
                 dist.computeIfAbsent(node1.getId(), k -> new HashMap<>())
-                    .put(node2.getId(), node1.getId() == node2.getId() ? 0 : Double.MAX_VALUE);
+                    .put(node2.getId(), node1.getId() == node2.getId() ? NodeDistance.ZERO : NodeDistance.INFINITE);
             }
         }
         for (final Component node : nodes) {
@@ -37,18 +37,18 @@ public class FloydAlgorithm {
                     double relatedScore = relatedNodeRelations.size();
                     dist.get(node.getId())
                         .compute(relatedNode.getId(), (k, oldVal) -> {
-                            if (oldVal != null && oldVal == Double.MAX_VALUE) {
-                                return relatedScore / totalRelationScore;
+                            if (oldVal != null && oldVal.equals(NodeDistance.INFINITE)) {
+                                return new NodeDistance(relatedScore / totalRelationScore);
                             }
-                            return Optional.ofNullable(oldVal).orElse(0.0) + (relatedScore / totalRelationScore);
+                            return Optional.ofNullable(oldVal).orElse(NodeDistance.ZERO).plus(relatedScore / totalRelationScore);
                         });
                     if (allIds.contains(relatedNode.getId())) {
                         dist.get(relatedNode.getId())
                             .compute(relatedNode.getId(), (k, oldVal) -> {
-                                if (oldVal != null && oldVal == Double.MAX_VALUE) {
-                                    return relatedScore / totalRelationScore;
+                                if (oldVal != null && oldVal.equals(NodeDistance.INFINITE)) {
+                                    return new NodeDistance(relatedScore / totalRelationScore);
                                 }
-                                return Optional.ofNullable(oldVal).orElse(0.0) + (relatedScore / totalRelationScore);
+                                return Optional.ofNullable(oldVal).orElse(NodeDistance.ZERO).plus(relatedScore / totalRelationScore);
                             });
                     }
                 }
@@ -60,8 +60,8 @@ public class FloydAlgorithm {
                     continue;
                 }
                 dist.get(node1.getId()).compute(node2.getId(), (k, score) -> {
-                    if (score != null && score != Double.MAX_VALUE) {
-                        return 1.0 / score;
+                    if (score != null && !score.equals(NodeDistance.INFINITE)) {
+                        return new NodeDistance(1.0 / score.getDistance());
                     }
                     return score;
                 });
@@ -70,14 +70,14 @@ public class FloydAlgorithm {
         for (long k : allIds) {
             for (long i : allIds) {
                 for (long j : allIds) {
-                    double dist_ik = dist.get(i).get(k);
-                    double dist_kj = dist.get(k).get(j);
-                    if (dist_ik == Double.MAX_VALUE || dist_kj == Double.MAX_VALUE) {
+                    NodeDistance dist_ik = dist.get(i).get(k);
+                    NodeDistance dist_kj = dist.get(k).get(j);
+                    if (dist_ik.equals(NodeDistance.INFINITE) || dist_kj.equals(NodeDistance.INFINITE)) {
                         continue;
                     }
-                    double dist_ij = dist.get(i).get(j);
-                    if (dist_ij > dist_ik + dist_kj) {
-                        dist.get(i).put(j, dist_ik + dist_kj);
+                    NodeDistance dist_ij = dist.get(i).get(j);
+                    if (dist_ij.greaterThan(dist_ik, dist_kj)) {
+                        dist.get(i).put(j, dist_ik.plus(dist_kj));
                     }
                 }
             }

@@ -18,6 +18,8 @@ import org.robinbird.util.Msgs;
 @AllArgsConstructor
 public class AgglomerativeClustering implements ClusteringMethod {
 
+    private static final double SCORE_MAX = 10.0;
+
     @NonNull
     private final ClusteringNodeFactory clusteringNodeFactory;
 
@@ -27,7 +29,7 @@ public class AgglomerativeClustering implements ClusteringMethod {
     public List<ClusteringNode> cluster(@NonNull final List<Component> components,
                                         @NonNull final RelationsSelector relationsSelector,
                                         @NonNull final ClusteringNodeMatcher nodeMatcher) {
-        final Map<Long, Map<Long, Double>> dist = FloydAlgorithm.calculateDistances(components, relationsSelector);
+        final Map<Long, Map<Long, NodeDistance>> dist = FloydAlgorithm.calculateDistances(components, relationsSelector);
         final Map<Long, Component> idToComps = components.stream().collect(Collectors.toMap(Component::getId, Function.identity()));
         final Map<Long, AgglomerativeClusteringNode> roots = new HashMap<>();
         final List<Edge> edges = new ArrayList<>();
@@ -39,9 +41,9 @@ public class AgglomerativeClustering implements ClusteringMethod {
             for (int idx2=idx1+1; idx2<size; ++idx2) {
                 final long i = compIds.get(idx1);
                 final long j = compIds.get(idx2);
-                final double dist_ij = dist.get(i).get(j);
-                if (dist_ij > 0.0 && dist_ij < Double.MAX_VALUE) {
-                    edges.add(new Edge(idToComps.get(i), idToComps.get(j), dist_ij));
+                final NodeDistance dist_ij = dist.get(i).get(j);
+                if (!dist_ij.equals(NodeDistance.INFINITE)) {
+                    edges.add(new Edge(idToComps.get(i), idToComps.get(j), dist_ij.getDistance()));
                 }
             }
         }
@@ -56,6 +58,7 @@ public class AgglomerativeClustering implements ClusteringMethod {
             roots.put(clusteringNode.getId(), clusteringNode);
         });
 
+        double realMaxScore = 0.0;
         for (final Edge edge : edges) {
             final AgglomerativeClusteringNode clusteringNode1 = compToClusteringNode.get(edge.getFrom());
             final AgglomerativeClusteringNode clusteringNode2 = compToClusteringNode.get(edge.getTo());
@@ -67,7 +70,14 @@ public class AgglomerativeClustering implements ClusteringMethod {
             AgglomerativeClusteringNode clusteringNode = clusteringNodeFactory.create();
             clusteringNode.addMemberNode(clusteringNode1);
             clusteringNode.addMemberNode(clusteringNode2);
-            clusteringNode.setScore(clusteringNode1.getScore() + clusteringNode2.getScore() + edge.getWeight());
+            double newScore = clusteringNode1.getScore() + clusteringNode2.getScore();
+            if (edge.getWeight() != Double.MAX_VALUE) {
+                newScore += edge.getWeight();
+            }
+            clusteringNode.setScore(newScore);
+            if (newScore > realMaxScore) {
+                realMaxScore = newScore;
+            }
             roots.remove(clusteringNode1.getId());
             roots.remove(clusteringNode2.getId());
             roots.put(clusteringNode.getId(), clusteringNode);
@@ -75,7 +85,11 @@ public class AgglomerativeClustering implements ClusteringMethod {
             compToClusteringNode.put(edge.getTo(), clusteringNode);
         }
 
+        // 10 is defined as maxScore
+        // adding 0.1 to make sure 10 is including everything regardless of double precision
+        double adjustedMax = realMaxScore * Math.min(scoreMax, SCORE_MAX) / 10.0 + 0.1;
+        double adjustedMin = Math.min(realMaxScore * Math.max(scoreMin, 0.0) / 10.0, adjustedMax);
         return nodeMatcher.match(new ArrayList<>(roots.values()),
-                                 new AgglomerativeClusteringNodeMatchers.MatchScoreRangeParams(scoreMin, scoreMax));
+                                 new AgglomerativeClusteringNodeMatchers.MatchScoreRangeParams(adjustedMin, adjustedMax));
     }
 }

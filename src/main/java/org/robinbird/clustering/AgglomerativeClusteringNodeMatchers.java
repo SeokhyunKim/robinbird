@@ -34,7 +34,7 @@ public class AgglomerativeClusteringNodeMatchers {
             }
             final AgglomerativeClusteringNode aggNode = (AgglomerativeClusteringNode) node;
             final double nodeScore = aggNode.getScore();
-            if (rangeParams.getMin() <= nodeScore && nodeScore < rangeParams.getMax()) {
+            if (rangeParams.getMin() <= nodeScore && nodeScore <= rangeParams.getMax()) {
                 matchedNodes.add(aggNode);
                 final List<ClusteringNode> childResults = matchScoreRange(node.getMemberNodes()
                                                                               .stream()
