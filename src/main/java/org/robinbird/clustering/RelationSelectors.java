@@ -17,7 +17,7 @@ public class RelationSelectors {
      * @param component
      * @return
      */
-    public static List<Relation> getClassRelations(Component component) {
+    public static List<Relation> getComponentRelations(Component component) {
         return component.getRelations()
                         .stream()
                         .filter(r -> {

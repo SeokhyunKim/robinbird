@@ -6,6 +6,6 @@ import org.robinbird.model.Relation;
 
 public interface RelationsSelector {
 
-    List<Relation> getEdges(Component component);
+    List<Relation> getRelations(Component component);
 
 }

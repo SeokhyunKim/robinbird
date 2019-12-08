@@ -51,7 +51,7 @@ public class AgglomerativeClustering implements ClusteringMethod {
         components.forEach(component -> {
             final AgglomerativeClusteringNode clusteringNode = clusteringNodeFactory.create();
             clusteringNode.addMemberNode(component);
-            clusteringNode.setScore(1.0);
+            clusteringNode.setScore(0.0);
             compToClusteringNode.put(component, clusteringNode);
             roots.put(clusteringNode.getId(), clusteringNode);
         });
@@ -67,7 +67,7 @@ public class AgglomerativeClustering implements ClusteringMethod {
             AgglomerativeClusteringNode clusteringNode = clusteringNodeFactory.create();
             clusteringNode.addMemberNode(clusteringNode1);
             clusteringNode.addMemberNode(clusteringNode2);
-            clusteringNode.setScore(clusteringNode1.getScore() + clusteringNode2.getScore());
+            clusteringNode.setScore(clusteringNode1.getScore() + clusteringNode2.getScore() + edge.getWeight());
             roots.remove(clusteringNode1.getId());
             roots.remove(clusteringNode2.getId());
             roots.put(clusteringNode.getId(), clusteringNode);

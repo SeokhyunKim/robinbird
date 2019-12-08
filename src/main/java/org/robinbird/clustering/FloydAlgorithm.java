@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.NonNull;
 import org.robinbird.model.Component;
 import org.robinbird.model.Relation;
@@ -14,16 +15,56 @@ public class FloydAlgorithm {
                                                                   @NonNull final RelationsSelector relationsSelector) {
         final Map<Long, Map<Long, Double>> dist = new HashMap<>();
         final List<Long> allIds = new ArrayList<>(nodes.size());
+        double scoreSum = 0.0;
         for (final Component node1 : nodes) {
             allIds.add(node1.getId());
+            scoreSum += relationsSelector.getRelations(node1).size();
+        }
+        final double totalRelationScore = scoreSum;
+        for (final Component node1 : nodes) {
             for (final Component node2 : nodes) {
                 dist.computeIfAbsent(node1.getId(), k -> new HashMap<>())
-                    .put(node2.getId(), node1 == node2 ? 0 : Double.MAX_VALUE);
+                    .put(node2.getId(), node1.getId() == node2.getId() ? 0 : Double.MAX_VALUE);
             }
         }
         for (final Component node : nodes) {
-            for (final Relation edge : relationsSelector.getEdges(node)) {
-                dist.get(node.getId()).put(edge.getRelatedComponent().getId(), 1.0);
+            List<Relation> relations = relationsSelector.getRelations(node);
+            Map<Component, List<Relation>> relatedNodeToRelations = new HashMap<>();
+            relations.forEach(relation -> relatedNodeToRelations.computeIfAbsent(relation.getRelatedComponent(), k -> new ArrayList<>())
+                                                                .add(relation));
+            relatedNodeToRelations.forEach((relatedNode, relatedNodeRelations) -> {
+                if (relatedNode.getId() != node.getId()) {
+                    double relatedScore = relatedNodeRelations.size();
+                    dist.get(node.getId())
+                        .compute(relatedNode.getId(), (k, oldVal) -> {
+                            if (oldVal != null && oldVal == Double.MAX_VALUE) {
+                                return relatedScore / totalRelationScore;
+                            }
+                            return Optional.ofNullable(oldVal).orElse(0.0) + (relatedScore / totalRelationScore);
+                        });
+                    if (allIds.contains(relatedNode.getId())) {
+                        dist.get(relatedNode.getId())
+                            .compute(relatedNode.getId(), (k, oldVal) -> {
+                                if (oldVal != null && oldVal == Double.MAX_VALUE) {
+                                    return relatedScore / totalRelationScore;
+                                }
+                                return Optional.ofNullable(oldVal).orElse(0.0) + (relatedScore / totalRelationScore);
+                            });
+                    }
+                }
+            });
+        }
+        for (final Component node1 : nodes) {
+            for (final Component node2 : nodes) {
+                if (node1.getId() == node2.getId()) {
+                    continue;
+                }
+                dist.get(node1.getId()).compute(node2.getId(), (k, score) -> {
+                    if (score != null && score != Double.MAX_VALUE) {
+                        return 1.0 / score;
+                    }
+                    return score;
+                });
             }
         }
         for (long k : allIds) {
@@ -43,5 +84,4 @@ public class FloydAlgorithm {
         }
         return dist;
     }
-
 }

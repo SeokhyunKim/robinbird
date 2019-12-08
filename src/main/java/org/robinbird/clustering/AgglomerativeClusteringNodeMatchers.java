@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Relation;
 import org.robinbird.model.RelationCategory;
 
@@ -21,8 +22,7 @@ public class AgglomerativeClusteringNodeMatchers {
         private final double min, max;
     }
 
-    public static List<ClusteringNode> matchScoreRange(@NonNull final Collection<ClusteringNode> nodes,
-                                                                    @NonNull final Object params) {
+    public static List<ClusteringNode> matchScoreRange(@NonNull final Collection<ClusteringNode> nodes, @NonNull final Object params) {
         if (nodes.isEmpty()) {
             return Lists.newArrayList();
         }
@@ -34,9 +34,13 @@ public class AgglomerativeClusteringNodeMatchers {
             }
             final AgglomerativeClusteringNode aggNode = (AgglomerativeClusteringNode) node;
             final double nodeScore = aggNode.getScore();
-            if (rangeParams.getMax() <= nodeScore && nodeScore < rangeParams.getMax()) {
+            if (rangeParams.getMin() <= nodeScore && nodeScore < rangeParams.getMax()) {
                 matchedNodes.add(aggNode);
-                final List<ClusteringNode> childResults = matchScoreRange(node.getMemberNodes(), params);
+                final List<ClusteringNode> childResults = matchScoreRange(node.getMemberNodes()
+                                                                              .stream()
+                                                                              .filter(n -> n.getComponentCategory() == CLUSTERING_NODE)
+                                                                              .map(n -> (ClusteringNode) n)
+                                                                              .collect(Collectors.toList()), params);
                 matchedNodes.addAll(childResults);
             }
         }

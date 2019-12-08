@@ -24,6 +24,7 @@ import org.robinbird.clustering.ClusteringNodeFactory;
 import org.robinbird.clustering.RelationSelectors;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisJob;
+import org.robinbird.model.ComponentCategory;
 import org.robinbird.presentation.GMLPresentation;
 import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.Presentation;
@@ -118,8 +119,8 @@ public class Application {
 					new ClusteringMethodFactory(new ClusteringNodeFactory(componentRepository));
 			final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(clusteringMethodType, params);
 			final List<ClusteringNode> clusteringNodes =
-					clusteringMethod.cluster(analysisContext.getComponents(CLASS),
-											 RelationSelectors::getClassRelations,
+					clusteringMethod.cluster(analysisContext.getComponents(ComponentCategory.classCategories()),
+											 RelationSelectors::getComponentRelations,
 											 clusteringMethodFactory.getNodeMatcher(clusteringMethodType));
 			final PresentationFactory presentationFactory = new PresentationFactory();
 			final Presentation presentation = presentationFactory.create(presentationType);
@@ -228,7 +229,7 @@ public class Application {
 		sa.appendLine("  . This will generate PlantUML class diagram script for the given root");
 		sa.appendLine("robinbird -r root_path -excluded-class ExcludedClass.*");
 		sa.appendLine("  . This will generate PlantUML class diagrams from root_path excluding classes matched with Java regular " +
-							  "expression 'EscludedClass.*'");
+							  "expression 'ExcludedClass.*'");
 		sa.appendLine("robinbird -gdb mydb");
 		sa.appendLine("  . Generate a database file which can be used for generating diagrams later. Db file name will be \'mydb.h2.db\'");
 		sa.appendLine("robinbird -db mydb");

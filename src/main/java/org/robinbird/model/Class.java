@@ -40,9 +40,7 @@ public class Class extends Component {
     private Class(final long id, @NonNull final String name, @NonNull final ComponentCategory category,
                   @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
         super(id, name, category, relations, metadata);
-        Validate.isTrue(category == ComponentCategory.CLASS ||
-                        category == ComponentCategory.TEMPLATE_CLASS ||
-                        category == ComponentCategory.INTERFACE,
+        Validate.isTrue(category.isClassCategory(),
                         Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, category.name()));
     }
 
@@ -73,9 +71,7 @@ public class Class extends Component {
 
     public void setParent(@NonNull final Class parent) {
         final ComponentCategory category = parent.getComponentCategory();
-        Validate.isTrue(category == ComponentCategory.CLASS ||
-                                category == ComponentCategory.TEMPLATE_CLASS ||
-                                category == ComponentCategory.INTERFACE,
+        Validate.isTrue(category.isClassCategory(),
                         Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, category.name()));
         final Relation parentRelation = Relation.builder()
                                                 .relationCategory(RelationCategory.PARENT_CLASS)

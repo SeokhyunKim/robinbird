@@ -1,5 +1,8 @@
 package org.robinbird.model;
 
+import com.google.common.collect.Sets;
+import java.util.Set;
+
 public enum ComponentCategory {
     // source code related categories
     PRIMITIVE_TYPE,
@@ -14,6 +17,8 @@ public enum ComponentCategory {
     // for clustering
     CLUSTERING_NODE;
 
+    private static Set<ComponentCategory> classCategories = Sets.newHashSet(CLASS, INTERFACE, TEMPLATE_CLASS);
+
     boolean isMemberVariableCategory() {
         return (this != PACKAGE) && (this != VARARGS) && (this != FUNCTION);
     }
@@ -22,4 +27,11 @@ public enum ComponentCategory {
         return (this != PACKAGE);
     }
 
+    boolean isClassCategory() {
+        return (this == CLASS) || (this == TEMPLATE_CLASS) || (this == INTERFACE);
+    }
+
+    public static Set<ComponentCategory> classCategories() {
+        return classCategories;
+    }
 }

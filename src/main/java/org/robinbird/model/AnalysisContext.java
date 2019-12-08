@@ -6,6 +6,7 @@ import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
 import static org.robinbird.util.Msgs.Key.INVALID_COMPONENT_CATEGORY;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
@@ -79,6 +80,12 @@ public class AnalysisContext {
 
     public List<Component> getComponents(@NonNull final ComponentCategory componentCategory) {
         return repository.getComponents(componentCategory);
+    }
+
+    public List<Component> getComponents(@NonNull final java.util.Collection<ComponentCategory> categories) {
+        List<Component> components = new ArrayList<>();
+        categories.forEach(category -> components.addAll(getComponents(category)));
+        return components;
     }
 
     // todo: name should be a full name

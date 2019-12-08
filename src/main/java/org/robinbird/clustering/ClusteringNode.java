@@ -28,12 +28,10 @@ public class ClusteringNode extends Component {
         addRelation(relation);
     }
 
-    public List<ClusteringNode> getMemberNodes() {
+    public List<Component> getMemberNodes() {
         final List<Relation> relations = getRelations(RelationCategory.CLUSTER_MEMBER);
         return relations.stream()
                         .map(Relation::getRelatedComponent)
-                        .filter(c -> c.getComponentCategory() == CLUSTERING_NODE)
-                        .map(c -> (ClusteringNode)c)
                         .collect(Collectors.toList());
     }
 }

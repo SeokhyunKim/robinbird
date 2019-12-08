@@ -1,12 +1,16 @@
 package org.robinbird.presentation;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
+import org.robinbird.clustering.ClusteringNode;
 import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.AccessLevel;
 import org.robinbird.model.AnalysisContext;
@@ -189,6 +193,60 @@ public class PlantUMLPresentation implements Presentation {
 
     private boolean isGeneric(String name) {
         return name.contains("<");
+    }
+
+    @Override
+    public String presentClusteringNodes(List<ClusteringNode> clusteringNodes) {
+        Set<ClusteringNode> allNodes = new HashSet<>(clusteringNodes);
+        Set<ClusteringNode> rendered = new HashSet<>();
+        StringAppender sa = new StringAppender();
+        sa.appendLine("@startuml");
+        for (ClusteringNode node : clusteringNodes) {
+            if (rendered.contains(node)) {
+                continue;
+            }
+            List<String> nodeNames = getAllNodeNames(node);
+            addAllNodesToRendered(node, rendered, allNodes);
+            Iterator<String> itor = nodeNames.iterator();
+            StringAppender compName = new StringAppender();
+            while (itor.hasNext()) {
+                String name = itor.next();
+                if (itor.hasNext()) {
+                    compName.append(name).append(", ");
+                } else {
+                    compName.append(name);
+                }
+            }
+            sa.append("[").append(compName.toString()).appendLine("]");
+        }
+        sa.appendLine("@enduml");
+        return sa.toString();
+    }
+
+    private List<String> getAllNodeNames(ClusteringNode node) {
+        List<String> names = new LinkedList<>();
+        for (Component childNode : node.getMemberNodes()) {
+            if (childNode.getComponentCategory() == ComponentCategory.CLUSTERING_NODE) {
+                names.addAll(getAllNodeNames((ClusteringNode) childNode));
+            } else {
+                names.add(childNode.getName());
+            }
+        }
+        return names;
+    }
+
+    private void addAllNodesToRendered(ClusteringNode node, Set<ClusteringNode> rendered, Set<ClusteringNode> allNodes) {
+        rendered.add(node);
+        for (Component childNode : node.getMemberNodes()) {
+            if (childNode.getComponentCategory() != ComponentCategory.CLUSTERING_NODE) {
+                continue;
+            }
+            ClusteringNode childClusteringNode = (ClusteringNode) childNode;
+            if (!allNodes.contains(childClusteringNode)) {
+                continue;
+            }
+            addAllNodesToRendered(childClusteringNode, rendered, allNodes);
+        }
     }
 
 }
