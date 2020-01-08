@@ -27,11 +27,13 @@ import org.robinbird.util.Msgs;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Converter {
 
+    private static ObjectMapper objectMapper = OBJECT_MAPPER;
+
     public static Component convert(@NonNull final ComponentEntity entity) {
         try {
             final Map<String, String> metadata;
             if (entity.getMetadata() != null) {
-                metadata = OBJECT_MAPPER.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
+                metadata = objectMapper.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
             } else {
                 metadata = Maps.newHashMap();
             }
@@ -51,7 +53,6 @@ public class Converter {
         entity.setName(component.getName());
         entity.setComponentCategory(component.getComponentCategory().name());
 
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             entity.setMetadata(objectMapper.writeValueAsString(component.getMetadata()));
         } catch (final JsonProcessingException e) {
@@ -70,7 +71,7 @@ public class Converter {
         entity.setId(relation.getId());
 
         try {
-            entity.setMetadata(OBJECT_MAPPER.writeValueAsString(relation.getMetadata()));
+            entity.setMetadata(objectMapper.writeValueAsString(relation.getMetadata()));
         } catch (final JsonProcessingException e) {
             throw new RobinbirdException(Msgs.get(JSON_PROCESSING_ISSUE, relation.toString()), e);
         }
@@ -82,7 +83,7 @@ public class Converter {
                                    @NonNull final Component relatedComponent, @NonNull final Component parent) {
         final Map<String, String> metadata;
         try {
-            metadata = OBJECT_MAPPER.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
+            metadata = objectMapper.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
         } catch (final IOException e) {
             throw new RobinbirdException(Msgs.get(JSON_PROCESSING_ISSUE, entity.toString()), e);
         }

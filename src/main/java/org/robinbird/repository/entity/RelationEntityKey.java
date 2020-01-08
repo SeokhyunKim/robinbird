@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class RelationEntityKey implements Serializable {
 
-    private long parentId;
+    private String parentId;
     private String id;
 
 }

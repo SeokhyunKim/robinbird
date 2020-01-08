@@ -10,8 +10,8 @@ apply plugin: 'eclipse'
 // set main class for application plugin
 mainClassName = "org.robinbird.Application"
 // default JVM args for application plugin
-applicationDefaultJvmArgs = ["-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"]
-//applicationDefaultJvmArgs = ["-Dorg.slf4j.simpleLogger.defaultLogLevel=debug", "-Xms1g", "-Xmx4g"]
+//applicationDefaultJvmArgs = ["-Dorg.slf4j.simpleLogger.defaultLogLevel=debug"]
+applicationDefaultJvmArgs = ["-Dorg.slf4j.simpleLogger.defaultLogLevel=debug", "-Xms3g", "-Xmx3g"]
 
 run {
 	// split space-delimited value in robinbird.args (or rb.args) and pass as args

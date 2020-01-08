@@ -4,7 +4,7 @@ import static org.robinbird.model.Cardinality.MULTIPLE;
 import static org.robinbird.model.Cardinality.ONE;
 import static org.robinbird.model.ComponentCasts.toClass;
 import static org.robinbird.model.ComponentCategory.ARRAY;
-import static org.robinbird.model.ComponentCategory.COLLECTION;
+import static org.robinbird.model.ComponentCategory.CONTAINER;
 import static org.robinbird.model.ComponentCategory.PACKAGE;
 import static org.robinbird.util.JsonObjectMapper.OBJECT_MAPPER;
 import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
@@ -37,7 +37,7 @@ public class Class extends Component {
     private static final String TEMPLATE_VARIABLES_KEY = "templateVariables";
 
     @Builder
-    private Class(final long id, @NonNull final String name, @NonNull final ComponentCategory category,
+    private Class(@NonNull final String id, @NonNull final String name, @NonNull final ComponentCategory category,
                   @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
         super(id, name, category, relations, metadata);
         Validate.isTrue(category.isClassCategory(),
@@ -153,7 +153,7 @@ public class Class extends Component {
 
     private Cardinality getMemberVariableCardinality(@NonNull final ComponentCategory category) {
         Validate.isTrue(category != PACKAGE, Msgs.get(WRONG_COMPONENT_CATEGORY, category.name()));
-        if (category == COLLECTION || category == ARRAY) {
+        if (category == CONTAINER || category == ARRAY) {
             return MULTIPLE;
         }
         return ONE;

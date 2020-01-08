@@ -15,12 +15,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.Validate;
 import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.AccessLevel;
 import org.robinbird.model.Analyser;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Class;
-import org.robinbird.model.Collection;
+import org.robinbird.model.Container;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Function;
@@ -34,7 +35,8 @@ import org.robinbird.util.Msgs;
 @Slf4j
 public class Java8Analyser extends Java8BaseListener implements Analyser {
 
-    private enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE, INNER_CLASS};
+    // public for test
+    public enum State { NONE, PARSING_CLASS, PARSING_INTERFACE, EXCLUDED_TYPE, INNER_CLASS};
 
     private AnalysisContext analysisContext;
     State state = State.NONE;
@@ -101,14 +103,14 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         }
         if (ctx.superinterfaces() != null) {
             Java8Parser.SuperinterfacesContext superinterfacesContext = ctx.superinterfaces();
-            if (superinterfacesContext.interfaceTypeList() != null) {
-                for (Java8Parser.InterfaceTypeContext interfaceTypeContext : superinterfacesContext.interfaceTypeList().interfaceType()) {
-                    Class implementingInterface = analysisContext.getClass(interfaceTypeContext.getText());
-                    if (implementingInterface == null) {
-                        implementingInterface = analysisContext.registerClass(interfaceTypeContext.getText(), ComponentCategory.INTERFACE);
-                    }
-                    newClass.addInterface(implementingInterface);
+            Validate.isTrue(superinterfacesContext.interfaceTypeList() != null,
+                            Msgs.get(INTERNAL_ERROR));
+            for (Java8Parser.InterfaceTypeContext interfaceTypeContext : superinterfacesContext.interfaceTypeList().interfaceType()) {
+                Class implementingInterface = analysisContext.getClass(interfaceTypeContext.getText());
+                if (implementingInterface == null) {
+                    implementingInterface = analysisContext.registerClass(interfaceTypeContext.getText(), ComponentCategory.INTERFACE);
                 }
+                newClass.addInterface(implementingInterface);
             }
         }
         analysisContext.pushCurrent(newClass);
@@ -197,7 +199,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         }
         Java8Parser.UnannClassOrInterfaceTypeContext classOrInterfaceTypeContext = ctx.unannReferenceType().unannClassOrInterfaceType();
         final String typeName = classOrInterfaceTypeContext.getText();
-        if (getCollectionTypeName(typeName) != null) {
+        if (getContainerTypeName(typeName) != null) {
             return Optional.empty();
         }
         return Optional.of(analysisContext.register(typeName));
@@ -210,12 +212,12 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         Java8Parser.UnannReferenceTypeContext referenceTypeContext = ctx.unannReferenceType();
         if (referenceTypeContext.unannClassOrInterfaceType() != null) {
             final String typeName = referenceTypeContext.unannClassOrInterfaceType().getText();
-            if (getCollectionTypeName(typeName) != null) {
+            if (getContainerTypeName(typeName) != null) {
                 final List<Java8Parser.ReferenceTypeContext> java8RefTypes = findJava8ParserReferenceTypes(referenceTypeContext);
                 final List<Component> types = getReferenceComponents(java8RefTypes);
-                final String collectionTypeName = getCollectionTypeName(typeName);
-                final Collection collection = analysisContext.registerCollection(collectionTypeName, types);
-                return Optional.of(collection);
+                final String collectionTypeName = getContainerTypeName(typeName);
+                final Container container = analysisContext.registerContainer(collectionTypeName, types);
+                return Optional.of(container);
             }
             return Optional.empty();
         } else if (referenceTypeContext.unannArrayType() != null) {
@@ -377,7 +379,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
     private List<Component> getReferenceComponents(List<Java8Parser.ReferenceTypeContext> referenceTypeContexts) {
         List<Component> refComponents = new ArrayList<>();
         for (Java8Parser.ReferenceTypeContext context : referenceTypeContexts) {
-            if (getCollectionTypeName(context.getText()) != null) {
+            if (getContainerTypeName(context.getText()) != null) {
                 continue;
             }
             if (isPrimitiveType(context.getText())) {
@@ -398,8 +400,11 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         return false;
     }
 
-    private String getCollectionTypeName(String text) {
-        String[] collections = { "List", "LinkedList", "ArrayList",
+    private String getContainerTypeName(String text) {
+        String[] collections = { "Optional", // for java Optional
+                                 "Collection", "java.util.Collection", // todo: full class name currently cannot be matched with simple name
+                                 "List", "LinkedList", "ArrayList",
+                                 "Stack",
                                  "Set", "TreeSet", "HashSet", "LinkedHashSet",
                                  "Map", "HashMap", "TreeMap", "ConcurrentMap"};
         for (String collection : collections) {

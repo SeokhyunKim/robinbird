@@ -13,7 +13,7 @@ import org.robinbird.model.RelationCategory;
 
 public class ClusteringNode extends Component {
 
-    public ClusteringNode(final long id, @NonNull final String name,
+    public ClusteringNode(@NonNull final String id, @NonNull final String name,
                           @Nullable final List<Relation> relations,
                           @Nullable final Map<String, String> metadata) {
         super(id, name, CLUSTERING_NODE, relations, metadata);

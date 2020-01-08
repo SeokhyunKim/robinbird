@@ -54,7 +54,7 @@ public class Msgs {
 			.put(Key.REGEXP_FOR_EXCLUSION_IS_NOT_GIVEN, "Regular expression pattern for exclusion is not given.")
 			.put(Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY, "List for defining package name is empty.")
 			.put(Key.CANNOT_CREATE_GRAPH_NODE_FROM_TYPE, "Cannot create graph node from Type %s.")
-			.put(Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION, "Failed to get associated type from Collection %s.")
+			.put(Key.FAILED_TO_GET_ASSOCIATED_TYPE_FROM_COLLECTION, "Failed to get associated type from Container %s.")
 			.put(Key.FAILED_TO_FIND_AGGCLUSTER_NODE, "Failed to find agglomerative clustering node %s.")
 			.put(Key.SCORE_FOR_CLUSTERING_IS_NOT_GIVEN, "Score for controling clustering method was not given.")
 			.put(Key.CLUSTERING_TYPE_IS_NOT_GIVEN, "Clustering type was not given.")
@@ -73,6 +73,10 @@ public class Msgs {
 
 	public static String get(Key k) {
 		return msgMap.get(k);
+	}
+
+	public static String getAndAddMessage(Key k, String msg) {
+		return msgMap.get(k) + ": " + msg;
 	}
 
 	public static String get(Key k, String msg) {

@@ -41,7 +41,7 @@ public class ComponentRepository {
      * @return Optional of found AnalysisUnit. If this doesn't find anything, returns empty optional.
      */
     public Optional<Component> getComponent(@NonNull final String name) {
-        final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntity(name);
+        final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntityByName(name);
         return ceOpt.map(Converter::convert);
     }
 
@@ -54,7 +54,7 @@ public class ComponentRepository {
         final List<RelationEntity> entities = componentEntityDao.loadRelationEntities(parent.getId());
         final List<Relation> relations = new ArrayList<>(entities.size());
         entities.forEach(e -> {
-            final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntity(e.getRelatedComponentId());
+            final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntityById(e.getRelatedComponentId());
             ceOpt.ifPresent(aue -> {
                 final RelationCategory relationCategory = RelationCategory.valueOf(e.getRelationCategory());
                 relations.add(Relation.builder()
@@ -165,7 +165,7 @@ public class ComponentRepository {
                         Msgs.get(TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED, relation.toString()));
         final RelationEntity saved = componentEntityDao.save(Converter.convert(relation));
         final Optional<ComponentEntity> relatedComponentEntityOpt =
-                componentEntityDao.loadComponentEntity(saved.getRelatedComponentId());
+                componentEntityDao.loadComponentEntityById(saved.getRelatedComponentId());
         if (!relatedComponentEntityOpt.isPresent()) {
             throw new RobinbirdException(Msgs.get(Msgs.Key.INTERNAL_ERROR));
         }

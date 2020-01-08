@@ -11,34 +11,24 @@ public class ClusteringMethodFactory {
     @NonNull
     private final ClusteringNodeFactory clusteringNodeFactory;
 
-    public ClusteringMethod create(@NonNull final ClusteringMethodType type, @NonNull final String[] paramStrings) {
+    public ClusteringMethod create(@NonNull final ClusteringMethodType type) {
         final ClusteringMethod clusteringMethod;
         switch (type) {
             default:
-            case AGGLOMERATIVE_CLUSTERING: {
-                Validate.isTrue(paramStrings.length >= 2, Msgs.get(Msgs.Key.INTERNAL_ERROR));
-                final double[] minMax = new double[2];
-                int i = 0;
-                for (String paramStr : paramStrings) {
-                    minMax[i] = Double.parseDouble(paramStr);
-                    if (++i >= 2) {
-                        break;
-                    }
-                }
-                clusteringMethod = new AgglomerativeClustering(clusteringNodeFactory, minMax[0], minMax[1]);
-            }
-            break;
+            case AGGLOMERATIVE:
+                clusteringMethod = new AgglomerativeClustering(clusteringNodeFactory);
+                break;
         }
         return clusteringMethod;
     }
 
-    public ClusteringNodeMatcher getNodeMatcher(@NonNull final ClusteringMethodType type) {
-        final ClusteringNodeMatcher nodeMatcher;
-        switch (type) {
-            default:
-            case AGGLOMERATIVE_CLUSTERING:
-                nodeMatcher = AgglomerativeClusteringNodeMatchers::matchScoreRange;
+    public double[] convertToParameters(@NonNull final String[] paramStrings) {
+        Validate.isTrue(paramStrings.length >= 1, Msgs.get(Msgs.Key.INTERNAL_ERROR));
+        final double[] params = new double[paramStrings.length];
+        int i = 0;
+        for (String paramStr : paramStrings) {
+            params[i] = Double.parseDouble(paramStr);
         }
-        return nodeMatcher;
+        return params;
     }
 }

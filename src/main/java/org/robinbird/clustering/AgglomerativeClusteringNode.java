@@ -6,12 +6,13 @@ import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.NonNull;
 
+
 public class AgglomerativeClusteringNode extends ClusteringNode {
 
     private static final String SCORE_KEY = "score";
 
     @Builder
-    public AgglomerativeClusteringNode(final long id, @Nullable final String name, @NonNull final Map<String, String> metadata) {
+    public AgglomerativeClusteringNode(@NonNull final String id, @Nullable final String name, @NonNull final Map<String, String> metadata) {
         super(id, name, null, metadata);
     }
 

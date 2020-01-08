@@ -25,7 +25,7 @@ public class Package extends Component {
     private static String DELIMITER = ".";
 
     @Builder
-    private Package(final long id, @NonNull final String name, @Nullable final List<Relation> relations) {
+    private Package(@NonNull final String id, @NonNull final String name, @Nullable final List<Relation> relations) {
         super(id, name, ComponentCategory.PACKAGE, relations, null);
     }
 

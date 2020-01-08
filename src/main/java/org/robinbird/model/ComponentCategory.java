@@ -10,7 +10,7 @@ public enum ComponentCategory {
     CLASS,
     INTERFACE,
     TEMPLATE_CLASS,
-    COLLECTION,
+    CONTAINER,
     ARRAY,
     VARARGS,
     FUNCTION,
@@ -27,7 +27,7 @@ public enum ComponentCategory {
         return (this != PACKAGE);
     }
 
-    boolean isClassCategory() {
+    public boolean isClassCategory() {
         return (this == CLASS) || (this == TEMPLATE_CLASS) || (this == INTERFACE);
     }
 

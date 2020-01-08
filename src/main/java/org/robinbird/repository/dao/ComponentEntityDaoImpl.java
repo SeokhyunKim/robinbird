@@ -111,12 +111,12 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     }
 
     @Override
-    public Optional<ComponentEntity> loadComponentEntity(final long id) {
+    public Optional<ComponentEntity> loadComponentEntityById(final String id) {
         return loadEntity(loadComponentEntityWithIdQuery, "id", id);
     }
 
     @Override
-    public Optional<ComponentEntity> loadComponentEntity(@NonNull final String name) {
+    public Optional<ComponentEntity> loadComponentEntityByName(@NonNull final String name) {
         return loadEntity(loadComponentEntityWithNameQuery, "name", name);
     }
 
@@ -126,12 +126,12 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     }
 
     @Override
-    public Optional<RelationEntity> loadRelationEntity(final long parentId, final String id) {
+    public Optional<RelationEntity> loadRelationEntity(final String parentId, final String id) {
         return loadEntity(loadRelationEntityWithParentIdAndIdQuery, "parentId", parentId, "id", id);
     }
 
     @Override
-    public List<RelationEntity> loadRelationEntities(final long parentId) {
+    public List<RelationEntity> loadRelationEntities(final String parentId) {
         return loadEntities(loadRelationEntitiesWithParentIdQuery, "parentId", parentId);
     }
 
@@ -160,7 +160,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     public <T> T update(@NonNull final T entity) {
         if (entity instanceof ComponentEntity) {
             final ComponentEntity ae = (ComponentEntity)entity;
-            final Optional<ComponentEntity> analysisEntityOpt = loadComponentEntity(ae.getId());
+            final Optional<ComponentEntity> analysisEntityOpt = loadComponentEntityById(ae.getId());
             if (!analysisEntityOpt.isPresent()) {
                 return null;
             }

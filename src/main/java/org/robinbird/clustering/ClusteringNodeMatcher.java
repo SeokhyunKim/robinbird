@@ -1,9 +1,10 @@
 package org.robinbird.clustering;
 
+import java.util.Collection;
 import java.util.List;
 
 
 public interface ClusteringNodeMatcher {
 
-    List<ClusteringNode> match(List<ClusteringNode> clusteringNodes, Object params);
+    List<ClusteringNode> match(Collection<ClusteringNode> clusteringNodes, Object params);
 }

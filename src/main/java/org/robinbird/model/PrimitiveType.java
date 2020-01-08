@@ -12,7 +12,7 @@ import lombok.ToString;
 public class PrimitiveType extends Component {
 
     @Builder
-    public PrimitiveType(final long id, @NonNull final String name) {
+    public PrimitiveType(@NonNull final String id, @NonNull final String name) {
         super(id, name, ComponentCategory.PRIMITIVE_TYPE, null, null);
     }
 

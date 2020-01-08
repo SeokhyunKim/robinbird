@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.clustering.ClusteringNode;
 import org.robinbird.exception.RobinbirdException;
@@ -25,10 +28,15 @@ import org.robinbird.model.RelationCategory;
 import org.robinbird.util.Msgs;
 import org.robinbird.util.StringAppender;
 
+@AllArgsConstructor
 public class PlantUMLPresentation implements Presentation {
+
+    @NonNull
+    private final CommandLine commandLine;
 
     @Override
     public String presentClasses(@NonNull final AnalysisContext analysisContext) {
+        final boolean skipMembers = this.commandLine.hasOption("sm");
         StringAppender sa = new StringAppender();
         sa.appendLine("@startuml");
         sa.appendLine("left to right direction");
@@ -42,8 +50,10 @@ public class PlantUMLPresentation implements Presentation {
             for (Class classObj : classPackage.getClasses()) {
                 // class name, member variables, and member functions
                 sa.appendLine(String.format("class %s {", classObj.getName()));
-                sa.append(printMemberVariables(classObj.getMemberVariableRelations()));
-                sa.append(printMemberFunctions(classObj.getMemberFunctionRelations()));
+                if (!skipMembers) {
+                    sa.append(printMemberVariables(classObj.getMemberVariableRelations()));
+                    sa.append(printMemberFunctions(classObj.getMemberFunctionRelations()));
+                }
                 sa.appendLine("}");
             }
             sa.appendLine("}");
@@ -101,7 +111,13 @@ public class PlantUMLPresentation implements Presentation {
         // generate PlantUML scripts for the generated relations
         for (final UMLRelation UMLRelation : umlRelations.values()) {
             final Component first = UMLRelation.getFirst();
+            if (!first.getComponentCategory().isClassCategory()) {
+                continue;
+            }
             final Component second = UMLRelation.getSecond();
+            if (!second.getComponentCategory().isClassCategory()) {
+                continue;
+            }
             final String firstName = removeGenerics(first.getName());
             final String secondName = removeGenerics(second.getName());
             final Optional<Cardinality> firstToSecondOpt = UMLRelation.getCardinalityFromFirstToSecond();

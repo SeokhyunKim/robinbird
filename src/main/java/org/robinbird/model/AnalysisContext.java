@@ -156,27 +156,27 @@ public class AnalysisContext {
         return Package.create(newPackageComponent);
     }
 
-    public Collection registerCollection(@NonNull final String typeName, @NonNull final List<Component> types) {
+    public Container registerContainer(@NonNull final String typeName, @NonNull final List<Component> types) {
         log.debug("typeName={}, types={}", typeName, types);
         final Optional<Component> compOpt = repository.getComponent(typeName);
         if (compOpt.isPresent()) {
             final Component comp = compOpt.get();
-            Validate.isTrue(comp.getComponentCategory() == ComponentCategory.COLLECTION,
+            Validate.isTrue(comp.getComponentCategory() == ComponentCategory.CONTAINER,
                             Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, typeName, comp.getComponentCategory().name()));
-            final Collection collection = Collection.builder()
-                                                    .id(comp.getId())
-                                                    .name(comp.getName())
-                                                    .relatedTypes(comp.getRelations())
-                                                    .build();
-            log.debug("Existing component. Returning {}", collection);
-            return collection;
+            final Container container = Container.builder()
+                                                 .id(comp.getId())
+                                                 .name(comp.getName())
+                                                 .relatedTypes(comp.getRelations())
+                                                 .build();
+            log.debug("Existing component. Returning {}", container);
+            return container;
         }
-        final Component newCollectionComponent = repository.registerComponent(typeName, ComponentCategory.COLLECTION);
-        final Collection newCollection = Collection.create(newCollectionComponent);
-        newCollection.addRelatedTypes(types);
-        log.debug("Trying to persist a new collection: {}", newCollection);
-        newCollection.persist();
-        return newCollection;
+        final Component newCollectionComponent = repository.registerComponent(typeName, ComponentCategory.CONTAINER);
+        final Container newContainer = Container.create(newCollectionComponent);
+        newContainer.addRelatedTypes(types);
+        log.debug("Trying to persist a new collection: {}", newContainer);
+        newContainer.persist();
+        return newContainer;
     }
 
     public Array registerPrimitiveTypeArray(@NonNull final String typeName) {

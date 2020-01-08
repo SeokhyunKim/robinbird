@@ -29,7 +29,7 @@ public class GMLPresentation implements Presentation {
         // each class (or interface) becomes a node
         for(final Component component : analysisContext.getComponents(ComponentCategory.CLASS)) {
             final Class classObj = (Class) component;
-            appendNodeString(sa, Long.toString(classObj.getId()), classObj.getName());
+            appendNodeString(sa, classObj.getId(), classObj.getName());
         }
 
         // relations considering inheritance, interface, and member variables

@@ -2,15 +2,18 @@ package org.robinbird.model;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.robinbird.repository.ComponentRepository;
 
 @Getter
@@ -24,7 +27,8 @@ public class Component {
         Component.componentRepository = componentRepository;
     }
 
-    private final long id;
+    @NonNull
+    private final String id;
     @NonNull
     private final String name;
     @NonNull
@@ -34,7 +38,7 @@ public class Component {
 
     private Map<String, String> metadata;
 
-    public Component(final long id, @NonNull final String name, @NonNull ComponentCategory componentCategory,
+    public Component(@NonNull final String id, @NonNull final String name, @NonNull ComponentCategory componentCategory,
                      @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
         this.id = id;
         this.name = name;
@@ -51,7 +55,7 @@ public class Component {
     }
 
     public boolean hasPersisted() {
-        return id > 0L;
+        return StringUtils.isNotEmpty(id);
     }
 
     /**
@@ -85,7 +89,11 @@ public class Component {
 
     private void lazyLoadingRelations() {
         if (this.relations == null) {
-            this.relations = componentRepository.getRelations(this);
+            if (componentRepository != null) {
+                this.relations = componentRepository.getRelations(this);
+            } else {
+                this.relations = Lists.newArrayList();
+            }
         }
     }
 
@@ -133,4 +141,7 @@ public class Component {
         return metadata.get(key);
     }
 
+    static public Component createComponentWithoutPersistence(@NonNull ComponentCategory componentCategory) {
+        return new Component(UUID.randomUUID().toString(), UUID.randomUUID().toString(), componentCategory, null, null);
+    }
 }

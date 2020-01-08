@@ -10,7 +10,7 @@ import org.robinbird.util.Msgs;
 public class Array extends Component {
 
     @Builder
-    public Array(final long id, @NonNull final String name) {
+    public Array(@NonNull final String id, @NonNull final String name) {
         super(id, name, ComponentCategory.ARRAY, null, null);
     }
 

@@ -10,7 +10,7 @@ import org.robinbird.util.Msgs;
 public class Varargs extends Component {
 
     @Builder
-    public Varargs(final long id, @NonNull String name) {
+    public Varargs(@NonNull final String id, @NonNull String name) {
         super(id, name, ComponentCategory.VARARGS, null, null);
     }
 

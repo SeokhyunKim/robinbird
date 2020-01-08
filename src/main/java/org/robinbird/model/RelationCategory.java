@@ -9,8 +9,8 @@ public enum RelationCategory {
     // package relationships
     PACKAGE_MEMBER,
     PARENT_PACKAGE,
-    // an element type used in a collection
-    COLLECTION_ELEMENT_TYPE,
+    // a template type used in a collection or Optional
+    TEMPLATE_TYPE,
     // a base type of an array
     ARRAY_BASE_TYPE,
     // a base type of a varargs

@@ -116,18 +116,18 @@ public class Application {
 			final ClusteringMethodType clusteringMethodType = clusteringMethodTypeOpt.get();
 			final String[] params = getClusteringParameters(commandLine);
 			final ClusteringMethodFactory clusteringMethodFactory =
-					new ClusteringMethodFactory(new ClusteringNodeFactory(componentRepository));
-			final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(clusteringMethodType, params);
+					new ClusteringMethodFactory(new ClusteringNodeFactory());
+			final ClusteringMethod clusteringMethod = clusteringMethodFactory.create(clusteringMethodType);
 			final List<ClusteringNode> clusteringNodes =
 					clusteringMethod.cluster(analysisContext.getComponents(ComponentCategory.classCategories()),
 											 RelationSelectors::getComponentRelations,
-											 clusteringMethodFactory.getNodeMatcher(clusteringMethodType));
+											 clusteringMethodFactory.convertToParameters(params));
 			final PresentationFactory presentationFactory = new PresentationFactory();
-			final Presentation presentation = presentationFactory.create(presentationType);
+			final Presentation presentation = presentationFactory.create(presentationType, commandLine);
 			presentationText = presentation.presentClusteringNodes(clusteringNodes);
 		} else {
 			final PresentationFactory presentationFactory = new PresentationFactory();
-			final Presentation presentation = presentationFactory.create(presentationType);
+			final Presentation presentation = presentationFactory.create(presentationType, commandLine);
 			presentationText = presentation.presentClasses(analysisContext);
 		}
 
@@ -182,20 +182,6 @@ public class Application {
 			presentation = PresentationType.PLANTUML.name();
 		}
 		return PresentationType.valueOf(presentation);
-	}
-
-	private Presentation createPresentation(PresentationType ptype, CommandLine commandLine) {
-		Presentation presentation;
-		switch (ptype) {
-			case GML:
-				presentation = new GMLPresentation();
-				break;
-			case PLANTUML:
-			default:
-				presentation = new PlantUMLPresentation();
-				break;
-		}
-		return presentation;
 	}
 
 	public static void main(String[] args) {
@@ -282,6 +268,11 @@ public class Application {
 					  .numberOfArgs(Option.UNLIMITED_VALUES)
 					  .desc("Classes matched with this regular expression will not be shown in class diagram")
 					  .build();
+		final Option skipMembers =
+                Option.builder("sm")
+                      .longOpt("skip-members")
+                      .desc("skip member variables and methods in a class diagram")
+                      .build();
 		final Option clusteringType =
 				Option.builder("ct")
 					  .longOpt("clustering-type")
@@ -301,6 +292,7 @@ public class Application {
 							.addOption(gdb)
 							.addOption(terminalClass)
 							.addOption(excludedClass)
+                            .addOption(skipMembers)
 							.addOption(clusteringType)
 							.addOption(params);
 	}

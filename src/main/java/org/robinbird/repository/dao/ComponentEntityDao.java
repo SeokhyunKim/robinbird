@@ -7,15 +7,15 @@ import org.robinbird.repository.entity.RelationEntity;
 
 public interface ComponentEntityDao {
 
-    Optional<ComponentEntity> loadComponentEntity(long id);
+    Optional<ComponentEntity> loadComponentEntityById(String id);
 
-    Optional<ComponentEntity> loadComponentEntity(String name);
+    Optional<ComponentEntity> loadComponentEntityByName(String name);
 
     List<ComponentEntity> loadComponentEntities(String componentCategory);
 
-    Optional<RelationEntity> loadRelationEntity(long parentId, String id);
+    Optional<RelationEntity> loadRelationEntity(String parentId, String id);
 
-    List<RelationEntity> loadRelationEntities(long parentId);
+    List<RelationEntity> loadRelationEntities(String parentId);
 
     int getNumComponentEntities();
 

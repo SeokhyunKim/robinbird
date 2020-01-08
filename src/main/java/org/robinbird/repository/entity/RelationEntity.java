@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class RelationEntity {
 
     @Id
-    private long parentId;
+    private String parentId;
 
     @Id
     private String id;
@@ -25,7 +25,7 @@ public class RelationEntity {
 
     private String name;
 
-    private long relatedComponentId;
+    private String relatedComponentId;
 
     private String cardinality;
 

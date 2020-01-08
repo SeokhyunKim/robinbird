@@ -16,32 +16,32 @@ import org.robinbird.util.Msgs;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Collection extends Component {
+public class Container extends Component {
 
     @Builder
-    public Collection(final long id, @NonNull final String name, @Nullable final List<Relation> relatedTypes) {
-        super(id, name, ComponentCategory.COLLECTION, relatedTypes, null);
+    public Container(@NonNull final String id, @NonNull final String name, @Nullable final List<Relation> relatedTypes) {
+        super(id, name, ComponentCategory.CONTAINER, relatedTypes, null);
     }
 
     public void addRelatedTypes(@NonNull final List<Component> relatedTypes) {
         final List<Relation> relations = relatedTypes.stream()
                                                      .map(c -> Relation.builder()
                                                                        .parent(this)
-                                                                       .relationCategory(RelationCategory.COLLECTION_ELEMENT_TYPE)
+                                                                       .relationCategory(RelationCategory.TEMPLATE_TYPE)
                                                                        .relatedComponent(c)
                                                                        .build())
                                                      .collect(Collectors.toList());
         relations.forEach(this::addRelation);
     }
 
-    public static Collection create(@NonNull final Component component) {
-        Validate.isTrue(component.getComponentCategory() == ComponentCategory.COLLECTION,
+    public static Container create(@NonNull final Component component) {
+        Validate.isTrue(component.getComponentCategory() == ComponentCategory.CONTAINER,
                         Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, component.getName(), component.getComponentCategory().name()));
-        return Collection.builder()
-                         .id(component.getId())
-                         .name(component.getName())
-                         .relatedTypes(component.getRelations())
-                         .build();
+        return Container.builder()
+                        .id(component.getId())
+                        .name(component.getName())
+                        .relatedTypes(component.getRelations())
+                        .build();
     }
 
 }

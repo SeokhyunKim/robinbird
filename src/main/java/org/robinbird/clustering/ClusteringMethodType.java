@@ -1,5 +1,9 @@
 package org.robinbird.clustering;
 
 public enum  ClusteringMethodType {
-    AGGLOMERATIVE_CLUSTERING
+    AGGLOMERATIVE;
+
+    public boolean isAgglomerativeClustering() {
+        return this == AGGLOMERATIVE;
+    }
 }

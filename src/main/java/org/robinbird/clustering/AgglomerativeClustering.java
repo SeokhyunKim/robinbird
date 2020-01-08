@@ -1,6 +1,10 @@
 package org.robinbird.clustering;
 
+import static org.robinbird.model.ComponentCategory.CLUSTERING_NODE;
+
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,28 +27,33 @@ public class AgglomerativeClustering implements ClusteringMethod {
     @NonNull
     private final ClusteringNodeFactory clusteringNodeFactory;
 
-    private final double scoreMin, scoreMax;
-
     @Override
     public List<ClusteringNode> cluster(@NonNull final List<Component> components,
                                         @NonNull final RelationsSelector relationsSelector,
-                                        @NonNull final ClusteringNodeMatcher nodeMatcher) {
-        final Map<Long, Map<Long, NodeDistance>> dist = FloydAlgorithm.calculateDistances(components, relationsSelector);
-        final Map<Long, Component> idToComps = components.stream().collect(Collectors.toMap(Component::getId, Function.identity()));
-        final Map<Long, AgglomerativeClusteringNode> roots = new HashMap<>();
-        final List<Edge> edges = new ArrayList<>();
+                                        final double[] params) {
+        final Map<String, Map<String, NodeDistance>> dist = FloydAlgorithm.calculateDistances(components, relationsSelector);
+        final Map<String, Component> idToComps = components.stream().collect(Collectors.toMap(Component::getId, Function.identity()));
+        final Map<String, AgglomerativeClusteringNode> roots = new HashMap<>();
+        final List<BidirectionalEdge> edges = new ArrayList<>();
 
-        final List<Long> compIds = new ArrayList<>(dist.keySet());
-        Collections.sort(compIds);
-        final int size = compIds.size();
-        for (int idx1=0; idx1<size; ++idx1) {
-            for (int idx2=idx1+1; idx2<size; ++idx2) {
-                final long i = compIds.get(idx1);
-                final long j = compIds.get(idx2);
+        final List<String> compIds = new ArrayList<>(dist.keySet());
+        for (int idx1 = 0; idx1 < compIds.size() - 1; idx1++) {
+            final String i = compIds.get(idx1);
+            for (int idx2 = idx1 + 1; idx2 < compIds.size(); idx2++) {
+                final String j = compIds.get(idx2);
                 final NodeDistance dist_ij = dist.get(i).get(j);
-                if (!dist_ij.equals(NodeDistance.INFINITE)) {
-                    edges.add(new Edge(idToComps.get(i), idToComps.get(j), dist_ij.getDistance()));
+                final NodeDistance dist_ji = dist.get(j).get(i);
+                if (dist_ij.equals(NodeDistance.INFINITE) && dist_ji.equals(NodeDistance.INFINITE)) {
+                    continue;
                 }
+                double distance = 0.0;
+                if (!dist_ij.equals(NodeDistance.INFINITE)) {
+                    distance += dist_ij.getDistance();
+                }
+                if (!dist_ji.equals(NodeDistance.INFINITE)) {
+                    distance += dist_ji.getDistance();
+                }
+                edges.add(new BidirectionalEdge(idToComps.get(i), idToComps.get(j), distance));
             }
         }
         Collections.sort(edges);
@@ -59,21 +68,22 @@ public class AgglomerativeClustering implements ClusteringMethod {
         });
 
         double realMaxScore = 0.0;
-        for (final Edge edge : edges) {
-            final AgglomerativeClusteringNode clusteringNode1 = compToClusteringNode.get(edge.getFrom());
-            final AgglomerativeClusteringNode clusteringNode2 = compToClusteringNode.get(edge.getTo());
+        for (final BidirectionalEdge edge : edges) {
+            if (roots.size() <= 1) {
+                break;
+            }
+            final AgglomerativeClusteringNode clusteringNode1 = compToClusteringNode.get(edge.getComponent1());
+            final AgglomerativeClusteringNode clusteringNode2 = compToClusteringNode.get(edge.getComponent2());
+
             Validate.isTrue(clusteringNode1 != null, Msgs.get(Msgs.Key.INTERNAL_ERROR));
             Validate.isTrue(clusteringNode2 != null, Msgs.get(Msgs.Key.INTERNAL_ERROR));
-            if (clusteringNode1 == clusteringNode2) {
+            if (clusteringNode1.equals(clusteringNode2)) {
                 continue;
             }
             AgglomerativeClusteringNode clusteringNode = clusteringNodeFactory.create();
             clusteringNode.addMemberNode(clusteringNode1);
             clusteringNode.addMemberNode(clusteringNode2);
-            double newScore = clusteringNode1.getScore() + clusteringNode2.getScore();
-            if (edge.getWeight() != Double.MAX_VALUE) {
-                newScore += edge.getWeight();
-            }
+            double newScore = clusteringNode1.getScore() + clusteringNode2.getScore() + edge.getWeight();
             clusteringNode.setScore(newScore);
             if (newScore > realMaxScore) {
                 realMaxScore = newScore;
@@ -81,15 +91,55 @@ public class AgglomerativeClustering implements ClusteringMethod {
             roots.remove(clusteringNode1.getId());
             roots.remove(clusteringNode2.getId());
             roots.put(clusteringNode.getId(), clusteringNode);
-            compToClusteringNode.put(edge.getFrom(), clusteringNode);
-            compToClusteringNode.put(edge.getTo(), clusteringNode);
+            updateComponentToClusteringNodeMappings(compToClusteringNode, clusteringNode, clusteringNode);
         }
 
         // 10 is defined as maxScore
-        // adding 0.1 to make sure 10 is including everything regardless of double precision
-        double adjustedMax = realMaxScore * Math.min(scoreMax, SCORE_MAX) / 10.0 + 0.1;
-        double adjustedMin = Math.min(realMaxScore * Math.max(scoreMin, 0.0) / 10.0, adjustedMax);
-        return nodeMatcher.match(new ArrayList<>(roots.values()),
-                                 new AgglomerativeClusteringNodeMatchers.MatchScoreRangeParams(adjustedMin, adjustedMax));
+        double score = params[0];
+        if (score > SCORE_MAX) {
+            score = SCORE_MAX;
+        } else if (score < 0.0) {
+            score = 0.0;
+        }
+        double adjustedScore = realMaxScore * score / SCORE_MAX;
+        return matchScoreEqualsOrLessThan(roots.values(), adjustedScore)
+                       .stream()
+                       .map(n -> (ClusteringNode)n)
+                       .collect(Collectors.toList());
+    }
+
+    private void updateComponentToClusteringNodeMappings(final Map<Component, AgglomerativeClusteringNode> mappings,
+                                                         final AgglomerativeClusteringNode node,
+                                                         final AgglomerativeClusteringNode newClusteringNode) {
+        for (Component child : node.getMemberNodes()) {
+            if (child.getComponentCategory() == CLUSTERING_NODE) {
+                updateComponentToClusteringNodeMappings(mappings, (AgglomerativeClusteringNode)child, newClusteringNode);
+            } else {
+                mappings.put(child, newClusteringNode);
+            }
+        }
+    }
+
+    private List<AgglomerativeClusteringNode> matchScoreEqualsOrLessThan(final Collection<AgglomerativeClusteringNode> nodes,
+                                                                         final double score) {
+        if (nodes.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        final List<AgglomerativeClusteringNode> matchedNodes = new ArrayList<>();
+        for (final AgglomerativeClusteringNode node : nodes) {
+            final double nodeScore = node.getScore();
+            if (nodeScore > score) {
+                final List<AgglomerativeClusteringNode> childResults =
+                        matchScoreEqualsOrLessThan(node.getMemberNodes()
+                                                       .stream()
+                                                       .filter(n -> n.getComponentCategory() == CLUSTERING_NODE)
+                                                       .map(n -> (AgglomerativeClusteringNode)n).collect(Collectors.toList()),
+                                                   score);
+                matchedNodes.addAll(childResults);
+            } else {
+                matchedNodes.add(node);
+            }
+        }
+        return matchedNodes;
     }
 }

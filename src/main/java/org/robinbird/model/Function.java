@@ -19,7 +19,7 @@ public class Function extends Component {
     private static String PARAMETER_ORDER = "parameterOrder";
 
     @Builder
-    public Function(final long id, @NonNull final String name, @Nullable final List<Relation> relations) {
+    public Function(@NonNull final String id, @NonNull final String name, @Nullable final List<Relation> relations) {
         super(id, name, ComponentCategory.FUNCTION, relations, null);
     }
 
