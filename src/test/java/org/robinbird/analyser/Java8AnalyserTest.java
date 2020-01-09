@@ -498,8 +498,11 @@ public class Java8AnalyserTest {
         when(analysisContext.registerClass(anyString(), any())).thenReturn(current);
         when(analysisContext.getCurrent()).thenReturn(null).thenReturn(current);
         Component integerMock = mock(Component.class);
+        when(integerMock.getName()).thenReturn("Integer");
         Component generalClassMock = mock(Component.class);
+        when(generalClassMock.getName()).thenReturn("GeneralClass");
         Component charMock = mock(Component.class);
+        when(charMock.getName()).thenReturn("char");
         when(analysisContext.registerPrimitiveType("Integer")).thenReturn(integerMock);
         when(analysisContext.register("GeneralClass")).thenReturn(generalClassMock);
         when(analysisContext.registerPrimitiveType("char")).thenReturn(charMock);
@@ -521,7 +524,9 @@ public class Java8AnalyserTest {
         when(analysisContext.registerClass(anyString(), any())).thenReturn(current);
         when(analysisContext.getCurrent()).thenReturn(null).thenReturn(current);
         Component integerMock = mock(Component.class);
+        when(integerMock.getName()).thenReturn("Integer");
         Array charMock = mock(Array.class);
+        when(charMock.getName()).thenReturn("char");
         Component objectMock = mock(Component.class);
         Varargs objectVarargsMock = mock(Varargs.class);
         when(analysisContext.registerPrimitiveType("Integer")).thenReturn(integerMock);

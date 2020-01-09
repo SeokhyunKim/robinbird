@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -417,10 +418,12 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
         log.debug("methodName={}, params={}", methodName, params);
         StringBuilder stringBuilder = new StringBuilder(methodName);
         if (params != null) {
+            StringBuilder paramsBuilder = new StringBuilder();
             for (Component t : params) {
-                stringBuilder.append(METHOD_PARAMETER_SEPERATOR);
-                stringBuilder.append(t.getName());
+                paramsBuilder.append(t.getName());
             }
+            stringBuilder.append(METHOD_PARAMETER_SEPERATOR)
+                         .append(UUID.nameUUIDFromBytes(paramsBuilder.toString().getBytes()).toString());
         }
         return stringBuilder.toString();
     }

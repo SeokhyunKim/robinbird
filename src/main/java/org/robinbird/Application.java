@@ -1,7 +1,6 @@
 package org.robinbird;
 
 import static org.robinbird.model.AnalysisJob.Language.JAVA8;
-import static org.robinbird.model.ComponentCategory.CLASS;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,8 +24,6 @@ import org.robinbird.clustering.RelationSelectors;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisJob;
 import org.robinbird.model.ComponentCategory;
-import org.robinbird.presentation.GMLPresentation;
-import org.robinbird.presentation.PlantUMLPresentation;
 import org.robinbird.presentation.Presentation;
 import org.robinbird.presentation.PresentationFactory;
 import org.robinbird.presentation.PresentationType;
@@ -46,7 +43,7 @@ public class Application {
 
 	private String shellDir;
 
-	private static enum DB_OPTION {
+	private enum DB_OPTION {
 		GENERATE_DB_FILE,
 		NOT_PARSING_AND_READ_DB_FILE,
 		NO_DB_FILE
@@ -90,9 +87,11 @@ public class Application {
 
 		final ComponentEntityDao componentEntityDao;
 		if (dbOption == DB_OPTION.GENERATE_DB_FILE) {
-			componentEntityDao = ComponentEntityDaoH2Factory.createDao(dbFileName, true);
+			componentEntityDao = ComponentEntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
+																	   true);
 		} else if (dbOption == DB_OPTION.NOT_PARSING_AND_READ_DB_FILE) {
-			componentEntityDao = ComponentEntityDaoH2Factory.createDao(dbFileName, false);
+			componentEntityDao = ComponentEntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
+																	   false);
 		} else {
 			componentEntityDao = ComponentEntityDaoH2Factory.createDao();
 		}
