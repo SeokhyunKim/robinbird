@@ -24,4 +24,9 @@ public class AgglomerativeClusteringNode extends ClusteringNode {
         return Optional.ofNullable(getMetadataValue(SCORE_KEY)).map(Double::parseDouble).orElse(0.0);
     }
 
+    @Override
+    public boolean isChildNode() {
+        return Double.compare(getScore(), 0.0) <= 0;
+    }
+
 }

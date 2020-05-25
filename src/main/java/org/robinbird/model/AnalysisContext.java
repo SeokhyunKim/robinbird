@@ -48,6 +48,7 @@ public class AnalysisContext {
 
         if (currentPackage != null) {
             currentPackage.addClass(component);
+            component.setPackage(currentPackage);
         }
         currentComponents.push(component);
     }

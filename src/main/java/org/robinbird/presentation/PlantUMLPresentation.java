@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.clustering.ClusteringNode;
 import org.robinbird.exception.RobinbirdException;
@@ -20,6 +20,7 @@ import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.Cardinality;
 import org.robinbird.model.Class;
 import org.robinbird.model.Component;
+import org.robinbird.model.ComponentCasts;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Function;
 import org.robinbird.model.Package;
@@ -221,7 +222,7 @@ public class PlantUMLPresentation implements Presentation {
             if (rendered.contains(node)) {
                 continue;
             }
-            List<String> nodeNames = getAllNodeNames(node);
+            Set<String> nodeNames = getNodeNames(node);
             addAllNodesToRendered(node, rendered, allNodes);
             Iterator<String> itor = nodeNames.iterator();
             StringAppender compName = new StringAppender();
@@ -233,10 +234,37 @@ public class PlantUMLPresentation implements Presentation {
                     compName.append(name);
                 }
             }
-            sa.append("[").append(compName.toString()).appendLine("]");
+            if (compName.isNotEmpty()) {
+                sa.append("[").append(compName.toString()).appendLine("]");
+            }
         }
         sa.appendLine("@enduml");
         return sa.toString();
+    }
+
+    private Set<String> getNodeNames(ClusteringNode node) {
+        Set<String> names = new HashSet<>();
+        //if (node.isChildNode()) {
+            names.addAll(getAllNodeNames(node));
+//        } else {
+//            names.addAll(getPackageNames(node));
+//        }
+        return names;
+    }
+
+    private Set<String> getPackageNames(ClusteringNode node) {
+        Set<String> names = new HashSet<>();
+        for (Component childNode : node.getMemberNodes()) {
+            if (childNode.getComponentCategory() == ComponentCategory.CLUSTERING_NODE) {
+                names.addAll(getPackageNames((ClusteringNode) childNode));
+            } else {
+                if (childNode.getComponentCategory() == ComponentCategory.CLASS) {
+                    final Optional<Package> packageOpt = ComponentCasts.toClass(childNode).getPackage();
+                    packageOpt.ifPresent(p -> names.add("Package(" + p.getName() + ")"));
+                }
+            }
+        }
+        return names;
     }
 
     private List<String> getAllNodeNames(ClusteringNode node) {

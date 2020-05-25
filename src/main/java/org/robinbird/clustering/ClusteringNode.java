@@ -19,6 +19,10 @@ public class ClusteringNode extends Component {
         super(id, name, CLUSTERING_NODE, relations, metadata);
     }
 
+    public boolean isChildNode() {
+        return false;
+    }
+
     public void addMemberNode(@NonNull final Component node) {
         final Relation relation = Relation.builder()
                                           .relationCategory(RelationCategory.CLUSTER_MEMBER)

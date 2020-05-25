@@ -21,7 +21,12 @@ public class FloydAlgorithm {
         double scoreSum = 0.0;
         for (final Component node : nodes) {
             allIds.add(node.getId());
-            scoreSum += relationsSelector.getRelations(node).size();
+            for (final Relation r : relationsSelector.getRelations(node)) {
+                if (r.getRelatedComponent().getId().equals(node.getId())) {
+                    continue;
+                }
+                scoreSum += 1;
+            }
         }
         final double totalRelationScore = scoreSum;
         for (final Component node1 : nodes) {

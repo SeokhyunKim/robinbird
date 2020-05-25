@@ -97,6 +97,31 @@ public class Class extends Component {
                                 .build());
     }
 
+    public void setPackage(@NonNull final Package parentPackage) {
+        final ComponentCategory category = parentPackage.getComponentCategory();
+        Validate.isTrue(category == PACKAGE,
+                        Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, category.name()));
+        final Relation packageRelation = Relation.builder()
+                                                .relationCategory(RelationCategory.PARENT_PACKAGE)
+                                                .relatedComponent(parentPackage)
+                                                .parent(this)
+                                                .build();
+        this.addRelation(packageRelation);
+    }
+
+    public Optional<Package> getPackage() {
+        final List<Relation> relations = this.getRelations(RelationCategory.PARENT_PACKAGE);
+        if (relations.isEmpty()) {
+            return Optional.empty();
+        }
+        final Component relatedComp = relations.iterator().next().getRelatedComponent();
+        return Optional.of(Package.builder()
+                                  .id(relatedComp.getId())
+                                  .name(relatedComp.getName())
+                                  .relations(relatedComp.getRelations())
+                                  .build());
+    }
+
     public void addInterface(@NonNull final Class newInterface) {
         // todo: check whether this is safe
         //Validate.isTrue(newInterface.getComponentCategory() == ComponentCategory.INTERFACE,

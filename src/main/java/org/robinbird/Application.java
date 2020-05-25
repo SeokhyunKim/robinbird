@@ -2,7 +2,9 @@ package org.robinbird;
 
 import static org.robinbird.model.AnalysisJob.Language.JAVA8;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -15,6 +17,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.robinbird.clustering.AgglomerativeClustering;
+import org.robinbird.clustering.AgglomerativeClusteringNode;
 import org.robinbird.clustering.ClusteringMethod;
 import org.robinbird.clustering.ClusteringMethodFactory;
 import org.robinbird.clustering.ClusteringMethodType;
@@ -23,6 +27,7 @@ import org.robinbird.clustering.ClusteringNodeFactory;
 import org.robinbird.clustering.RelationSelectors;
 import org.robinbird.model.AnalysisContext;
 import org.robinbird.model.AnalysisJob;
+import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.presentation.Presentation;
 import org.robinbird.presentation.PresentationFactory;
@@ -121,6 +126,7 @@ public class Application {
 					clusteringMethod.cluster(analysisContext.getComponents(ComponentCategory.classCategories()),
 											 RelationSelectors::getComponentRelations,
 											 clusteringMethodFactory.convertToParameters(params));
+			//printClusteringNodesForDebug(clusteringNodes);
 			final PresentationFactory presentationFactory = new PresentationFactory();
 			final Presentation presentation = presentationFactory.create(presentationType, commandLine);
 			presentationText = presentation.presentClusteringNodes(clusteringNodes);
@@ -133,6 +139,31 @@ public class Application {
 		System.out.println(presentationText);
 		componentEntityDao.close();
 		log.info("Database closed.");
+	}
+
+	private void printClusteringNodesForDebug(@NonNull final List<ClusteringNode> nodes) {
+		nodes.forEach(node -> printClusteringNodeForDebug(node, 0));
+	}
+
+	private void printClusteringNodeForDebug(@NonNull final ClusteringNode node, final int indent) {
+		StringAppender sa = new StringAppender();
+		if (node instanceof AgglomerativeClusteringNode) {
+			final AgglomerativeClusteringNode aggNode = (AgglomerativeClusteringNode)node;
+			System.out.println(sa.repeatedAppend("  ", indent)
+								 .append(aggNode.getName())
+								 .append(" ")
+								 .append(String.format("%.2f", aggNode.getScore())).toString());
+		} else {
+			System.out.println(sa.repeatedAppend("  ", indent).append(node.getName()).toString());
+		}
+		for (final Component c : node.getMemberNodes()) {
+			if (c instanceof ClusteringNode) {
+				printClusteringNodeForDebug((ClusteringNode) c, indent + 1);
+			} else {
+				StringAppender childsa = new StringAppender();
+				System.out.println(childsa.repeatedAppend("  ", indent + 1).append(c.getName()).toString());
+			}
+		}
 	}
 
 	private Path getRootPath(CommandLine commandLine) {

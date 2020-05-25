@@ -96,13 +96,16 @@ public class AgglomerativeClustering implements ClusteringMethod {
 
         // 10 is defined as maxScore
         double score = params[0];
+        double range = params.length > 1 ? params[1] : 1.0;
         if (score > SCORE_MAX) {
             score = SCORE_MAX;
         } else if (score < 0.0) {
             score = 0.0;
         }
         double adjustedScore = realMaxScore * score / SCORE_MAX;
-        return matchScoreEqualsOrLessThan(roots.values(), adjustedScore)
+        double adjustedRange = Math.min(realMaxScore * range / SCORE_MAX, adjustedScore);
+        log.info("Given score {}, real max score {}, and adjusted score {}", score, realMaxScore, adjustedScore);
+        return matchScoreEqualsOrGreaterThan(roots.values(), adjustedScore, adjustedRange)
                        .stream()
                        .map(n -> (ClusteringNode)n)
                        .collect(Collectors.toList());
@@ -120,22 +123,28 @@ public class AgglomerativeClustering implements ClusteringMethod {
         }
     }
 
-    private List<AgglomerativeClusteringNode> matchScoreEqualsOrLessThan(final Collection<AgglomerativeClusteringNode> nodes,
-                                                                         final double score) {
+    private List<AgglomerativeClusteringNode> matchScoreEqualsOrGreaterThan(final Collection<AgglomerativeClusteringNode> nodes,
+                                                                            final double score, final double range) {
         if (nodes.isEmpty()) {
             return Lists.newArrayList();
         }
         final List<AgglomerativeClusteringNode> matchedNodes = new ArrayList<>();
         for (final AgglomerativeClusteringNode node : nodes) {
             final double nodeScore = node.getScore();
-            if (nodeScore > score) {
-                final List<AgglomerativeClusteringNode> childResults =
-                        matchScoreEqualsOrLessThan(node.getMemberNodes()
-                                                       .stream()
-                                                       .filter(n -> n.getComponentCategory() == CLUSTERING_NODE)
-                                                       .map(n -> (AgglomerativeClusteringNode)n).collect(Collectors.toList()),
-                                                   score);
-                matchedNodes.addAll(childResults);
+            //log.info("{}", nodeScore);
+            if (Double.compare(nodeScore + range, score) < 0) {
+                continue;
+            }
+            //log.debug("node name: {}, node score: {}", node.getName(), nodeScore);
+            final List<AgglomerativeClusteringNode> childNodes = node.getMemberNodes()
+                                                                     .stream()
+                                                                     .filter(n -> n instanceof AgglomerativeClusteringNode)
+                                                                     .map(n -> (AgglomerativeClusteringNode)n)
+                                                                     .peek(n -> log.debug("child node name: {}, child node score: {}", n.getName(), n.getScore()))
+                                                                     .collect(Collectors.toList());
+            final boolean allLessThanScore = childNodes.stream().anyMatch(n -> Double.compare(n.getScore() + range, score) >= 0);
+            if (allLessThanScore) {
+                matchedNodes.addAll(matchScoreEqualsOrGreaterThan(childNodes, score, range));
             } else {
                 matchedNodes.add(node);
             }

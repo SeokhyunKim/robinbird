@@ -3,6 +3,7 @@ package org.robinbird.clustering;
 import static org.robinbird.model.RelationCategory.IMPLEMENTING_INTERFACE;
 import static org.robinbird.model.RelationCategory.MEMBER_VARIABLE;
 import static org.robinbird.model.RelationCategory.PARENT_CLASS;
+import static org.robinbird.model.RelationCategory.PARENT_PACKAGE;
 
 import java.util.List;
 import java.util.stream.Collectors;
