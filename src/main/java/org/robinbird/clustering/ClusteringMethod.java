@@ -5,6 +5,6 @@ import org.robinbird.model.Component;
 
 public interface ClusteringMethod {
 
-    List<ClusteringNode> cluster(List<Component> components, RelationsSelector relationsSelector, double[] params);
+    List<ClusteringNode> cluster(List<Component> components, RelationFilter relationFilter, double[] params);
 
 }

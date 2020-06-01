@@ -2,14 +2,12 @@ package org.robinbird.model;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.robinbird.model.ComponentCasts.toClass;
-import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.LIST_FOR_PACKAGE_NAME_IS_EMPTY;
-import static org.robinbird.util.Msgs.Key.WRONG_COMPONENT_CATEGORY;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,9 +22,10 @@ public class Package extends Component {
 
     private static String DELIMITER = ".";
 
-    @Builder
-    private Package(@NonNull final String id, @NonNull final String name, @Nullable final List<Relation> relations) {
-        super(id, name, ComponentCategory.PACKAGE, relations, null);
+    private Package(@NonNull final String id, @NonNull final String name,
+                    @Nullable Map<RelationCategory, List<Relation>> relations,
+                    @Nullable Map<String, String> metadata) {
+        super(id, name, ComponentCategory.PACKAGE, relations, metadata);
     }
 
     public void addClass(@NonNull final Class component) {
@@ -35,28 +34,29 @@ public class Package extends Component {
                                           .relationCategory(RelationCategory.PACKAGE_MEMBER)
                                           .relatedComponent(component)
                                           .cardinality(Cardinality.ONE)
-                                          .parent(this)
+                                          .owner(this)
                                           .build();
         addRelation(relation);
         // persist immediately
-        persist();
+        CurrentRbRepository.persist(this);
     }
 
     public List<Class> getClasses() {
-        return getRelations(RelationCategory.PACKAGE_MEMBER)
+        return getRelationsList(RelationCategory.PACKAGE_MEMBER)
                        .stream()
                        .map(r -> toClass(r.getRelatedComponent()))
                        .collect(Collectors.toList());
     }
 
+    public static Package create(@NonNull final String id, @NonNull final String name) {
+        return new Package(id, name, null, null);
+    }
+
     public static Package create(@NonNull final Component component) {
         Validate.isTrue(component.getComponentCategory() == ComponentCategory.PACKAGE,
-                        Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, component.getName(), component.getComponentCategory().name()));
-        return Package.builder()
-                      .id(component.getId())
-                      .name(component.getName())
-                      .relations(component.getRelations())
-                      .build();
+                        Msgs.get(Msgs.Key.INTERNAL_ERROR));
+        return new Package(component.getId(), component.getName(),
+                           component.getRelations(), component.getMetadata());
     }
 
     public static String createPackageName(@NonNull final List<String> packageNameList) {

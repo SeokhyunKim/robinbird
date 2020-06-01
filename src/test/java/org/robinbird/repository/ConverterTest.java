@@ -119,7 +119,7 @@ public class ConverterTest {
                              .name("test")
                              .relationCategory(RelationCategory.MEMBER_VARIABLE)
                              .relatedComponent(related)
-                             .parent(parent)
+                             .owner(parent)
                              .id(UUID.randomUUID().toString())
                              .build();
         RelationEntity e = Converter.convert(r);
@@ -141,7 +141,7 @@ public class ConverterTest {
                              .name("test")
                              .relationCategory(RelationCategory.MEMBER_VARIABLE)
                              .relatedComponent(related)
-                             .parent(parent)
+                             .owner(parent)
                              .id(UUID.randomUUID().toString())
                              .build();
         ObjectMapper objectMapper = mock(ObjectMapper.class);
@@ -162,7 +162,7 @@ public class ConverterTest {
         Component parent = mock(Component.class);
 
         Relation r = Converter.convert(e, related, parent);
-        Assert.assertThat(r.getParent(), is(parent));
+        Assert.assertThat(r.getOwner(), is(parent));
         Assert.assertThat(r.getRelatedComponent(), is(related));
         Assert.assertThat(r.getId(), is("1"));
         Assert.assertThat(r.getName(), is("test"));

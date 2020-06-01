@@ -23,7 +23,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.robinbird.analyser.Java8Analyser;
 import org.robinbird.parser.java8.Java8Lexer;
 import org.robinbird.parser.java8.Java8Parser;
-import org.robinbird.repository.ComponentRepository;
+import org.robinbird.repository.RbRepository;
 import org.robinbird.util.Msgs;
 
 @Slf4j
@@ -44,10 +44,10 @@ public class AnalysisJob {
         paths.add(p);
     }
 
-    public AnalysisContext analysis(@NonNull final ComponentRepository componentRepository,
+    public AnalysisContext analysis(@NonNull final RbRepository rbRepository,
                                     final boolean analysisFiles,
                                     @Nullable List<Pattern> terminalPatterns, @Nullable List<Pattern> excludePatterns) {
-        AnalysisContext analysisContext = new AnalysisContext(componentRepository);
+        AnalysisContext analysisContext = new AnalysisContext(rbRepository);
         if (terminalPatterns != null && terminalPatterns.size()>0) {
             analysisContext.setTerminalClassPatterns(terminalPatterns);
         }

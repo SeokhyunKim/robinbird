@@ -35,12 +35,15 @@ public class GMLPresentation implements Presentation {
         // relations considering inheritance, interface, and member variables
         for(final Component component : analysisContext.getComponents(ComponentCategory.CLASS)) {
             final Class classObj = (Class) component;
-            for (final Relation relation : classObj.getRelations()) {
-                if (!consideredCategories.contains(relation.getRelationCategory())) {
-                    continue;
+            classObj.getRelations().forEach((category, relations) -> {
+                for (final Relation relation : relations) {
+                    if (!consideredCategories.contains(relation.getRelationCategory())) {
+                        continue;
+                    }
+                    appendEdgeString(sa, classObj.getName(), relation.getRelatedComponent().getName());
                 }
-                appendEdgeString(sa, classObj.getName(), relation.getRelatedComponent().getName());
-            }
+
+            });
         }
 
         sa.appendLine("]");

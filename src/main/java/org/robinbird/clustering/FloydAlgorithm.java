@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import lombok.NonNull;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.model.Component;
@@ -15,13 +13,13 @@ import org.robinbird.util.Msgs;
 public class FloydAlgorithm {
 
     public static Map<String, Map<String, NodeDistance>> calculateDistances(@NonNull final List<Component> nodes,
-                                                                            @NonNull final RelationsSelector relationsSelector) {
+                                                                            @NonNull final RelationFilter relationFilter) {
         final Map<String, Map<String, NodeDistance>> dist = new HashMap<>();
         final List<String> allIds = new ArrayList<>(nodes.size());
         double scoreSum = 0.0;
         for (final Component node : nodes) {
             allIds.add(node.getId());
-            for (final Relation r : relationsSelector.getRelations(node)) {
+            for (final Relation r : relationFilter.getRelations(node)) {
                 if (r.getRelatedComponent().getId().equals(node.getId())) {
                     continue;
                 }
@@ -36,7 +34,7 @@ public class FloydAlgorithm {
             }
         }
         for (final Component node : nodes) {
-            List<Relation> relations = relationsSelector.getRelations(node);
+            List<Relation> relations = relationFilter.getRelations(node);
             Map<Component, List<Relation>> relatedNodeToRelations = new HashMap<>();
             relations.forEach(relation -> relatedNodeToRelations.computeIfAbsent(relation.getRelatedComponent(),
                                                                                  k -> new ArrayList<>())

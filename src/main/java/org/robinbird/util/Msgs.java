@@ -35,6 +35,7 @@ public class Msgs {
 		WRONG_COMPONENT_CATEGORY,
 		TRIED_TO_ADD_WRONG_COMPONENT,
 		TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED,
+		MULTIPLE_INDEPENDENT_COMPONENTS_OF_SAME_NAME,
 		INTERNAL_ERROR
 	}
 
@@ -68,6 +69,7 @@ public class Msgs {
 			.put(Key.TRIED_TO_ADD_WRONG_COMPONENT, "Tried to add wrong component. Component: %s.")
 			.put(Key.TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED,
 				 "Tried to create a new relation with already persisted one. Relation: %s.")
+			.put(Key.MULTIPLE_INDEPENDENT_COMPONENTS_OF_SAME_NAME, "Found multiple independent components of same name.")
 			.build();
 	}
 

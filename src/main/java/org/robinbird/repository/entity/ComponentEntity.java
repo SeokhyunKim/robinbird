@@ -12,8 +12,9 @@ import lombok.NonNull;
 @Entity
 @Table(name = "component",
        indexes = {
-        @Index(columnList = "name", unique = true),
-        @Index(columnList = "componentCategory")})
+        @Index(columnList = "name"),
+        @Index(columnList = "componentCategory"),
+        @Index(columnList = "ownerId")})
 public class ComponentEntity {
 
     @Id
@@ -22,6 +23,8 @@ public class ComponentEntity {
     private String name;
 
     private String componentCategory;
+
+    private String ownerId;
 
     private String metadata;
 

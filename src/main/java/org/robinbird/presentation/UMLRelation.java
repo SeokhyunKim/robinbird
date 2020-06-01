@@ -72,7 +72,7 @@ public class UMLRelation {
     }
 
     private Optional<Cardinality> getCardinality(@NonNull final Component comp1, @NonNull final Component comp2) {
-        final List<Relation> comp1MemberVars = comp1.getRelations(RelationCategory.MEMBER_VARIABLE);
+        final List<Relation> comp1MemberVars = comp1.getRelationsList(RelationCategory.MEMBER_VARIABLE);
         final Set<Cardinality> cardinalitySet = comp1MemberVars.stream()
                                                                .filter(r -> r.getRelatedComponent().equals(comp2))
                                                                .map(Relation::getCardinality)

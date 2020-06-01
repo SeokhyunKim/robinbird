@@ -5,6 +5,7 @@ import static org.robinbird.model.RelationCategory.MEMBER_VARIABLE;
 import static org.robinbird.model.RelationCategory.PARENT_CLASS;
 import static org.robinbird.model.RelationCategory.PARENT_PACKAGE;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.robinbird.model.Component;
@@ -19,14 +20,10 @@ public class RelationSelectors {
      * @return
      */
     public static List<Relation> getComponentRelations(Component component) {
-        return component.getRelations()
-                        .stream()
-                        .filter(r -> {
-                            RelationCategory category = r.getRelationCategory();
-                            return category == PARENT_CLASS ||
-                                   category == IMPLEMENTING_INTERFACE ||
-                                   category == MEMBER_VARIABLE;
-                        })
-                        .collect(Collectors.toList());
+        final List<Relation> relations = new ArrayList<>();
+        relations.addAll(component.getRelationsList(PARENT_CLASS));
+        relations.addAll(component.getRelationsList(IMPLEMENTING_INTERFACE));
+        relations.addAll(component.getRelationsList(MEMBER_VARIABLE));
+        return relations;
     }
 }

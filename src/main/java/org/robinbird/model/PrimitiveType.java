@@ -1,5 +1,6 @@
 package org.robinbird.model;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,7 +14,7 @@ public class PrimitiveType extends Component {
 
     @Builder
     public PrimitiveType(@NonNull final String id, @NonNull final String name) {
-        super(id, name, ComponentCategory.PRIMITIVE_TYPE, null, null);
+        super(id, name, ComponentCategory.PRIMITIVE_TYPE, (List<Relation>)null, null);
     }
 
 }

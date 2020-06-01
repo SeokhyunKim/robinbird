@@ -1,11 +1,15 @@
 package org.robinbird.model;
 
-import com.google.common.collect.Lists;
+import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
+import static org.robinbird.util.Utils.deepCopyMap;
+
 import com.google.common.collect.Maps;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -13,37 +17,53 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
-import org.robinbird.repository.ComponentRepository;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Validate;
+import org.robinbird.util.Msgs;
 
 @Getter
 @ToString
-@EqualsAndHashCode(exclude = {"relations"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Component {
 
-    private static ComponentRepository componentRepository;
-
-    public static void setComponentRepository(@NonNull final ComponentRepository componentRepository) {
-        Component.componentRepository = componentRepository;
-    }
-
+    @EqualsAndHashCode.Include
     @NonNull
     private final String id;
+
     @NonNull
     private final String name;
+
     @NonNull
     private ComponentCategory componentCategory;
 
-    private List<Relation> relations;
+    private Map<RelationCategory, List<Relation>> relations;
 
+    @NonNull
     private Map<String, String> metadata;
 
     public Component(@NonNull final String id, @NonNull final String name, @NonNull ComponentCategory componentCategory,
-                     @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
+                     @Nullable final Map<RelationCategory, List<Relation>> relations, @Nullable final Map<String, String> metadata) {
         this.id = id;
         this.name = name;
         this.componentCategory = componentCategory;
-        this.relations = relations;
+        if (relations != null) {
+            this.relations = deepCopyMap(relations);
+        }
+        this.metadata = metadata;
+        if (this.metadata == null) {
+            this.metadata = new HashMap<>();
+        }
+    }
+
+    public Component(@NonNull final String id, @NonNull final String name, @NonNull ComponentCategory componentCategory,
+                     @Nullable final Collection<Relation> relations, @Nullable final Map<String, String> metadata) {
+        this.id = id;
+        this.name = name;
+        this.componentCategory = componentCategory;
+        if (relations != null) {
+            this.relations = deepCopyMap(relations.stream()
+                                                  .collect(Collectors.groupingBy(Relation::getRelationCategory)));
+        }
         this.metadata = metadata;
         if (this.metadata == null) {
             this.metadata = new HashMap<>();
@@ -54,75 +74,116 @@ public class Component {
         this.componentCategory = componentCategory;
     }
 
-    public boolean hasPersisted() {
-        return StringUtils.isNotEmpty(id);
-    }
-
-    /**
-     * Save current {@link Component} information in database. Current relations will overwrite database relations.
-     */
-    public void persist() {
-        componentRepository.updateComponent(this);
-    }
-
-    /**
-     * Get relations as an immutable list.
-     * @return new list of relations.
-     */
-    public List<Relation> getRelations() {
+    public Map<RelationCategory, List<Relation>> getRelations() {
         lazyLoadingRelations();
-        return Lists.newArrayList(relations);
+        return deepCopyMap(this.relations);
     }
 
-    public List<Relation> getRelations(@NonNull final RelationCategory relationCategory) {
-        return getRelations().stream().filter(r -> r.getRelationCategory() == relationCategory).collect(Collectors.toList());
+    public List<Relation> getRelationsList() {
+        lazyLoadingRelations();
+        return this.relations.values().stream().flatMap(List::stream).collect(Collectors.toList());
+    }
+
+    public List<Relation> getRelationsList(@NonNull final RelationCategory relationCategory) {
+        lazyLoadingRelations();
+        final List<Relation> relations = this.relations.get(relationCategory);
+        if (relations == null) {
+            return new ArrayList<>();
+        }
+        return relations;
     }
 
     /**
-     * Add a new relatedComponent.
-     * @param relation a new relatedComponent to add.
+     * Add a new relatedRbType.
+     * @param relation a new relatedRbType to add.
      */
     public void addRelation(@NonNull final Relation relation) {
         lazyLoadingRelations();
-        this.relations.add(relation);
+        this.relations.computeIfAbsent(relation.getRelationCategory(), k -> new ArrayList<>())
+                      .add(relation);
     }
 
     private void lazyLoadingRelations() {
         if (this.relations == null) {
-            if (componentRepository != null) {
-                this.relations = componentRepository.getRelations(this);
-            } else {
-                this.relations = Lists.newArrayList();
-            }
+            final List<Relation> relations = CurrentRbRepository.getRelations(this);
+            this.relations = new HashMap<>();
+            relations.forEach(r -> this.relations.computeIfAbsent(r.getRelationCategory(), k -> new ArrayList<>())
+                                                 .add(r));
         }
     }
 
     /**
-     * Delete a relatedComponent.
-     * @param relation a relatedComponent to be deleted.
+     * Delete a relatedRbType.
+     * @param relation a relatedRbType to be deleted.
      */
+    // todo: revist the comparing logic of this function
     public void deleteRelation(@NonNull final Relation relation) {
         lazyLoadingRelations();
-        this.relations.removeIf(r -> r.equals(relation) &&
-                                     (r.getParent().getId() == relation.getParent().getId()));
+        if (!this.relations.containsKey(relation.getRelationCategory())) {
+            return;
+        }
+        this.relations.get(relation.getRelationCategory())
+                      .removeIf(r -> r.equals(relation) &&
+                                     (r.getOwner().getId() == relation.getOwner().getId()));
     }
 
     public void deleteRelationObject(@NonNull final Relation relation) {
         lazyLoadingRelations();
-        this.relations.removeIf(r -> r == relation);
+        if (!this.relations.containsKey(relation.getRelationCategory())) {
+            return;
+        }
+        this.relations.get(relation.getRelationCategory())
+                      .removeIf(r -> r == relation);
+    }
+
+    public void deleteRelationByCategory(@NonNull final RelationCategory relationCategory) {
+        if (!this.relations.containsKey(relationCategory)) {
+            return;
+        }
+        this.relations.get(relationCategory)
+                      .removeIf(r -> r.getRelationCategory() == relationCategory);
     }
 
     /**
      * Discard current relations and load relations from database.
      * Thus, all the unsaved relations will be lost. To save current relations, persist should be called beforehand.
      * This will load relations from database and replace current relations.
-     * @return new relations list loaded from database.
+     * @return new relations map loaded from database.
      */
-    public List<Relation> discardAndLoadRelations() {
-        final List<Relation> loadedRelations = componentRepository.getRelations(this);
+    public Map<RelationCategory, List<Relation>> discardAndLoadRelations() {
+        final List<Relation> loadedRelations = CurrentRbRepository.getRelations(this);
         this.relations.clear();
-        this.relations.addAll(loadedRelations);
-        return this.relations;
+        loadedRelations.forEach(r -> this.relations.computeIfAbsent(r.getRelationCategory(), k -> new ArrayList<>())
+                                                   .add(r));
+        return getRelations();
+    }
+
+    public void setOwnerComponent(@NonNull final Component owner) {
+        lazyLoadingRelations();
+        deleteRelationByCategory(RelationCategory.OWNER_COMPONENT);
+        final Relation parentRelation = Relation.builder()
+                                                .relationCategory(RelationCategory.OWNER_COMPONENT)
+                                                .relatedComponent(owner)
+                                                .owner(this)
+                                                .build();
+        this.addRelation(parentRelation);
+    }
+
+    public Optional<Component> getOwnerComponent() {
+        lazyLoadingRelations();
+        if (CollectionUtils.isEmpty(this.relations.get(RelationCategory.OWNER_COMPONENT))) {
+            return Optional.empty();
+        }
+        final List<Relation> relations = this.relations.get(RelationCategory.OWNER_COMPONENT);
+        Validate.isTrue(relations.size() <= 1, Msgs.get(INTERNAL_ERROR));
+        final Component relatedComp = relations.iterator().next().getRelatedComponent();
+        return Optional.of(Class.builder()
+                                .id(relatedComp.getId())
+                                .name(relatedComp.getName())
+                                .category(relatedComp.getComponentCategory())
+                                .relations(relatedComp.getRelations())
+                                .metadata(relatedComp.getMetadata())
+                                .build());
     }
 
     public Map<String, String> getMetadata() {
@@ -142,6 +203,7 @@ public class Component {
     }
 
     static public Component createComponentWithoutPersistence(@NonNull ComponentCategory componentCategory) {
-        return new Component(UUID.randomUUID().toString(), UUID.randomUUID().toString(), componentCategory, null, null);
+        return new Component(UUID.randomUUID().toString(), UUID.randomUUID().toString(), componentCategory,
+                             (List<Relation>)null, null);
     }
 }

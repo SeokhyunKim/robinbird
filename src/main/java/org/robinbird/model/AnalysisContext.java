@@ -1,29 +1,27 @@
 package org.robinbird.model;
 
-import static org.robinbird.model.ModelConstants.ARRAY_SUFFIX;
-import static org.robinbird.model.ModelConstants.VARARGS_SUFFIX;
 import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
 import static org.robinbird.util.Msgs.Key.INVALID_COMPONENT_CATEGORY;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
-import org.robinbird.repository.ComponentRepository;
+import org.robinbird.repository.RbRepository;
 import org.robinbird.util.Msgs;
 
 @Slf4j
 public class AnalysisContext {
 
-    private final ComponentRepository repository;
+    private final RbRepository repository;
     private final Stack<Class> currentComponents = new Stack<>();
 
     @Getter @Setter
@@ -38,7 +36,7 @@ public class AnalysisContext {
     @Getter @Setter
     private boolean isParsingEnum;
 
-    public AnalysisContext(@NonNull final ComponentRepository repository) {
+    public AnalysisContext(@NonNull final RbRepository repository) {
         this.repository = repository;
     }
 
@@ -83,7 +81,7 @@ public class AnalysisContext {
         return repository.getComponents(componentCategory);
     }
 
-    public List<Component> getComponents(@NonNull final java.util.Collection<ComponentCategory> categories) {
+    public List<Component> getComponents(@NonNull final Collection<ComponentCategory> categories) {
         List<Component> components = new ArrayList<>();
         categories.forEach(category -> components.addAll(getComponents(category)));
         return components;
@@ -147,37 +145,42 @@ public class AnalysisContext {
             final Component comp = compOpt.get();
             Validate.isTrue(comp.getComponentCategory() == ComponentCategory.PACKAGE,
                             Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, packageName, comp.getComponentCategory().name()));
-            return Package.builder()
-                          .id(comp.getId())
-                          .name(comp.getName())
-                          .relations(comp.getRelations())
-                          .build();
+            return Package.create(comp);
         }
         final Component newPackageComponent = repository.registerComponent(packageName, ComponentCategory.PACKAGE);
         return Package.create(newPackageComponent);
     }
 
-    public Container registerContainer(@NonNull final String typeName, @NonNull final List<Component> types) {
-        log.debug("typeName={}, types={}", typeName, types);
-        final Optional<Component> compOpt = repository.getComponent(typeName);
-        if (compOpt.isPresent()) {
-            final Component comp = compOpt.get();
-            Validate.isTrue(comp.getComponentCategory() == ComponentCategory.CONTAINER,
-                            Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, typeName, comp.getComponentCategory().name()));
-            final Container container = Container.builder()
-                                                 .id(comp.getId())
-                                                 .name(comp.getName())
-                                                 .relatedTypes(comp.getRelations())
-                                                 .build();
-            log.debug("Existing component. Returning {}", container);
-            return container;
+    public Container registerContainer(@NonNull final String collectionTypeName, @NonNull final List<Component> types) {
+        log.debug("collectionTypeName={}, types={}", collectionTypeName, types);
+        Validate.isTrue(getCurrent() != null, Msgs.get(INTERNAL_ERROR));
+        final Component owner = getCurrent();
+        final Optional<Component> baseTypeCompOpt = repository.getComponent(collectionTypeName);
+        final Component baseTypeComp;
+        if (baseTypeCompOpt.isPresent()) {
+            baseTypeComp = baseTypeCompOpt.get();
+        } else {
+            // register a collection as TEMPLATE_CLASS
+            baseTypeComp = repository.registerComponent(collectionTypeName, ComponentCategory.TEMPLATE_CLASS);
         }
-        final Component newCollectionComponent = repository.registerComponent(typeName, ComponentCategory.CONTAINER);
-        final Container newContainer = Container.create(newCollectionComponent);
-        newContainer.addRelatedTypes(types);
-        log.debug("Trying to persist a new collection: {}", newContainer);
-        newContainer.persist();
-        return newContainer;
+        final String containerName = Container.createContainerName(collectionTypeName, types);
+        final Optional<Component> containerCompOpt = repository.getDependentComponent(containerName, owner);
+        final Component containerComp;
+        final Container container;
+        if (containerCompOpt.isPresent()) {
+            containerComp = containerCompOpt.get();
+            container = Container.create(containerComp);
+        } else {
+            containerComp = repository.registerDependentComponent(containerName, ComponentCategory.CONTAINER, owner);
+            container = Container.create(containerComp.getId(),
+                                         baseTypeComp,
+                                         types,
+                                         owner);
+            log.debug("Trying to persist a new collection: {}", container);
+            CurrentRbRepository.persist(container);
+        }
+
+        return container;
     }
 
     public Array registerPrimitiveTypeArray(@NonNull final String typeName) {
@@ -191,51 +194,55 @@ public class AnalysisContext {
     }
 
     private Array registerArray(@NonNull final Component baseType) {
-        final String arrayName = baseType.getName() + ARRAY_SUFFIX;
-        final Optional<Component> componentOpt = repository.getComponent(arrayName);
+        Validate.isTrue(getCurrent() != null, Msgs.get(INTERNAL_ERROR));
+        final Component owner = getCurrent();
+        final String arrayName = Array.createArrayName(baseType);
+        final Optional<Component> componentOpt = repository.getDependentComponent(arrayName, owner);
         if (componentOpt.isPresent()) {
             final Component component = componentOpt.get();
             Validate.isTrue(component.getComponentCategory() == ComponentCategory.ARRAY,
                             Msgs.get(INTERNAL_ERROR));
+
             return Array.create(component);
         }
-        final Component arrayComponent = register(baseType.getName() + ARRAY_SUFFIX, ComponentCategory.ARRAY);
-        final Array array = Array.create(arrayComponent);
-        array.addBaseType(baseType);
-        array.persist();
+        final Component arrayComp = repository.registerDependentComponent(arrayName, ComponentCategory.ARRAY, owner);
+        final Array array = Array.create(arrayComp.getId(), baseType, owner);
+        CurrentRbRepository.persist(array);
         return array;
     }
 
     public Varargs registerVarargs(@NonNull final Component baseType) {
-        final String varargsName = baseType.getName() + VARARGS_SUFFIX;
-        final Optional<Component> componentOpt = repository.getComponent(varargsName);
+        Validate.isTrue(getCurrent() != null, Msgs.get(INTERNAL_ERROR));
+        final Component owner = getCurrent();
+        final String varargsName = Varargs.createVarargsName(baseType);
+        final Optional<Component> componentOpt = repository.getDependentComponent(varargsName, owner);
         if (componentOpt.isPresent()) {
             final Component component = componentOpt.get();
             Validate.isTrue(component.getComponentCategory() == ComponentCategory.VARARGS,
                             Msgs.get(INTERNAL_ERROR));
             return Varargs.create(component);
         }
-        final Component comp = register(varargsName, ComponentCategory.VARARGS);
-        final Varargs varargs = Varargs.create(comp);
-        varargs.addBaseType(baseType);
-        varargs.persist();
+        final Component varargsComp = repository.registerDependentComponent(varargsName, ComponentCategory.VARARGS, owner);
+        final Varargs varargs = Varargs.create(varargsComp.getId(), baseType, owner);
+        CurrentRbRepository.persist(varargs);
         return varargs;
     }
 
-    public Function registerFunction(@NonNull final String functionName, @Nullable final List<Component> params,
+    public Function registerFunction(@NonNull final String functionName, @NonNull final List<Component> params,
                                      @NonNull final Component returnType) {
-        final Optional<Component> componentOpt = repository.getComponent(functionName);
+        Validate.isTrue(getCurrent() != null, Msgs.get(INTERNAL_ERROR));
+        final Component owner = getCurrent();
+        final String funcNameWithParams = Function.createFunctionName(functionName, params);
+        final Optional<Component> componentOpt = repository.getDependentComponent(funcNameWithParams, owner);
         if (componentOpt.isPresent()) {
             final Component component = componentOpt.get();
             Validate.isTrue(component.getComponentCategory() == ComponentCategory.FUNCTION,
                             Msgs.get(INTERNAL_ERROR));
             return Function.create(component);
         }
-        final Component func = register(functionName, ComponentCategory.FUNCTION);
-        final Function function = Function.create(func);
-        function.addParameters(params);
-        function.addReturnType(returnType);
-        function.persist();
+        final Component functionComp = repository.registerDependentComponent(funcNameWithParams, ComponentCategory.FUNCTION, owner);
+        final Function function = Function.create(functionComp.getId(), returnType, functionName, params, owner);
+        CurrentRbRepository.persist(function);
         return function;
     }
 

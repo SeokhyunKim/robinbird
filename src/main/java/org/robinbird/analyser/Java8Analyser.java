@@ -25,6 +25,7 @@ import org.robinbird.model.Class;
 import org.robinbird.model.Container;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
+import org.robinbird.model.CurrentRbRepository;
 import org.robinbird.model.Function;
 import org.robinbird.model.ModelConstants;
 import org.robinbird.model.Package;
@@ -66,7 +67,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
     @Override
     public void exitPackageDeclaration(Java8Parser.PackageDeclarationContext ctx) {
-        analysisContext.getCurrentPackage().persist();
+        CurrentRbRepository.persist(analysisContext.getCurrentPackage());
     }
 
     @Override
@@ -100,7 +101,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
                 // category will be updated when the parent is parsed.
                 parent = analysisContext.registerClass(classTypeContext.getText(), ComponentCategory.CLASS);
             }
-            newClass.setParent(parent);
+            newClass.setParentClass(parent);
         }
         if (ctx.superinterfaces() != null) {
             Java8Parser.SuperinterfacesContext superinterfacesContext = ctx.superinterfaces();
@@ -119,7 +120,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
     @Override
     public void exitNormalClassDeclaration(Java8Parser.NormalClassDeclarationContext ctx) {
-        analysisContext.getCurrent().persist();
+        CurrentRbRepository.persist(analysisContext.getCurrent());
         analysisContext.popCurrent();
         analysisContext.setCurrentPackage(null);
     }
@@ -144,7 +145,7 @@ public class Java8Analyser extends Java8BaseListener implements Analyser {
 
     @Override
     public void exitNormalInterfaceDeclaration(Java8Parser.NormalInterfaceDeclarationContext ctx) {
-        analysisContext.getCurrent().persist();
+        CurrentRbRepository.persist(analysisContext.getCurrent());
         analysisContext.popCurrent();
         analysisContext.setCurrentPackage(null);
     }

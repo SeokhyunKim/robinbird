@@ -8,30 +8,32 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
+import org.robinbird.model.CurrentRbRepository;
 import org.robinbird.model.Relation;
 import org.robinbird.model.RelationCategory;
-import org.robinbird.repository.dao.ComponentEntityDao;
+import org.robinbird.repository.dao.EntityDao;
 import org.robinbird.repository.entity.ComponentEntity;
 import org.robinbird.repository.entity.RelationEntity;
 import org.robinbird.util.Msgs;
 
 @Slf4j
-public class ComponentRepository {
+public class RbRepository {
 
-    private final ComponentEntityDao componentEntityDao;
+    private final EntityDao entityDao;
 
-    public ComponentRepository(@NonNull final ComponentEntityDao componentEntityDao) {
-        this.componentEntityDao = componentEntityDao;
-        Component.setComponentRepository(this);
+    public RbRepository(@NonNull final EntityDao entityDao) {
+        this.entityDao = entityDao;
+        CurrentRbRepository.setRbRepository(this);
+        log.info("Update the current RbRepository: {}", this);
     }
 
     /**
@@ -41,20 +43,35 @@ public class ComponentRepository {
      * @return Optional of found AnalysisUnit. If this doesn't find anything, returns empty optional.
      */
     public Optional<Component> getComponent(@NonNull final String name) {
-        final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntityByName(name);
-        return ceOpt.map(Converter::convert);
+        final List<ComponentEntity> entities = entityDao.loadComponentEntityByName(name);
+        // when component has name and owner, it means a composite component like container or array.
+        // except composite components, thee should be one component per each distinct name.
+        final List<ComponentEntity> independentComponents = entities.stream()
+                                                                    .filter(e -> StringUtils.isEmpty(e.getOwnerId()))
+                                                                    .collect(Collectors.toList());
+        if (independentComponents.isEmpty()) {
+            return Optional.empty();
+        }
+        if (independentComponents.size() > 1) {
+            throw new RobinbirdException(Msgs.get(Msgs.Key.MULTIPLE_INDEPENDENT_COMPONENTS_OF_SAME_NAME));
+        }
+        return Optional.of(Converter.convert(independentComponents.get(0)));
+    }
+
+    public Optional<Component> getDependentComponent(@NonNull final String name, @NonNull final Component owner) {
+        return entityDao.loadComponentEntityByNameAndOwnerId(name, owner.getId()).map(Converter::convert);
     }
 
     public List<Component> getComponents(@NonNull final ComponentCategory componentCategory) {
-        final List<ComponentEntity> entities = componentEntityDao.loadComponentEntities(componentCategory.name());
+        final List<ComponentEntity> entities = entityDao.loadComponentEntities(componentCategory.name());
         return entities.stream().map(Converter::convert).collect(Collectors.toList());
     }
 
-    public List<Relation> getRelations(@NonNull final Component parent) {
-        final List<RelationEntity> entities = componentEntityDao.loadRelationEntities(parent.getId());
+    public List<Relation> getRelations(@NonNull final Component owner) {
+        final List<RelationEntity> entities = entityDao.loadRelationEntities(owner.getId());
         final List<Relation> relations = new ArrayList<>(entities.size());
         entities.forEach(e -> {
-            final Optional<ComponentEntity> ceOpt = componentEntityDao.loadComponentEntityById(e.getRelatedComponentId());
+            final Optional<ComponentEntity> ceOpt = entityDao.loadComponentEntityById(e.getRelatedComponentId());
             ceOpt.ifPresent(aue -> {
                 final RelationCategory relationCategory = RelationCategory.valueOf(e.getRelationCategory());
                 relations.add(Relation.builder()
@@ -62,7 +79,7 @@ public class ComponentRepository {
                                       .relationCategory(relationCategory)
                                       .relatedComponent(Converter.convert(ceOpt.get()))
                                       .cardinality(Cardinality.valueOf(e.getCardinality()))
-                                      .parent(parent)
+                                      .owner(owner)
                                       .id(e.getId())
                                       .build());
             });
@@ -92,9 +109,26 @@ public class ComponentRepository {
         final ComponentEntity newEntity = new ComponentEntity();
         newEntity.setName(name);
         newEntity.setComponentCategory(category.name());
-        final ComponentEntity saved = componentEntityDao.save(newEntity);
+        final ComponentEntity saved = entityDao.save(newEntity);
         return Converter.convert(saved);
+    }
 
+    public Component registerDependentComponent(@NonNull final String name, @NonNull final ComponentCategory category,
+                                                @NonNull final Component owner) {
+        final Optional<Component> dependentCompOpt = getDependentComponent(name, owner);
+        if (dependentCompOpt.isPresent()) {
+            final Component dependentComp = dependentCompOpt.get();
+            Validate.isTrue(dependentComp.getComponentCategory() == category,
+                            "Trying to register Component with different " +
+                                    "category. Name: " + name + ", category: " + category.name());
+            return dependentComp;
+        }
+        final ComponentEntity newEntity = new ComponentEntity();
+        newEntity.setName(name);
+        newEntity.setComponentCategory(category.name());
+        newEntity.setOwnerId(owner.getId());
+        final ComponentEntity saved = entityDao.save(newEntity);
+        return Converter.convert(saved);
     }
 
     /**
@@ -116,30 +150,27 @@ public class ComponentRepository {
         // Relations wanted to be updated.
         final Map<Integer, List<Relation>> compRelationsMap = new HashMap<>();
         // component.getRelations() can return current not persisted relations.
-        component.getRelations().forEach(r -> compRelationsMap.computeIfAbsent(r.hashCode(), k -> new ArrayList<>()).add(r));
+        component.getRelationsList().forEach(r -> compRelationsMap.computeIfAbsent(r.hashCode(), k -> new ArrayList<>())
+                                                                  .add(r));
 
-        // 1. delete relatedComponent entities not existing in component
+        // 1. delete relation entities not existing in component
         for (Map.Entry<Integer, List<Relation>> entry : dbRelationsMap.entrySet()) {
             final Integer relationHashCode = entry.getKey();
             final List<Relation> relationsInDb = entry.getValue();
+            final List<Relation> compRelations = compRelationsMap.get(relationHashCode);
             Iterator<Relation> itor = relationsInDb.iterator();
-            int numDeleted;
-            if (compRelationsMap.get(relationHashCode) == null) {
-                numDeleted = relationsInDb.size();
-            } else {
-                numDeleted = relationsInDb.size() - compRelationsMap.get(relationHashCode).size();
-            }
             while (itor.hasNext()) {
-                if (numDeleted-- <= 0) {
-                    break;
+                final Relation dbRelation = itor.next();
+                // hash code conflict should be rare. so this would be ok in terms of performance
+                final boolean isExisting = compRelations.stream().anyMatch(r -> r.equals(dbRelation));
+                if (!isExisting) {
+                    entityDao.delete(Converter.convert(dbRelation));
+                    itor.remove();
                 }
-                final Relation r = itor.next();
-                componentEntityDao.delete(Converter.convert(r));
-                itor.remove();
             }
         }
 
-        // 2. add new relatedComponent entity not existing in db.
+        // 2. add new component entity not existing in db.
         for (final List<Relation> relationsInComp : compRelationsMap.values()) {
             relationsInComp.forEach(r -> {
                 if (!r.isPersisted()) {
@@ -157,15 +188,15 @@ public class ComponentRepository {
      */
     public void updateComponentWithoutChangingRelations(@NonNull final Component component) {
         final ComponentEntity entity = Converter.convert(component);
-        componentEntityDao.update(entity);
+        entityDao.update(entity);
     }
 
     private Relation persistNewRelation(@NonNull final Relation relation, @NonNull final Component parent) {
         Validate.isTrue(relation.getId() == null,
                         Msgs.get(TRIED_TO_CREATE_NEW_PERSISTED_RELATION_WITH_ALREADY_STORED, relation.toString()));
-        final RelationEntity saved = componentEntityDao.save(Converter.convert(relation));
+        final RelationEntity saved = entityDao.save(Converter.convert(relation));
         final Optional<ComponentEntity> relatedComponentEntityOpt =
-                componentEntityDao.loadComponentEntityById(saved.getRelatedComponentId());
+                entityDao.loadComponentEntityById(saved.getRelatedComponentId());
         if (!relatedComponentEntityOpt.isPresent()) {
             throw new RobinbirdException(Msgs.get(Msgs.Key.INTERNAL_ERROR));
         }

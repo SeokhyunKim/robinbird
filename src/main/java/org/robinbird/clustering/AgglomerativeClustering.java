@@ -29,9 +29,9 @@ public class AgglomerativeClustering implements ClusteringMethod {
 
     @Override
     public List<ClusteringNode> cluster(@NonNull final List<Component> components,
-                                        @NonNull final RelationsSelector relationsSelector,
+                                        @NonNull final RelationFilter relationFilter,
                                         final double[] params) {
-        final Map<String, Map<String, NodeDistance>> dist = FloydAlgorithm.calculateDistances(components, relationsSelector);
+        final Map<String, Map<String, NodeDistance>> dist = FloydAlgorithm.calculateDistances(components, relationFilter);
         final Map<String, Component> idToComps = components.stream().collect(Collectors.toMap(Component::getId, Function.identity()));
         final Map<String, AgglomerativeClusteringNode> roots = new HashMap<>();
         final List<BidirectionalEdge> edges = new ArrayList<>();

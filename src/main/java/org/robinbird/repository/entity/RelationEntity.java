@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@IdClass(RelationEntityKey.class)
+@IdClass(ChildEntityKey.class)
 @NoArgsConstructor
 @Table(name = "relation", indexes = {@Index(columnList = "parentId")})
 public class RelationEntity {
 
     @Id
-    private String parentId;
+    private String ownerId;
 
     @Id
     private String id;

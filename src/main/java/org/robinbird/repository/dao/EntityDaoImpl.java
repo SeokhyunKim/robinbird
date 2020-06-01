@@ -16,12 +16,13 @@ import org.robinbird.repository.entity.ComponentEntity;
 import org.robinbird.repository.entity.RelationEntity;
 
 @Slf4j
-public class ComponentEntityDaoImpl implements ComponentEntityDao {
+public class EntityDaoImpl implements EntityDao {
 
     private final EntityManagerFactory emf; // later, if wants to support multi-threads, need to create em per thread with this.
     private final EntityManager em; // currently running with embedded mode and open this when app starts and close when app ends.
 
     private final Query loadComponentEntityWithIdQuery;
+    private final Query loadComponentEntityWithNameAndOwnerIdQuery;
     private final Query loadComponentEntityWithNameQuery;
     private final Query loadComponentEntitiesWithComponentCategory;
     private final Query loadRelationEntityWithParentIdAndIdQuery;
@@ -32,17 +33,19 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     private final Query deleteRelationEntityQuery;
     private final Query countComponentEntities;
 
-    public ComponentEntityDaoImpl(@NonNull final EntityManagerFactory emf) {
+    public EntityDaoImpl(@NonNull final EntityManagerFactory emf) {
         this.emf = emf;
         this.em = this.emf.createEntityManager();
 
         loadComponentEntityWithIdQuery = em.createQuery("select ce from ComponentEntity ce where ce.id = :id");
+        loadComponentEntityWithNameAndOwnerIdQuery = em.createQuery("select ce from ComponentEntity ce " +
+                                                                            "where ce.name = :name and ce.ownerId = :ownerId");
         loadComponentEntityWithNameQuery = em.createQuery("select ce from ComponentEntity ce where ce.name = :name");
         loadComponentEntitiesWithComponentCategory = em.createQuery("select ce from ComponentEntity ce where " +
                                                                         "ce.componentCategory = :componentCategory");
-        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r where r.parentId = :parentId and r.id = :id");
-        loadRelationEntitiesWithParentIdQuery = em.createQuery("select r from RelationEntity r " +
-                                                                        "where r.parentId = :parentId");
+        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :parentId and r.id = :id");
+        loadRelationEntitiesWithParentIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :parentId");
+
         updateComponentEntityQuery = em.createQuery("update ComponentEntity " +
                                                             "set name = :name, " +
                                                             "componentCategory = :componentCategory, " +
@@ -54,9 +57,9 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
                                                            "relatedComponentId = :relationId," +
                                                            "cardinality = :cardinality," +
                                                            "metadata = :metadata" +
-                                                           " where parentId = :parentId and id = :id");
+                                                           " where ownerId = :parentId and id = :id");
         deleteComponentEntityQuery = em.createQuery("delete from ComponentEntity where id = :id");
-        deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where parentId = :parentId and id = :id");
+        deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where ownerId = :parentId and id = :id");
         countComponentEntities = em.createQuery("select count(ce) from ComponentEntity ce");
 
         log.info("DaoImpl created.");
@@ -116,8 +119,13 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
     }
 
     @Override
-    public Optional<ComponentEntity> loadComponentEntityByName(@NonNull final String name) {
-        return loadEntity(loadComponentEntityWithNameQuery, "name", name);
+    public Optional<ComponentEntity> loadComponentEntityByNameAndOwnerId(@NonNull final String name, @NonNull final String ownerId) {
+        return loadEntity(loadComponentEntityWithNameAndOwnerIdQuery, "name", name, "ownerId", ownerId);
+    }
+
+    @Override
+    public List<ComponentEntity> loadComponentEntityByName(String name) {
+        return loadEntities(loadComponentEntityWithNameQuery, "name", name);
     }
 
     @Override
@@ -171,11 +179,11 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
             return entity;
         } else if (entity instanceof RelationEntity) {
             final RelationEntity r = (RelationEntity)entity;
-            final Optional<RelationEntity> rOpt = loadRelationEntity(r.getParentId(), r.getId());
+            final Optional<RelationEntity> rOpt = loadRelationEntity(r.getOwnerId(), r.getId());
             if (!rOpt.isPresent()) {
                 return null;
             }
-            transactional(updateRelationEntityQuery.setParameter("parentId", r.getParentId())
+            transactional(updateRelationEntityQuery.setParameter("ownerId", r.getOwnerId())
                                                    .setParameter("id", r.getId())
                                                    .setParameter("relationCategory", r.getRelationCategory())
                                                    .setParameter("name", r.getName())
@@ -194,7 +202,7 @@ public class ComponentEntityDaoImpl implements ComponentEntityDao {
             transactional(deleteComponentEntityQuery.setParameter("id", ae.getId()), Query::executeUpdate);
         } else if (entity instanceof RelationEntity) {
             final RelationEntity r = (RelationEntity)entity;
-            transactional(deleteRelationEntityQuery.setParameter("parentId", r.getParentId())
+            transactional(deleteRelationEntityQuery.setParameter("ownerId", r.getOwnerId())
                                                    .setParameter("id", r.getId()), Query::executeUpdate);
         }
     }

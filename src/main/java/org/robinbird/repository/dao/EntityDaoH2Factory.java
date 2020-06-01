@@ -7,7 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import lombok.NonNull;
 
-public class ComponentEntityDaoH2Factory {
+public class EntityDaoH2Factory {
 
     private static final String PERSISTENT_UNIT = "entity-manager";
 
@@ -15,7 +15,7 @@ public class ComponentEntityDaoH2Factory {
      * Create ComponentEntityDao working in-memory.
      * @return created in-memory ComponentEntityDao.
      */
-    public static ComponentEntityDao createDao() {
+    public static EntityDao createDao() {
         return createDaoInternal(null, false);
     }
 
@@ -24,11 +24,11 @@ public class ComponentEntityDaoH2Factory {
      * @param dbFileName a db file name.
      * @return created ComponentEntityDao working with the given db file.
      */
-    public static ComponentEntityDao createDao(@NonNull final String dbFileName, final boolean discardExistingDbFile) {
+    public static EntityDao createDao(@NonNull final String dbFileName, final boolean discardExistingDbFile) {
         return createDaoInternal(dbFileName, discardExistingDbFile);
     }
 
-    private static ComponentEntityDao createDaoInternal(@Nullable final String dbFileName, final boolean discardExistingDbFile) {
+    private static EntityDao createDaoInternal(@Nullable final String dbFileName, final boolean discardExistingDbFile) {
         final EntityManagerFactory emf;
         if (dbFileName == null) {
             emf = Persistence.createEntityManagerFactory(PERSISTENT_UNIT);
@@ -46,7 +46,7 @@ public class ComponentEntityDaoH2Factory {
             }
             emf = Persistence.createEntityManagerFactory(PERSISTENT_UNIT, configOverrides);
         }
-        return new ComponentEntityDaoImpl(emf);
+        return new EntityDaoImpl(emf);
     }
 
 }

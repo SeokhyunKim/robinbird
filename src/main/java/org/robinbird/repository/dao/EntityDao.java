@@ -5,11 +5,13 @@ import java.util.Optional;
 import org.robinbird.repository.entity.ComponentEntity;
 import org.robinbird.repository.entity.RelationEntity;
 
-public interface ComponentEntityDao {
+public interface EntityDao {
 
     Optional<ComponentEntity> loadComponentEntityById(String id);
 
-    Optional<ComponentEntity> loadComponentEntityByName(String name);
+    Optional<ComponentEntity> loadComponentEntityByNameAndOwnerId(String name, String ownerId);
+
+    List<ComponentEntity> loadComponentEntityByName(String name);
 
     List<ComponentEntity> loadComponentEntities(String componentCategory);
 

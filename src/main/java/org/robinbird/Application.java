@@ -2,9 +2,7 @@ package org.robinbird;
 
 import static org.robinbird.model.AnalysisJob.Language.JAVA8;
 
-import com.google.common.collect.Lists;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -17,7 +15,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.robinbird.clustering.AgglomerativeClustering;
 import org.robinbird.clustering.AgglomerativeClusteringNode;
 import org.robinbird.clustering.ClusteringMethod;
 import org.robinbird.clustering.ClusteringMethodFactory;
@@ -32,9 +29,9 @@ import org.robinbird.model.ComponentCategory;
 import org.robinbird.presentation.Presentation;
 import org.robinbird.presentation.PresentationFactory;
 import org.robinbird.presentation.PresentationType;
-import org.robinbird.repository.ComponentRepository;
-import org.robinbird.repository.dao.ComponentEntityDao;
-import org.robinbird.repository.dao.ComponentEntityDaoH2Factory;
+import org.robinbird.repository.RbRepository;
+import org.robinbird.repository.dao.EntityDao;
+import org.robinbird.repository.dao.EntityDaoH2Factory;
 import org.robinbird.util.StringAppender;
 import org.robinbird.util.Utils;
 
@@ -90,23 +87,23 @@ public class Application {
 			dbFileName = "";
 		}
 
-		final ComponentEntityDao componentEntityDao;
+		final EntityDao entityDao;
 		if (dbOption == DB_OPTION.GENERATE_DB_FILE) {
-			componentEntityDao = ComponentEntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
-																	   true);
+			entityDao = EntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
+													 true);
 		} else if (dbOption == DB_OPTION.NOT_PARSING_AND_READ_DB_FILE) {
-			componentEntityDao = ComponentEntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
-																	   false);
+			entityDao = EntityDaoH2Factory.createDao(Paths.get(shellDir, dbFileName).toString(),
+													 false);
 		} else {
-			componentEntityDao = ComponentEntityDaoH2Factory.createDao();
+			entityDao = EntityDaoH2Factory.createDao();
 		}
-		final ComponentRepository componentRepository = new ComponentRepository(componentEntityDao);
+		final RbRepository rbRepository = new RbRepository(entityDao);
 
 		// real analysis job
-		final AnalysisContext analysisContext = analysisJob.analysis(componentRepository,
+		final AnalysisContext analysisContext = analysisJob.analysis(rbRepository,
 																	 dbOption != DB_OPTION.NOT_PARSING_AND_READ_DB_FILE,
 																	 terminalPatterns, excludedPatterns);
-		log.info("Recognized {} components.", componentEntityDao.getNumComponentEntities());
+		log.info("Recognized {} components.", entityDao.getNumComponentEntities());
 
 		// presentation type
 		final PresentationType presentationType = getPresentationType(commandLine);
@@ -137,7 +134,7 @@ public class Application {
 		}
 
 		System.out.println(presentationText);
-		componentEntityDao.close();
+		entityDao.close();
 		log.info("Database closed.");
 	}
 

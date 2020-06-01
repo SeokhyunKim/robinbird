@@ -1,16 +1,16 @@
 package org.robinbird.model;
 
-import static org.robinbird.util.Msgs.Key.FOUND_COMPONENT_OF_DIFFERENT_TYPE;
 import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
 
 import com.google.common.collect.Maps;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import lombok.Builder;
 import lombok.NonNull;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.util.Msgs;
 
@@ -18,21 +18,41 @@ public class Function extends Component {
 
     private static String PARAMETER_ORDER = "parameterOrder";
 
-    @Builder
-    public Function(@NonNull final String id, @NonNull final String name, @Nullable final List<Relation> relations) {
-        super(id, name, ComponentCategory.FUNCTION, relations, null);
+    private Function(@NonNull final String id, @NonNull final String name,
+                     @Nullable final Map<String, String> metadata) {
+        super(id, name, ComponentCategory.FUNCTION, (List<Relation>)null, metadata);
     }
 
-    public void addParameters(@Nullable final List<Component> parameters) {
-        if (parameters == null) {
+    private void setReturnType(@NonNull final Component returnType) {
+        deleteRelationByCategory(RelationCategory.FUNCTION_RETURN_TYPE);
+        final Relation relation = Relation.builder()
+                                          .owner(this)
+                                          .relatedComponent(returnType)
+                                          .relationCategory(RelationCategory.FUNCTION_RETURN_TYPE)
+                                          .build();
+        addRelation(relation);
+    }
+
+    public Optional<Component> getReturnType() {
+        final List<Relation> relations = getRelationsList(RelationCategory.FUNCTION_RETURN_TYPE);
+        Validate.isTrue(relations.size() <= 1, Msgs.get(INTERNAL_ERROR));
+        if (relations.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(relations.get(0).getRelatedComponent());
+    }
+
+    private void setParameters(@Nullable final List<Component> parameters) {
+        if (CollectionUtils.isEmpty(parameters)) {
             return;
         }
+        deleteRelationByCategory(RelationCategory.FUNCTION_PARAMETER);
         int order = 0;
         for (final Component param : parameters) {
             final Map<String, String> metadata = Maps.newHashMap();
-            metadata.put(PARAMETER_ORDER, Integer.toString(++order));
+            metadata.put(PARAMETER_ORDER, Integer.toString(order++));
             final Relation relation = Relation.builder()
-                                              .parent(this)
+                                              .owner(this)
                                               .relatedComponent(param)
                                               .relationCategory(RelationCategory.FUNCTION_PARAMETER)
                                               .metadata(metadata)
@@ -42,7 +62,7 @@ public class Function extends Component {
     }
 
     public List<Component> getParameters() {
-        final List<Relation> params = getRelations(RelationCategory.FUNCTION_PARAMETER);
+        final List<Relation> params = getRelationsList(RelationCategory.FUNCTION_PARAMETER);
         params.sort((p1, p2) -> {
             final String odrStr1 = Optional.ofNullable(p1.getMetadata().get(PARAMETER_ORDER)).orElse("0");
             final String odrStr2 = Optional.ofNullable(p2.getMetadata().get(PARAMETER_ORDER)).orElse("0");
@@ -51,28 +71,37 @@ public class Function extends Component {
         return params.stream().map(Relation::getRelatedComponent).collect(Collectors.toList());
     }
 
-    public void addReturnType(@NonNull final Component returnType) {
-        final Relation relation = Relation.builder()
-                                          .parent(this)
-                                          .relatedComponent(returnType)
-                                          .relationCategory(RelationCategory.FUNCTION_RETURN_TYPE)
-                                          .build();
-        addRelation(relation);
-    }
-
-    public Component getReturnType() {
-        final List<Relation> relations = getRelations(RelationCategory.FUNCTION_RETURN_TYPE);
-        Validate.isTrue(relations.size() == 1, Msgs.get(INTERNAL_ERROR));
-        return relations.iterator().next().getRelatedComponent();
+    public static Function create(@NonNull final String id,
+                                  @NonNull final Component returnType,
+                                  @NonNull final String functionName,
+                                  @NonNull final List<Component> parameters,
+                                  @NonNull final Component owner) {
+        final Function function = new Function(id, createFunctionName(functionName, parameters), null);
+        function.setOwnerComponent(owner);
+        function.setReturnType(returnType);
+        function.setParameters(parameters);
+        return function;
     }
 
     public static Function create(@NonNull final Component component) {
-        Validate.isTrue(component.getComponentCategory() == ComponentCategory.FUNCTION,
-                        Msgs.get(FOUND_COMPONENT_OF_DIFFERENT_TYPE, component.getName(), component.getComponentCategory().name()));
-        return Function.builder()
-                       .id(component.getId())
-                       .name(component.getName())
-                       .build();
+        final Function function = new Function(component.getId(), component.getName(), component.getMetadata());
+        Validate.isTrue(component.getOwnerComponent().isPresent(), Msgs.get(Msgs.Key.INTERNAL_ERROR));
+        return function;
     }
 
+    public static String createFunctionName(@NonNull final String functionName,
+                                            @NonNull final List<Component> parameters) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(functionName);
+        sb.append("(");
+        final Iterator<Component> itor = parameters.iterator();
+        if (itor.hasNext()) {
+            sb.append(itor.next().getName());
+        }
+        while (itor.hasNext()) {
+            sb.append(", ").append(itor.next().getName());
+        }
+        sb.append(")");
+        return sb.toString();
+    }
 }

@@ -2,7 +2,6 @@ package org.robinbird.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,6 +14,10 @@ public class Relation {
 
     private static final String COLLECTION_TYPE_KEY = "collectionType";
 
+    @NonNull
+    private final Component owner;
+    private final String id;
+
     @Builder.Default
     private final String name = "";
     @NonNull
@@ -23,10 +26,6 @@ public class Relation {
     private final Component relatedComponent;
     @Builder.Default
     private final Cardinality cardinality = Cardinality.ONE;
-
-    @NonNull
-    private final Component parent;
-    private final String id;
 
     @Builder.Default
     private final Map<String, String> metadata = new HashMap<>();
@@ -39,9 +38,9 @@ public class Relation {
     public String toString() {
         return "Relation(name=" + name +
                    ", relationCategory=" + relationCategory.name() +
-                   ", relatedComponent=" + relatedComponent.getName() +
+                   ", relatedRbType=" + relatedComponent.getName() +
                    ", cardinality=" + cardinality +
-                   ", parent=" + parent.getName() +
+                   ", owner=" + owner.getName() +
                    ", metadata=" + metadata.toString() + ")";
     }
 

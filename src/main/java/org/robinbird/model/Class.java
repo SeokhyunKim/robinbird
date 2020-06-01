@@ -6,15 +6,11 @@ import static org.robinbird.model.ComponentCasts.toClass;
 import static org.robinbird.model.ComponentCategory.ARRAY;
 import static org.robinbird.model.ComponentCategory.CONTAINER;
 import static org.robinbird.model.ComponentCategory.PACKAGE;
-import static org.robinbird.util.JsonObjectMapper.OBJECT_MAPPER;
 import static org.robinbird.util.Msgs.Key.INTERNAL_ERROR;
-import static org.robinbird.util.Msgs.Key.JSON_PROCESSING_ISSUE;
 import static org.robinbird.util.Msgs.Key.WRONG_COMPONENT_CATEGORY;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +22,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import org.apache.commons.lang3.Validate;
-import org.robinbird.exception.RobinbirdException;
+import org.robinbird.util.JsonObjectMapper;
 import org.robinbird.util.Msgs;
 
 @Getter
@@ -37,20 +33,18 @@ public class Class extends Component {
     private static final String TEMPLATE_VARIABLES_KEY = "templateVariables";
 
     @Builder
-    private Class(@NonNull final String id, @NonNull final String name, @NonNull final ComponentCategory category,
-                  @Nullable final List<Relation> relations, @Nullable final Map<String, String> metadata) {
+    private Class(@NonNull final String id, @NonNull final String name,
+                  @NonNull final ComponentCategory category,
+                  @Nullable final Map<RelationCategory, List<Relation>> relations,
+                  @Nullable final Map<String, String> metadata) {
         super(id, name, category, relations, metadata);
         Validate.isTrue(category.isClassCategory(),
                         Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, category.name()));
     }
 
     public void setTemplateVariables(@NonNull final List<String> vars) {
-        try {
-            final String templateVarsString = OBJECT_MAPPER.writeValueAsString(vars);
-            putMetadataValue(TEMPLATE_VARIABLES_KEY, templateVarsString);
-        } catch (final JsonProcessingException e) {
-            throw new RobinbirdException(Msgs.get(JSON_PROCESSING_ISSUE, vars.toString()), e);
-        }
+        final String templateVarsString = JsonObjectMapper.writeValueAsString(vars);
+        putMetadataValue(TEMPLATE_VARIABLES_KEY, templateVarsString);
     }
 
     public List<String> getTemplateVariables() {
@@ -61,32 +55,29 @@ public class Class extends Component {
         if (templateVarsString == null) {
             return Lists.newArrayList();
         }
-        try {
-            return OBJECT_MAPPER.readValue(templateVarsString, new TypeReference<List<String>>() {
-            });
-        } catch (final IOException e) {
-            throw new RobinbirdException(Msgs.get(JSON_PROCESSING_ISSUE, templateVarsString), e);
-        }
+        return JsonObjectMapper.readValue(templateVarsString, new TypeReference<List<String>>(){});
     }
 
-    public void setParent(@NonNull final Class parent) {
-        final ComponentCategory category = parent.getComponentCategory();
-        Validate.isTrue(category.isClassCategory(),
-                        Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, category.name()));
+    public void setParentClass(@NonNull final Class parent) {
+        final ComponentCategory parentCategory = parent.getComponentCategory();
+        Validate.isTrue(parentCategory.isClassCategory(),
+                        Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, parentCategory.name()));
+        deleteRelationByCategory(RelationCategory.PARENT_CLASS);
         final Relation parentRelation = Relation.builder()
                                                 .relationCategory(RelationCategory.PARENT_CLASS)
                                                 .relatedComponent(parent)
-                                                .parent(this)
+                                                .owner(this)
                                                 .build();
         this.addRelation(parentRelation);
     }
 
-    public Optional<Class> getParent() {
-        final List<Relation> relations = this.getRelations(RelationCategory.PARENT_CLASS);
-        Validate.isTrue(relations.size() <= 1, Msgs.get(INTERNAL_ERROR));
+    public Optional<Class> getParentClass() {
+        final List<Relation> relations = this.getRelationsList(RelationCategory.PARENT_CLASS);
         if (relations.isEmpty()) {
             return Optional.empty();
         }
+        Validate.isTrue(relations.size() <= 1, Msgs.get(INTERNAL_ERROR));
+
         final Component relatedComp = relations.iterator().next().getRelatedComponent();
         return Optional.of(Class.builder()
                                 .id(relatedComp.getId())
@@ -104,38 +95,33 @@ public class Class extends Component {
         final Relation packageRelation = Relation.builder()
                                                 .relationCategory(RelationCategory.PARENT_PACKAGE)
                                                 .relatedComponent(parentPackage)
-                                                .parent(this)
+                                                .owner(this)
                                                 .build();
         this.addRelation(packageRelation);
     }
 
     public Optional<Package> getPackage() {
-        final List<Relation> relations = this.getRelations(RelationCategory.PARENT_PACKAGE);
+        final List<Relation> relations = this.getRelationsList(RelationCategory.PARENT_PACKAGE);
         if (relations.isEmpty()) {
             return Optional.empty();
         }
         final Component relatedComp = relations.iterator().next().getRelatedComponent();
-        return Optional.of(Package.builder()
-                                  .id(relatedComp.getId())
-                                  .name(relatedComp.getName())
-                                  .relations(relatedComp.getRelations())
-                                  .build());
+        return Optional.of(Package.create(relatedComp));
     }
 
     public void addInterface(@NonNull final Class newInterface) {
-        // todo: check whether this is safe
-        //Validate.isTrue(newInterface.getComponentCategory() == ComponentCategory.INTERFACE,
-        //                Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, newInterface.getComponentCategory().name()));
+        Validate.isTrue(newInterface.getComponentCategory() == ComponentCategory.INTERFACE,
+                        Msgs.get(Msgs.Key.INVALID_COMPONENT_CATEGORY, newInterface.getComponentCategory().name()));
         final Relation interfaceRelation = Relation.builder()
                                                 .relationCategory(RelationCategory.IMPLEMENTING_INTERFACE)
                                                 .relatedComponent(newInterface)
-                                                .parent(this)
+                                                .owner(this)
                                                 .build();
         this.addRelation(interfaceRelation);
     }
 
     public List<Class> getInterfaces() {
-        final List<Relation> relations = this.getRelations(RelationCategory.IMPLEMENTING_INTERFACE);
+        final List<Relation> relations = this.getRelationsList(RelationCategory.IMPLEMENTING_INTERFACE);
         if (relations.isEmpty()) {
             return Lists.newArrayList();
         }
@@ -150,14 +136,14 @@ public class Class extends Component {
                                                 .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                                 .relatedComponent(memberVariableType)
                                                 .cardinality(cardinality)
-                                                .parent(this)
+                                                .owner(this)
                                                 .build();
         memberVariable.setAccessLevel(accessLevel);
         this.addRelation(memberVariable);
     }
 
     public List<Relation> getMemberVariableRelations() {
-        return getRelations(RelationCategory.MEMBER_VARIABLE);
+        return getRelationsList(RelationCategory.MEMBER_VARIABLE);
     }
 
     public void addMemberFunction(@NonNull final Function memberFunction, @NonNull final String methodName,
@@ -166,14 +152,14 @@ public class Class extends Component {
                                         .name(methodName)
                                         .relationCategory(RelationCategory.MEMBER_FUNCTION)
                                         .relatedComponent(memberFunction)
-                                        .parent(this)
+                                        .owner(this)
                                         .build();
         method.setAccessLevel(accessLevel);
         this.addRelation(method);
     }
 
     public List<Relation> getMemberFunctionRelations() {
-        return getRelations(RelationCategory.MEMBER_FUNCTION);
+        return getRelationsList(RelationCategory.MEMBER_FUNCTION);
     }
 
     private Cardinality getMemberVariableCardinality(@NonNull final ComponentCategory category) {

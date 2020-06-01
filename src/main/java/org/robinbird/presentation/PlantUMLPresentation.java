@@ -11,7 +11,6 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.robinbird.clustering.ClusteringNode;
 import org.robinbird.exception.RobinbirdException;
@@ -42,11 +41,7 @@ public class PlantUMLPresentation implements Presentation {
         sa.appendLine("@startuml");
         sa.appendLine("left to right direction");
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = Package.builder()
-                                          .id(component.getId())
-                                          .name(component.getName())
-                                          .relations(component.getRelations())
-                                          .build();
+            Package classPackage = Package.create(component);
             sa.appendLine("package " + classPackage.getName() + " {");
             for (Class classObj : classPackage.getClasses()) {
                 // class name, member variables, and member functions
@@ -61,13 +56,9 @@ public class PlantUMLPresentation implements Presentation {
         }
         // inheritance
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = Package.builder()
-                                          .id(component.getId())
-                                          .name(component.getName())
-                                          .relations(component.getRelations())
-                                          .build();
+            Package classPackage = Package.create(component);
             for (Class classObj : classPackage.getClasses()) {
-                final Optional<Class> parentOpt = classObj.getParent();
+                final Optional<Class> parentOpt = classObj.getParentClass();
                 if (parentOpt.isPresent()) {
                     final Class parent = parentOpt.get();
                     sa.appendLine(removeGenerics(parent.getName()) + " <|-- " + removeGenerics(classObj.getName()));
@@ -76,11 +67,7 @@ public class PlantUMLPresentation implements Presentation {
         }
         // interfaces
         for (Component component : analysisContext.getComponents(ComponentCategory.PACKAGE)) {
-            Package classPackage = Package.builder()
-                                          .id(component.getId())
-                                          .name(component.getName())
-                                          .relations(component.getRelations())
-                                          .build();
+            Package classPackage = Package.create(component);
             for (Class classObj : classPackage.getClasses()) {
                 if (classObj.getInterfaces().size() > 0) {
                     for (Class interfaceOfClassObj : classObj.getInterfaces()) {
@@ -99,7 +86,7 @@ public class PlantUMLPresentation implements Presentation {
                                         .relations(component.getRelations())
                                         .metadata(component.getMetadata())
                                         .build();
-            final List<Relation> relations = classObj.getRelations(RelationCategory.MEMBER_VARIABLE);
+            final List<Relation> relations = classObj.getRelationsList(RelationCategory.MEMBER_VARIABLE);
             for (final Relation relation : relations) {
                 final UMLRelation.Key key = UMLRelation.createKey(component, relation.getRelatedComponent());
                 if (umlRelations.get(key) != null) {
@@ -164,11 +151,7 @@ public class PlantUMLPresentation implements Presentation {
             sa.append("\t").append(convertAccessLevel(funcRelation.getAccessLevel())).append(" ");
             sa.append(funcRelation.getName()).append("(");
             final Component relatedComp = funcRelation.getRelatedComponent();
-            final Function func = Function.builder()
-                                          .id(relatedComp.getId())
-                                          .name(relatedComp.getName())
-                                          .relations(relatedComp.getRelations())
-                                          .build();
+            final Function func = Function.create(relatedComp);
             final Iterator<Component> itor = func.getParameters().iterator();
             while (itor.hasNext()) {
                 final Component param = itor.next();
@@ -177,7 +160,7 @@ public class PlantUMLPresentation implements Presentation {
                     sa.append(", ");
                 }
             }
-            sa.append(") : ").appendLine(func.getReturnType().getName());
+            sa.append(") : ").appendLine(func.getReturnType().get().getName());
         });
         return sa.toString();
     }

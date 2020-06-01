@@ -1,5 +1,11 @@
 package org.robinbird.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.NonNull;
+
 /**
  * Created by seokhyun on 12/15/17.
  */
@@ -14,6 +20,12 @@ public class Utils {
 		sa.appendLine("- Max Memory: " + runtime.maxMemory()/mb);
 		sa.appendLine("- Free Memory: " + runtime.freeMemory()/mb);
 		return sa.toString();
+	}
+
+	public static <S, T> Map<S, List<T>> deepCopyMap(@NonNull final Map<S, List<T>> map) {
+		final Map<S, List<T>> copiedMap = new HashMap<>();
+		map.forEach((k, ary) -> copiedMap.put(k, new ArrayList<>(ary)));
+		return copiedMap;
 	}
 
 }

@@ -27,13 +27,13 @@ public class ClusteringNode extends Component {
         final Relation relation = Relation.builder()
                                           .relationCategory(RelationCategory.CLUSTER_MEMBER)
                                           .relatedComponent(node)
-                                          .parent(this)
+                                          .owner(this)
                                           .build();
         addRelation(relation);
     }
 
     public List<Component> getMemberNodes() {
-        final List<Relation> relations = getRelations(RelationCategory.CLUSTER_MEMBER);
+        final List<Relation> relations = getRelationsList(RelationCategory.CLUSTER_MEMBER);
         return relations.stream()
                         .map(Relation::getRelatedComponent)
                         .collect(Collectors.toList());

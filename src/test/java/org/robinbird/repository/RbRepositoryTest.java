@@ -20,22 +20,22 @@ import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
 import org.robinbird.model.Relation;
 import org.robinbird.model.RelationCategory;
-import org.robinbird.repository.dao.ComponentEntityDao;
-import org.robinbird.repository.dao.ComponentEntityDaoH2Factory;
+import org.robinbird.repository.dao.EntityDao;
+import org.robinbird.repository.dao.EntityDaoH2Factory;
 
-public class ComponentRepositoryTest {
+public class RbRepositoryTest {
 
-    private static ComponentEntityDao componentEntityDao;
-    private ComponentRepository repository = new ComponentRepository(componentEntityDao);
+    private static EntityDao entityDao;
+    private RbRepository repository = new RbRepository(entityDao);
 
     @BeforeClass
     public static void dbSetup() {
-        ComponentRepositoryTest.componentEntityDao = ComponentEntityDaoH2Factory.createDao();
+        RbRepositoryTest.entityDao = EntityDaoH2Factory.createDao();
     }
 
     @After
     public void tearDown() {
-        componentEntityDao.deleteAll();
+        entityDao.deleteAll();
     }
 
     @Test
@@ -80,19 +80,19 @@ public class ComponentRepositoryTest {
         final Component r2 = repository.registerComponent("Relation2", ComponentCategory.CLASS);
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.ONE)
                                .relatedComponent(r1)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r2)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r3)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
@@ -115,13 +115,13 @@ public class ComponentRepositoryTest {
         final Component r1 = repository.registerComponent("Relation1", ComponentCategory.CLASS);
         final Component r2 = repository.registerComponent("Relation2", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.ONE)
                                .relatedComponent(r1)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r2)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
@@ -133,7 +133,7 @@ public class ComponentRepositoryTest {
         Assert.assertThat(names, is(ImmutableSet.of("Relation1", "Relation2")));
 
         au.deleteRelation(Relation.builder()
-                                  .parent(au)
+                                  .owner(au)
                                   .cardinality(Cardinality.ONE)
                                   .relatedComponent(r1)
                                   .relationCategory(RelationCategory.MEMBER_VARIABLE)
@@ -141,7 +141,7 @@ public class ComponentRepositoryTest {
 
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r3)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
@@ -158,7 +158,7 @@ public class ComponentRepositoryTest {
         final Component au = repository.registerComponent("Test3", ComponentCategory.CLASS);
         final Component r3 = repository.registerComponent("Relation3", ComponentCategory.CLASS);
         au.addRelation(Relation.builder()
-                               .parent(au)
+                               .owner(au)
                                .cardinality(Cardinality.MULTIPLE)
                                .relatedComponent(r3)
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
@@ -171,7 +171,7 @@ public class ComponentRepositoryTest {
     @Test
     public void test_nulls() {
         NullPointerTester tester = new NullPointerTester();
-        tester.testAllPublicConstructors(ComponentRepository.class);
+        tester.testAllPublicConstructors(RbRepository.class);
         tester.testAllPublicInstanceMethods(repository);
     }
 
