@@ -4,10 +4,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robinbird.util.JsonObjectMapper.OBJECT_MAPPER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,9 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.NullPointerTester;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.robinbird.JsonProcessingExceptionForTest;
@@ -26,6 +28,7 @@ import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
+import org.robinbird.model.CurrentRbRepository;
 import org.robinbird.model.Relation;
 import org.robinbird.model.RelationCategory;
 import org.robinbird.repository.entity.ComponentEntity;
@@ -35,7 +38,14 @@ public class ConverterTest {
 
     @Before
     public void setUp() {
-        TestUtils.setValueToStaticMember(Converter.class, "objectMapper", OBJECT_MAPPER);
+        RbRepository rbRepository = mock(RbRepository.class);
+        when(rbRepository.getRelations(any(Component.class))).thenReturn(new ArrayList<>());
+        CurrentRbRepository.setRbRepository(rbRepository);
+    }
+
+    @After
+    public void clean() {
+        CurrentRbRepository.setRbRepository(null);
     }
 
     @Test
@@ -92,7 +102,7 @@ public class ConverterTest {
 
     @Test
     public void test_convert_forComponent_whenValidComponent() {
-        Component comp = new Component("1", "test", ComponentCategory.CLASS, null, null);
+        Component comp = new Component("1", "test", ComponentCategory.CLASS, (List<Relation>)null, null);
         final ComponentEntity entity = Converter.convert(comp);
         Assert.assertThat(entity.getId(), is(comp.getId()));
         Assert.assertThat(entity.getName(), is(comp.getName()));
@@ -102,7 +112,7 @@ public class ConverterTest {
 
     @Test(expected = RobinbirdException.class)
     public void test_convert_forComponent_throwsException_whenFailedToCreateJsonFromMetadata() throws JsonProcessingException {
-        Component comp = new Component("1", "test", ComponentCategory.CLASS, null, null);
+        Component comp = new Component("1", "test", ComponentCategory.CLASS, (List<Relation>)null, null);
         ObjectMapper objectMapper = mock(ObjectMapper.class);
         when(objectMapper.writeValueAsString(ArgumentMatchers.any())).thenThrow(new JsonProcessingExceptionForTest());
         TestUtils.setValueToStaticMember(Converter.class, "objectMapper", objectMapper);
@@ -123,7 +133,7 @@ public class ConverterTest {
                              .id(UUID.randomUUID().toString())
                              .build();
         RelationEntity e = Converter.convert(r);
-        Assert.assertThat(e.getParentId(), is("1"));
+        Assert.assertThat(e.getOwnerId(), is("1"));
         Assert.assertNotNull(e.getId());
         Assert.assertThat(e.getCardinality(), is(Cardinality.ONE.name()));
         Assert.assertThat(e.getRelatedComponentId(), is("2"));

@@ -172,7 +172,7 @@ public class Java8AnalyserTest {
         ArgumentCaptor<Class> captor2 = ArgumentCaptor.forClass(Class.class);
         analyseTestCode(code);
         verify(analysisContext, times(1)).getClass(captor1.capture());
-        verify(newClassMock, times(1)).setParent(captor2.capture());
+        verify(newClassMock, times(1)).setOwnerComponent(captor2.capture());
 
         Assert.assertThat(captor1.getValue(), is("Parent"));
         Assert.assertThat(captor2.getValue(), is(parentMock));
@@ -194,7 +194,7 @@ public class Java8AnalyserTest {
         ArgumentCaptor<Class> captor2 = ArgumentCaptor.forClass(Class.class);
         analyseTestCode(code);
         verify(analysisContext, times(1)).getClass(captor1.capture());
-        verify(newClassMock, times(1)).setParent(captor2.capture());
+        verify(newClassMock, times(1)).setOwnerComponent(captor2.capture());
 
         Assert.assertThat(captor1.getValue(), is("Parent"));
         Assert.assertThat(captor2.getValue(), is(parentMock));

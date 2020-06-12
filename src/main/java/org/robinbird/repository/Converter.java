@@ -5,9 +5,12 @@ import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.Validate;
+import org.robinbird.exception.RobinbirdException;
 import org.robinbird.model.Cardinality;
 import org.robinbird.model.Component;
 import org.robinbird.model.ComponentCategory;
@@ -16,11 +19,13 @@ import org.robinbird.model.RelationCategory;
 import org.robinbird.repository.entity.ComponentEntity;
 import org.robinbird.repository.entity.RelationEntity;
 import org.robinbird.util.JsonObjectMapper;
+import org.robinbird.util.Msgs;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Converter {
 
-    public static Component convert(@NonNull final ComponentEntity entity) {
+    public static Component convert(@NonNull final ComponentEntity entity, @Nullable final Component owner) {
+        Validate.isTrue(entity.getOwnerId().equals(owner.getId()), Msgs.get(Msgs.Key.INTERNAL_ERROR));
         final Map<String, String> metadata;
         if (entity.getMetadata() != null) {
             metadata = JsonObjectMapper.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
@@ -30,6 +35,22 @@ public class Converter {
 
         return new Component(entity.getId(), entity.getName(), ComponentCategory.valueOf(entity.getComponentCategory()),
                              (List<Relation>)null, metadata);
+    }
+
+    public static Component convert(@NonNull final ComponentEntity entity) {
+        final Map<String, String> metadata;
+        if (entity.getMetadata() != null) {
+            metadata = JsonObjectMapper.readValue(entity.getMetadata(), new TypeReference<Map<String, String>>(){});
+        } else {
+            metadata = Maps.newHashMap();
+        }
+
+        try {
+            return new Component(entity.getId(), entity.getName(), ComponentCategory.valueOf(entity.getComponentCategory()),
+                                 (List<Relation>) null, metadata);
+        } catch (final Exception e) {
+            throw new RobinbirdException(Msgs.get(Msgs.Key.COMPONENT_ENTITY_WITH_NULL_CATEGORY, entity.toString()), e);
+        }
     }
 
     public static ComponentEntity convert(@NonNull final Component component) {

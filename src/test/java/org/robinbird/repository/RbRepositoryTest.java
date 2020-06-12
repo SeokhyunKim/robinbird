@@ -2,6 +2,7 @@ package org.robinbird.repository;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.mock;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.NullPointerTester;
@@ -127,7 +128,7 @@ public class RbRepositoryTest {
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         repository.updateComponent(au);
-        final Set<String> names = au.getRelations().stream()
+        final Set<String> names = au.getRelationsList().stream()
                                     .map(r -> r.getRelatedComponent().getName())
                                     .collect(Collectors.toSet());
         Assert.assertThat(names, is(ImmutableSet.of("Relation1", "Relation2")));
@@ -147,7 +148,7 @@ public class RbRepositoryTest {
                                .relationCategory(RelationCategory.MEMBER_VARIABLE)
                                .build());
         repository.updateComponent(au);
-        final Set<String> names2 = au.getRelations().stream()
+        final Set<String> names2 = au.getRelationsList().stream()
                                      .map(r -> r.getRelatedComponent().getName())
                                      .collect(Collectors.toSet());
         Assert.assertThat(names2, is(ImmutableSet.of("Relation2", "Relation3")));
@@ -171,8 +172,8 @@ public class RbRepositoryTest {
     @Test
     public void test_nulls() {
         NullPointerTester tester = new NullPointerTester();
+        tester.setDefault(Component.class, mock(Component.class));
         tester.testAllPublicConstructors(RbRepository.class);
         tester.testAllPublicInstanceMethods(repository);
     }
-
 }

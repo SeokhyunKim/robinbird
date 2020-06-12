@@ -131,7 +131,7 @@ public class AgglomerativeClusteringTest {
                         .category(ComponentCategory.CLASS)
                         .build();
         c1.addMemberVariable(c2, "c2-var", AccessLevel.PRIVATE);
-        c1.setParent(c2);
+        c1.setOwnerComponent(c2);
         c2.addMemberVariable(c1, "c1-var", AccessLevel.PRIVATE);
         List<Component> components = Lists.newArrayList(c1, c2);
         List<ClusteringNode> clusteringNodes =

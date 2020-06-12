@@ -43,8 +43,8 @@ public class EntityDaoImpl implements EntityDao {
         loadComponentEntityWithNameQuery = em.createQuery("select ce from ComponentEntity ce where ce.name = :name");
         loadComponentEntitiesWithComponentCategory = em.createQuery("select ce from ComponentEntity ce where " +
                                                                         "ce.componentCategory = :componentCategory");
-        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :parentId and r.id = :id");
-        loadRelationEntitiesWithParentIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :parentId");
+        loadRelationEntityWithParentIdAndIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :ownerId and r.id = :id");
+        loadRelationEntitiesWithParentIdQuery = em.createQuery("select r from RelationEntity r where r.ownerId = :ownerId");
 
         updateComponentEntityQuery = em.createQuery("update ComponentEntity " +
                                                             "set name = :name, " +
@@ -57,9 +57,9 @@ public class EntityDaoImpl implements EntityDao {
                                                            "relatedComponentId = :relationId," +
                                                            "cardinality = :cardinality," +
                                                            "metadata = :metadata" +
-                                                           " where ownerId = :parentId and id = :id");
+                                                           " where ownerId = :ownerId and id = :id");
         deleteComponentEntityQuery = em.createQuery("delete from ComponentEntity where id = :id");
-        deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where ownerId = :parentId and id = :id");
+        deleteRelationEntityQuery = em.createQuery("delete from RelationEntity where ownerId = :ownerId and id = :id");
         countComponentEntities = em.createQuery("select count(ce) from ComponentEntity ce");
 
         log.info("DaoImpl created.");
@@ -134,13 +134,13 @@ public class EntityDaoImpl implements EntityDao {
     }
 
     @Override
-    public Optional<RelationEntity> loadRelationEntity(final String parentId, final String id) {
-        return loadEntity(loadRelationEntityWithParentIdAndIdQuery, "parentId", parentId, "id", id);
+    public Optional<RelationEntity> loadRelationEntity(final String ownerId, final String id) {
+        return loadEntity(loadRelationEntityWithParentIdAndIdQuery, "ownerId", ownerId, "id", id);
     }
 
     @Override
-    public List<RelationEntity> loadRelationEntities(final String parentId) {
-        return loadEntities(loadRelationEntitiesWithParentIdQuery, "parentId", parentId);
+    public List<RelationEntity> loadRelationEntities(final String ownerId) {
+        return loadEntities(loadRelationEntitiesWithParentIdQuery, "ownerId", ownerId);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class FloydAlgorithmTest {
                         .category(ComponentCategory.CLASS)
                         .build();
         c1.addMemberVariable(c2, "c2-var", AccessLevel.PRIVATE);
-        c1.setParent(c2);
+        c1.setOwnerComponent(c2);
         c2.addMemberVariable(c1, "c1-var", AccessLevel.PRIVATE);
 
         Map<String, Map<String, NodeDistance>> dists = FloydAlgorithm.calculateDistances(Lists.newArrayList(c1, c2),

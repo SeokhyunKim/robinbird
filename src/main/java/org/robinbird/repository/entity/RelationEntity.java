@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @IdClass(ChildEntityKey.class)
 @NoArgsConstructor
-@Table(name = "relation", indexes = {@Index(columnList = "parentId")})
+@Table(name = "relation", indexes = {@Index(columnList = "ownerId")})
 public class RelationEntity {
 
     @Id
